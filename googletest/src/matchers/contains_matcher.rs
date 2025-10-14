@@ -43,19 +43,21 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn contains<T, InnerMatcherT>(inner: InnerMatcherT) -> ContainsMatcher<T, InnerMatcherT> {
+pub fn contains<T: ?Sized, InnerMatcherT>(
+    inner: InnerMatcherT,
+) -> ContainsMatcher<T, InnerMatcherT> {
     ContainsMatcher { inner, count: None, phantom: Default::default() }
 }
 
 /// A matcher which matches a container containing one or more elements a given
 /// inner [`Matcher`] matches.
-pub struct ContainsMatcher<T, InnerMatcherT> {
+pub struct ContainsMatcher<T: ?Sized, InnerMatcherT> {
     inner: InnerMatcherT,
     count: Option<Box<dyn Matcher<ActualT = usize>>>,
     phantom: PhantomData<T>,
 }
 
-impl<T, InnerMatcherT> ContainsMatcher<T, InnerMatcherT> {
+impl<T: ?Sized, InnerMatcherT> ContainsMatcher<T, InnerMatcherT> {
     /// Configures this instance to match containers which contain a number of
     /// matching items matched by `count`.
     ///
@@ -84,7 +86,7 @@ impl<T, InnerMatcherT> ContainsMatcher<T, InnerMatcherT> {
 //  because val is dropped before matcher but the trait bound requires that
 //  the argument to matches outlive the matcher. It works fine if one defines
 //  val before matcher.
-impl<T: Debug, InnerMatcherT: Matcher<ActualT = T>, ContainerT: Debug> Matcher
+impl<T: Debug, InnerMatcherT: Matcher<ActualT = T>, ContainerT: Debug + ?Sized> Matcher
     for ContainsMatcher<ContainerT, InnerMatcherT>
 where
     for<'a> &'a ContainerT: IntoIterator<Item = &'a T>,
@@ -140,8 +142,8 @@ where
     }
 }
 
-impl<ActualT, InnerMatcherT> ContainsMatcher<ActualT, InnerMatcherT> {
-    fn count_matches<T: Debug, ContainerT>(&self, actual: &ContainerT) -> usize
+impl<ActualT: ?Sized, InnerMatcherT> ContainsMatcher<ActualT, InnerMatcherT> {
+    fn count_matches<T: Debug, ContainerT: ?Sized>(&self, actual: &ContainerT) -> usize
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
         InnerMatcherT: Matcher<ActualT = T>,
@@ -158,7 +160,7 @@ impl<ActualT, InnerMatcherT> ContainsMatcher<ActualT, InnerMatcherT> {
 
 #[cfg(test)]
 mod tests {
-    use super::{contains, ContainsMatcher};
+    use super::{ContainsMatcher, contains};
     use crate::matcher::{Matcher, MatcherResult};
     use crate::prelude::*;
 

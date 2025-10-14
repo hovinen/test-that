@@ -187,3 +187,29 @@ fn explains_mismatch_referencing_explanation_of_inner_matcher_for_ref() -> Resul
         )))
     )
 }
+
+#[derive(Debug)]
+struct SomeStructWithAVec {
+    a_vec_property: Vec<u32>,
+}
+
+impl SomeStructWithAVec {
+    fn get_property_as_slice(&self) -> &[u32] {
+        &self.a_vec_property
+    }
+}
+
+#[test]
+fn matches_struct_with_vec_containing_value() -> Result<()> {
+    let value = SomeStructWithAVec { a_vec_property: vec![10] };
+    verify_that!(value, property!(*SomeStructWithAVec.get_property_as_slice(), contains(eq(10))))
+}
+
+#[test]
+fn matches_struct_with_vec_with_elements_are_value() -> Result<()> {
+    let value = SomeStructWithAVec { a_vec_property: vec![10] };
+    verify_that!(
+        value,
+        property!(*SomeStructWithAVec.get_property_as_slice(), elements_are![eq(10)])
+    )
+}
