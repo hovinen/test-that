@@ -485,7 +485,7 @@ macro_rules! expect_pred {
 pub mod internal {
     use crate::{
         internal::{source_location::SourceLocation, test_outcome::TestAssertionFailure},
-        matcher::{create_assertion_failure, Matcher, MatcherResult},
+        matcher::{Matcher, MatcherResult, create_assertion_failure},
     };
     use std::fmt::Debug;
 
@@ -499,7 +499,7 @@ pub mod internal {
     #[must_use = "The assertion result must be evaluated to affect the test result."]
     pub fn check_matcher<T: Debug + ?Sized>(
         actual: &T,
-        expected: impl Matcher<ActualT = T>,
+        expected: impl Matcher<T>,
         actual_expr: &'static str,
         source_location: SourceLocation,
     ) -> Result<(), TestAssertionFailure> {

@@ -60,13 +60,13 @@ mod unordered_elements_are_matcher;
 pub use anything_matcher::anything;
 pub use char_count_matcher::char_count;
 pub use container_eq_matcher::container_eq;
-pub use contains_matcher::{contains, ContainsMatcher};
+pub use contains_matcher::{ContainsMatcher, contains};
 pub use contains_regex_matcher::contains_regex;
 pub use display_matcher::displays_as;
 pub use each_matcher::each;
 pub use empty_matcher::empty;
 pub use eq_deref_of_matcher::eq_deref_of;
-pub use eq_matcher::{eq, EqMatcher};
+pub use eq_matcher::{EqMatcher, eq};
 pub use err_matcher::err;
 pub use ge_matcher::ge;
 pub use gt_matcher::gt;
@@ -77,15 +77,15 @@ pub use le_matcher::le;
 pub use len_matcher::len;
 pub use lt_matcher::lt;
 pub use matches_regex_matcher::matches_regex;
-pub use near_matcher::{approx_eq, near, NearMatcher};
+pub use near_matcher::{NearMatcher, approx_eq, near};
 pub use none_matcher::none;
 pub use not_matcher::not;
 pub use ok_matcher::ok;
 pub use points_to_matcher::points_to;
-pub use predicate_matcher::{predicate, PredicateMatcher};
+pub use predicate_matcher::{PredicateMatcher, predicate};
 pub use some_matcher::some;
 pub use str_matcher::{
-    contains_substring, ends_with, starts_with, StrMatcher, StrMatcherConfigurator,
+    StrMatcher, StrMatcherConfigurator, contains_substring, ends_with, starts_with,
 };
 pub use subset_of_matcher::subset_of;
 pub use superset_of_matcher::superset_of;

@@ -284,7 +284,7 @@ impl<T: Clone> Path<T> {
 mod tests {
     use super::*;
     use crate::prelude::*;
-    use quickcheck::{quickcheck, Arbitrary, TestResult};
+    use quickcheck::{Arbitrary, TestResult, quickcheck};
 
     #[test]
     fn returns_equal_when_strings_are_equal() -> Result<()> {

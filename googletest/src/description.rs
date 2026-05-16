@@ -17,7 +17,7 @@ use std::{
     fmt::{Display, Formatter, Result},
 };
 
-use crate::internal::description_renderer::{List, INDENTATION_SIZE};
+use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 
 /// A structured description, either of a (composed) matcher or of an
 /// assertion failure.

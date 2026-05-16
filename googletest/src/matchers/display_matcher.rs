@@ -15,7 +15,6 @@
 use crate::description::Description;
 use crate::matcher::{Matcher, MatcherResult};
 use std::fmt::{Debug, Display};
-use std::marker::PhantomData;
 
 /// Matches the string representation of types that implement `Display`.
 ///
@@ -23,22 +22,19 @@ use std::marker::PhantomData;
 /// let result: impl Display = ...;
 /// verify_that!(result, displays_as(eq(format!("{}", result))))?;
 /// ```
-pub fn displays_as<T: Debug + Display, InnerMatcher: Matcher<ActualT = String>>(
+pub fn displays_as<InnerMatcher: Matcher<String>>(
     inner: InnerMatcher,
-) -> impl Matcher<ActualT = T> {
-    DisplayMatcher::<T, _> { inner, phantom: Default::default() }
+) -> DisplayMatcher<InnerMatcher> {
+    DisplayMatcher { inner }
 }
 
-struct DisplayMatcher<T, InnerMatcher: Matcher> {
+pub struct DisplayMatcher<InnerMatcher> {
     inner: InnerMatcher,
-    phantom: PhantomData<T>,
 }
 
-impl<T: Debug + Display, InnerMatcher: Matcher<ActualT = String>> Matcher
-    for DisplayMatcher<T, InnerMatcher>
+impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
+    for DisplayMatcher<InnerMatcher>
 {
-    type ActualT = T;
-
     fn matches(&self, actual: &T) -> MatcherResult {
         self.inner.matches(&format!("{actual}"))
     }

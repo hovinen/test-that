@@ -16,7 +16,7 @@ use crate::{
     description::Description,
     matcher::{Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches an `Option` containing a value matched by `inner`.
 ///
@@ -38,18 +38,15 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn some<T: Debug>(inner: impl Matcher<ActualT = T>) -> impl Matcher<ActualT = Option<T>> {
-    SomeMatcher { inner, phantom: Default::default() }
+pub fn some<InnerMatcherT>(inner: InnerMatcherT) -> SomeMatcher<InnerMatcherT> {
+    SomeMatcher { inner }
 }
 
-struct SomeMatcher<T, InnerMatcherT> {
+pub struct SomeMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
-    phantom: PhantomData<T>,
 }
 
-impl<T: Debug, InnerMatcherT: Matcher<ActualT = T>> Matcher for SomeMatcher<T, InnerMatcherT> {
-    type ActualT = Option<T>;
-
+impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<Option<T>> for SomeMatcher<InnerMatcherT> {
     fn matches(&self, actual: &Option<T>) -> MatcherResult {
         actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
     }

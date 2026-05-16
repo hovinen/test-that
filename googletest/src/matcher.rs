@@ -22,17 +22,21 @@ use crate::matchers::__internal_unstable_do_not_depend_on_these::DisjunctionMatc
 use std::fmt::Debug;
 
 /// An interface for checking an arbitrary condition on a datum.
-pub trait Matcher {
-    /// The type against which this matcher matches.
-    type ActualT: Debug + ?Sized;
-
+///
+/// `ActualT` is a type parameter rather than an associated type so that a
+/// single matcher type may match against multiple actual types. For example,
+/// the `some` matcher implements both `Matcher<Option<T>>` and (where the
+/// inner matcher applies to an unsized type) `Matcher<Option<&T>>`. Property
+/// extractors returning `Option<&T>` rely on the latter impl so that the
+/// borrow's lifetime can thread through type inference.
+pub trait Matcher<ActualT: Debug + ?Sized> {
     /// Returns whether the condition matches the datum `actual`.
     ///
     /// The trait implementation defines what it means to "match". Often the
     /// matching condition is based on data stored in the matcher. For example,
     /// `eq` matches when its stored expected value is equal (in the sense of
     /// the `==` operator) to the value `actual`.
-    fn matches(&self, actual: &Self::ActualT) -> MatcherResult;
+    fn matches(&self, actual: &ActualT) -> MatcherResult;
 
     /// Returns a description of `self` or a negative description if
     /// `matcher_result` is `DoesNotMatch`.
@@ -133,7 +137,7 @@ pub trait Matcher {
     ///         .nested(self.expected.explain_match(actual.deref()))
     /// }
     /// ```
-    fn explain_match(&self, actual: &Self::ActualT) -> Description {
+    fn explain_match(&self, actual: &ActualT) -> Description {
         format!("which {}", self.describe(self.matches(actual))).into()
     }
 
@@ -160,10 +164,7 @@ pub trait Matcher {
     // TODO(b/264518763): Replace the return type with impl Matcher and reduce
     // visibility of ConjunctionMatcher once impl in return position in trait
     // methods is stable.
-    fn and<Right: Matcher<ActualT = Self::ActualT>>(
-        self,
-        right: Right,
-    ) -> ConjunctionMatcher<Self, Right>
+    fn and<Right: Matcher<ActualT>>(self, right: Right) -> ConjunctionMatcher<Self, Right>
     where
         Self: Sized,
     {
@@ -190,10 +191,7 @@ pub trait Matcher {
     // TODO(b/264518763): Replace the return type with impl Matcher and reduce
     // visibility of DisjunctionMatcher once impl in return position in trait
     // methods is stable.
-    fn or<Right: Matcher<ActualT = Self::ActualT>>(
-        self,
-        right: Right,
-    ) -> DisjunctionMatcher<Self, Right>
+    fn or<Right: Matcher<ActualT>>(self, right: Right) -> DisjunctionMatcher<Self, Right>
     where
         Self: Sized,
     {
@@ -211,7 +209,7 @@ const PRETTY_PRINT_LENGTH_THRESHOLD: usize = 60;
 /// The parameter `actual_expr` contains the expression which was evaluated to
 /// obtain `actual`.
 pub(crate) fn create_assertion_failure<T: Debug + ?Sized>(
-    matcher: &impl Matcher<ActualT = T>,
+    matcher: &impl Matcher<T>,
     actual: &T,
     actual_expr: &'static str,
     source_location: SourceLocation,

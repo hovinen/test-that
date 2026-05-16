@@ -104,8 +104,8 @@ pub struct ContainerEqMatcher<ActualContainerT: ?Sized, ExpectedContainerT> {
     phantom: PhantomData<ActualContainerT>,
 }
 
-impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT> Matcher
-    for ContainerEqMatcher<ActualContainerT, ExpectedContainerT>
+impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
+    Matcher<ActualContainerT> for ContainerEqMatcher<ActualContainerT, ExpectedContainerT>
 where
     ActualElementT: PartialEq<ExpectedElementT> + Debug + ?Sized,
     ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
@@ -114,8 +114,6 @@ where
     for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
     for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
 {
-    type ActualT = ActualContainerT;
-
     fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
         (*actual == self.expected).into()
     }

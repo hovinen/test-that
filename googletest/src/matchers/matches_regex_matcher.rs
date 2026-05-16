@@ -84,14 +84,12 @@ pub struct MatchesRegexMatcher<ActualT: ?Sized, PatternT: Deref<Target = str>> {
     phantom: PhantomData<ActualT>,
 }
 
-impl<PatternT, ActualT> Matcher for MatchesRegexMatcher<ActualT, PatternT>
+impl<PatternT, ActualT> Matcher<ActualT> for MatchesRegexMatcher<ActualT, PatternT>
 where
     PatternT: Deref<Target = str>,
     ActualT: AsRef<str> + Debug + ?Sized,
 {
-    type ActualT = ActualT;
-
-    fn matches(&self, actual: &Self::ActualT) -> MatcherResult {
+    fn matches(&self, actual: &ActualT) -> MatcherResult {
         self.regex.is_match(actual.as_ref()).into()
     }
 
@@ -109,7 +107,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use super::{matches_regex, MatchesRegexMatcher};
+    use super::{MatchesRegexMatcher, matches_regex};
     use crate::matcher::{Matcher, MatcherResult};
     use crate::prelude::*;
 

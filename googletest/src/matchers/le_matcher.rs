@@ -76,7 +76,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// <https://doc.rust-lang.org/core/cmp/trait.PartialOrd.html#implementors>
 pub fn le<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug>(
     expected: ExpectedT,
-) -> impl Matcher<ActualT = ActualT> {
+) -> impl Matcher<ActualT> {
     LeMatcher::<ActualT, _> { expected, phantom: Default::default() }
 }
 
@@ -85,11 +85,9 @@ struct LeMatcher<ActualT, ExpectedT> {
     phantom: PhantomData<ActualT>,
 }
 
-impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher
+impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
     for LeMatcher<ActualT, ExpectedT>
 {
-    type ActualT = ActualT;
-
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         (*actual <= self.expected).into()
     }

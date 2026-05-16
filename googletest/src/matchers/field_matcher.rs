@@ -152,11 +152,11 @@ pub mod internal {
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub fn field_matcher<OuterT: Debug, InnerT: Debug, InnerMatcher: Matcher<ActualT = InnerT>>(
+    pub fn field_matcher<OuterT: Debug, InnerT: Debug, InnerMatcher: Matcher<InnerT>>(
         field_accessor: fn(&OuterT) -> Option<&InnerT>,
         field_path: &'static str,
         inner: InnerMatcher,
-    ) -> impl Matcher<ActualT = OuterT> {
+    ) -> impl Matcher<OuterT> {
         FieldMatcher { field_accessor, field_path, inner }
     }
 
@@ -166,11 +166,9 @@ pub mod internal {
         inner: InnerMatcher,
     }
 
-    impl<OuterT: Debug, InnerT: Debug, InnerMatcher: Matcher<ActualT = InnerT>> Matcher
+    impl<OuterT: Debug, InnerT: Debug, InnerMatcher: Matcher<InnerT>> Matcher<OuterT>
         for FieldMatcher<OuterT, InnerT, InnerMatcher>
     {
-        type ActualT = OuterT;
-
         fn matches(&self, actual: &OuterT) -> MatcherResult {
             if let Some(value) = (self.field_accessor)(actual) {
                 self.inner.matches(value)

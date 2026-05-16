@@ -83,9 +83,7 @@ pub struct EqMatcher<A: ?Sized, T> {
     phantom: PhantomData<A>,
 }
 
-impl<T: Debug, A: Debug + ?Sized + PartialEq<T>> Matcher for EqMatcher<A, T> {
-    type ActualT = A;
-
+impl<T: Debug, A: Debug + ?Sized + PartialEq<T>> Matcher<A> for EqMatcher<A, T> {
     fn matches(&self, actual: &A) -> MatcherResult {
         (*actual == self.expected).into()
     }

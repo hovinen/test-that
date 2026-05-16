@@ -71,9 +71,7 @@ pub struct ContainsRegexMatcher<ActualT: ?Sized> {
     phantom: PhantomData<ActualT>,
 }
 
-impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher for ContainsRegexMatcher<ActualT> {
-    type ActualT = ActualT;
-
+impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher<ActualT> for ContainsRegexMatcher<ActualT> {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         self.regex.is_match(actual.as_ref()).into()
     }
@@ -92,7 +90,7 @@ impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher for ContainsRegexMatcher<Actu
 
 #[cfg(test)]
 mod tests {
-    use super::{contains_regex, ContainsRegexMatcher};
+    use super::{ContainsRegexMatcher, contains_regex};
     use crate::matcher::{Matcher, MatcherResult};
     use crate::prelude::*;
 

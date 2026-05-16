@@ -272,10 +272,7 @@ pub trait StrMatcherConfigurator<ActualT: ?Sized, ExpectedT> {
     /// This is only meaningful when the matcher was constructed with
     /// [`contains_substring`]. This method will panic when it is used with any
     /// other matcher construction.
-    fn times(
-        self,
-        times: impl Matcher<ActualT = usize> + 'static,
-    ) -> StrMatcher<ActualT, ExpectedT>;
+    fn times(self, times: impl Matcher<usize> + 'static) -> StrMatcher<ActualT, ExpectedT>;
 }
 
 /// A matcher which matches equality or containment of a string-like value in a
@@ -293,13 +290,11 @@ pub struct StrMatcher<ActualT: ?Sized, ExpectedT> {
     phantom: PhantomData<ActualT>,
 }
 
-impl<ExpectedT, ActualT> Matcher for StrMatcher<ActualT, ExpectedT>
+impl<ExpectedT, ActualT> Matcher<ActualT> for StrMatcher<ActualT, ExpectedT>
 where
     ExpectedT: Deref<Target = str> + Debug,
     ActualT: AsRef<str> + Debug + ?Sized,
 {
-    type ActualT = ActualT;
-
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         self.configuration.do_strings_match(self.expected.deref(), actual.as_ref()).into()
     }
@@ -342,10 +337,7 @@ impl<ActualT: ?Sized, ExpectedT, MatcherT: Into<StrMatcher<ActualT, ExpectedT>>>
         StrMatcher { configuration: existing.configuration.ignoring_ascii_case(), ..existing }
     }
 
-    fn times(
-        self,
-        times: impl Matcher<ActualT = usize> + 'static,
-    ) -> StrMatcher<ActualT, ExpectedT> {
+    fn times(self, times: impl Matcher<usize> + 'static) -> StrMatcher<ActualT, ExpectedT> {
         let existing = self.into();
         if !matches!(existing.configuration.mode, MatchMode::Contains) {
             panic!("The times() configurator is only meaningful with contains_substring().");
@@ -387,7 +379,7 @@ struct Configuration {
     ignore_leading_whitespace: bool,
     ignore_trailing_whitespace: bool,
     case_policy: CasePolicy,
-    times: Option<Box<dyn Matcher<ActualT = usize>>>,
+    times: Option<Box<dyn Matcher<usize>>>,
 }
 
 #[derive(Clone)]
@@ -570,7 +562,7 @@ impl Configuration {
         Self { case_policy: CasePolicy::IgnoreAscii, ..self }
     }
 
-    fn times(self, times: impl Matcher<ActualT = usize> + 'static) -> Self {
+    fn times(self, times: impl Matcher<usize> + 'static) -> Self {
         Self { times: Some(Box::new(times)), ..self }
     }
 }
@@ -589,7 +581,7 @@ impl Default for Configuration {
 
 #[cfg(test)]
 mod tests {
-    use super::{contains_substring, ends_with, starts_with, StrMatcher, StrMatcherConfigurator};
+    use super::{StrMatcher, StrMatcherConfigurator, contains_substring, ends_with, starts_with};
     use crate::matcher::{Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;

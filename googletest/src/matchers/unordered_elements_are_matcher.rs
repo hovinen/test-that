@@ -378,7 +378,7 @@ pub mod internal {
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
     pub struct UnorderedElementsAreMatcher<'a, ContainerT: ?Sized, T: Debug, const N: usize> {
-        elements: [Box<dyn Matcher<ActualT = T> + 'a>; N],
+        elements: [Box<dyn Matcher<T> + 'a>; N],
         requirements: Requirements,
         phantom: PhantomData<ContainerT>,
     }
@@ -386,10 +386,7 @@ pub mod internal {
     impl<'a, ContainerT: ?Sized, T: Debug, const N: usize>
         UnorderedElementsAreMatcher<'a, ContainerT, T, N>
     {
-        pub fn new(
-            elements: [Box<dyn Matcher<ActualT = T> + 'a>; N],
-            requirements: Requirements,
-        ) -> Self {
+        pub fn new(elements: [Box<dyn Matcher<T> + 'a>; N], requirements: Requirements) -> Self {
             Self { elements, requirements, phantom: Default::default() }
         }
     }
@@ -403,13 +400,11 @@ pub mod internal {
     // least one expected element and vice versa.
     // 3. `UnorderedElementsAreMatcher` verifies that a perfect matching exists
     // using Ford-Fulkerson.
-    impl<'a, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher
+    impl<'a, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
         for UnorderedElementsAreMatcher<'a, ContainerT, T, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
-        type ActualT = ContainerT;
-
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
             let match_matrix = MatchMatrix::generate(actual, &self.elements);
             match_matrix.is_match_for(self.requirements).into()
@@ -451,7 +446,7 @@ pub mod internal {
     }
 
     type KeyValueMatcher<'a, KeyT, ValueT> =
-        (Box<dyn Matcher<ActualT = KeyT> + 'a>, Box<dyn Matcher<ActualT = ValueT> + 'a>);
+        (Box<dyn Matcher<KeyT> + 'a>, Box<dyn Matcher<ValueT> + 'a>);
 
     /// This is the analogue to [UnorderedElementsAreMatcher] for maps and
     /// map-like collections.
@@ -480,13 +475,11 @@ pub mod internal {
         }
     }
 
-    impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher
-        for UnorderedElementsOfMapAreMatcher<'a, ContainerT, KeyT, ValueT, N>
+    impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: Debug + ?Sized, const N: usize>
+        Matcher<ContainerT> for UnorderedElementsOfMapAreMatcher<'a, ContainerT, KeyT, ValueT, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = (&'b KeyT, &'b ValueT)>,
     {
-        type ActualT = ContainerT;
-
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
             let match_matrix = MatchMatrix::generate_for_map(actual, &self.elements);
             match_matrix.is_match_for(self.requirements).into()
@@ -603,7 +596,7 @@ pub mod internal {
     impl<const N: usize> MatchMatrix<N> {
         fn generate<'a, T: Debug + 'a, ContainerT: Debug + ?Sized>(
             actual: &ContainerT,
-            expected: &[Box<dyn Matcher<ActualT = T> + 'a>; N],
+            expected: &[Box<dyn Matcher<T> + 'a>; N],
         ) -> Self
         where
             for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
@@ -962,7 +955,7 @@ pub mod internal {
         fn get_explanation<'a, T: Debug, ContainerT: Debug + ?Sized>(
             &self,
             actual: &ContainerT,
-            expected: &[Box<dyn Matcher<ActualT = T> + 'a>; N],
+            expected: &[Box<dyn Matcher<T> + 'a>; N],
             requirements: Requirements,
         ) -> Option<Description>
         where
@@ -1069,6 +1062,7 @@ pub mod internal {
 #[cfg(test)]
 mod tests {
     use super::internal::UnorderedElementsOfMapAreMatcher;
+    use crate::description::Description;
     use crate::matcher::{Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
@@ -1115,13 +1109,19 @@ mod tests {
         let value: HashMap<u32, u32> = HashMap::from_iter([(0, 1), (1, 1), (2, 2)]);
         verify_that!(
             matcher.explain_match(&value),
-            displays_as(contains_regex(
-                "Actual element 2 => 2 at index [0-2] matched expected element `is anything` => `is equal to 2` at index [0-2]."
-            )).and(displays_as(contains_regex(
-                "Actual element [0-1] => [0-1] at index [0-2] did not match any remaining expected element."
-            ))).and(displays_as(contains_substring(
-                "Expected element `is anything` => `is equal to 2` at index 2 did not match any remaining actual element."
-            )))
+            Matcher::<Description>::and(
+                Matcher::<Description>::and(
+                    displays_as(contains_regex(
+                        "Actual element 2 => 2 at index [0-2] matched expected element `is anything` => `is equal to 2` at index [0-2]."
+                    )),
+                    displays_as(contains_regex(
+                        "Actual element [0-1] => [0-1] at index [0-2] did not match any remaining expected element."
+                    )),
+                ),
+                displays_as(contains_substring(
+                    "Expected element `is anything` => `is equal to 2` at index 2 did not match any remaining actual element."
+                )),
+            )
         )
     }
 }

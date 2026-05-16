@@ -122,7 +122,7 @@ fn does_not_match_struct_with_non_matching_property() -> Result<()> {
 fn describes_itself_in_matching_case() -> Result<()> {
     verify_that!(
         property!(SomeStruct.get_property(), eq(1)).describe(MatcherResult::Match),
-        displays_as(eq("has property `get_property()`, which is equal to 1"))
+        displays_as(eq("has property `get_property()`, which matches `eq(1)`"))
     )
 }
 
@@ -130,7 +130,7 @@ fn describes_itself_in_matching_case() -> Result<()> {
 fn describes_itself_in_not_matching_case() -> Result<()> {
     verify_that!(
         property!(SomeStruct.get_property(), eq(1)).describe(MatcherResult::NoMatch),
-        displays_as(eq("has property `get_property()`, which isn't equal to 1"))
+        displays_as(eq("has property `get_property()`, which does not match `eq(1)`"))
     )
 }
 

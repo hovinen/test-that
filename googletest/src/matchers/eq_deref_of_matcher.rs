@@ -65,14 +65,12 @@ pub struct EqDerefOfMatcher<ActualT: ?Sized, ExpectedRefT> {
     phantom: PhantomData<ActualT>,
 }
 
-impl<ActualT, ExpectedRefT, ExpectedT> Matcher for EqDerefOfMatcher<ActualT, ExpectedRefT>
+impl<ActualT, ExpectedRefT, ExpectedT> Matcher<ActualT> for EqDerefOfMatcher<ActualT, ExpectedRefT>
 where
     ActualT: Debug + ?Sized,
     ExpectedRefT: Deref<Target = ExpectedT> + Debug,
     ExpectedT: PartialEq<ActualT> + Debug,
 {
-    type ActualT = ActualT;
-
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         (self.expected.deref() == actual).into()
     }

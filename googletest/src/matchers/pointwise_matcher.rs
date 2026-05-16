@@ -171,13 +171,11 @@ pub mod internal {
         }
     }
 
-    impl<T: Debug, MatcherT: Matcher<ActualT = T>, ContainerT: ?Sized + Debug> Matcher
+    impl<T: Debug, MatcherT: Matcher<T>, ContainerT: ?Sized + Debug> Matcher<ContainerT>
         for PointwiseMatcher<ContainerT, MatcherT>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
-        type ActualT = ContainerT;
-
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
             let mut zipped_iterator = zip(actual.into_iter(), self.matchers.iter());
             for (element, matcher) in zipped_iterator.by_ref() {

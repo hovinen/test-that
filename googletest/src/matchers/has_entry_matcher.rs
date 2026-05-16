@@ -62,10 +62,10 @@ use std::marker::PhantomData;
 /// However, `has_entry` will offer somewhat better diagnostic messages in the
 /// case of assertion failure. And it avoid the extra allocation hidden in the
 /// code above.
-pub fn has_entry<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ActualT = ValueT>>(
+pub fn has_entry<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>(
     key: KeyT,
     inner: MatcherT,
-) -> impl Matcher<ActualT = HashMap<KeyT, ValueT>> {
+) -> impl Matcher<HashMap<KeyT, ValueT>> {
     HasEntryMatcher { key, inner, phantom: Default::default() }
 }
 
@@ -75,11 +75,9 @@ struct HasEntryMatcher<KeyT, ValueT, MatcherT> {
     phantom: PhantomData<ValueT>,
 }
 
-impl<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ActualT = ValueT>> Matcher
-    for HasEntryMatcher<KeyT, ValueT, MatcherT>
+impl<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>
+    Matcher<HashMap<KeyT, ValueT>> for HasEntryMatcher<KeyT, ValueT, MatcherT>
 {
-    type ActualT = HashMap<KeyT, ValueT>;
-
     fn matches(&self, actual: &HashMap<KeyT, ValueT>) -> MatcherResult {
         if let Some(value) = actual.get(&self.key) {
             self.inner.matches(value)

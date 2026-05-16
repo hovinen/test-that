@@ -56,9 +56,9 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn char_count<T: Debug + ?Sized + AsRef<str>, E: Matcher<ActualT = usize>>(
+pub fn char_count<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>>(
     expected: E,
-) -> impl Matcher<ActualT = T> {
+) -> impl Matcher<T> {
     CharLenMatcher { expected, phantom: Default::default() }
 }
 
@@ -67,9 +67,7 @@ struct CharLenMatcher<T: ?Sized, E> {
     phantom: PhantomData<T>,
 }
 
-impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<ActualT = usize>> Matcher for CharLenMatcher<T, E> {
-    type ActualT = T;
-
+impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMatcher<T, E> {
     fn matches(&self, actual: &T) -> MatcherResult {
         self.expected.matches(&actual.as_ref().chars().count())
     }
@@ -131,9 +129,7 @@ mod tests {
     #[test]
     fn char_count_explains_match() -> Result<()> {
         struct TestMatcher<T>(PhantomData<T>);
-        impl<T: Debug> Matcher for TestMatcher<T> {
-            type ActualT = T;
-
+        impl<T: Debug> Matcher<T> for TestMatcher<T> {
             fn matches(&self, _: &T) -> MatcherResult {
                 false.into()
             }

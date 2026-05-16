@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use quote::quote;
-use syn::{parse_macro_input, Attribute, ItemFn, ReturnType};
+use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 
 /// Marks a test to be run by the Google Rust test runner.
 ///

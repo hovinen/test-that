@@ -29,10 +29,8 @@ pub mod internal {
 
     // This implementation is provided for completeness, but is completely trivial.
     // The only actual value which can be supplied is (), which must match.
-    impl Matcher for () {
-        type ActualT = ();
-
-        fn matches(&self, _: &Self::ActualT) -> MatcherResult {
+    impl Matcher<()> for () {
+        fn matches(&self, _: &()) -> MatcherResult {
             MatcherResult::Match
         }
 
@@ -50,12 +48,9 @@ pub mod internal {
     #[doc(hidden)]
     macro_rules! tuple_matcher_n {
         ($([$field_number:tt, $matcher_type:ident, $field_type:ident]),*) => {
-            impl<$($field_type: Debug, $matcher_type: Matcher<ActualT = $field_type>),*>
-                Matcher for ($($matcher_type,)*)
-            {
-                type ActualT = ($($field_type,)*);
-
-                fn matches(&self, actual: &($($field_type,)*)) -> MatcherResult {
+            impl<$($field_type: Debug, $matcher_type: Matcher<$field_type>),*>
+                Matcher<($($field_type,)*)> for ($($matcher_type,)*)
+            {                fn matches(&self, actual: &($($field_type,)*)) -> MatcherResult {
                     $(match self.$field_number.matches(&actual.$field_number) {
                         MatcherResult::Match => {},
                         MatcherResult::NoMatch => {

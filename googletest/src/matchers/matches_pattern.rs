@@ -227,10 +227,9 @@
 /// Trailing commas are allowed (but not required) in both ordinary and tuple
 /// structs.
 ///
-/// Unfortunately, this matcher does *not* work with methods returning string
-/// slices:
+/// Methods returning string slices now work too:
 ///
-/// ```compile_fail
+/// ```
 /// # use googletest::prelude::*;
 /// # #[derive(Debug)]
 /// pub struct MyStruct {
@@ -242,7 +241,7 @@
 ///
 /// let value = MyStruct { a_string: "A string".into() };
 /// verify_that!(value, matches_pattern!( MyStruct {
-///     get_a_string(): eq("A string"),   // Does not compile
+///     get_a_string(): eq("A string"),
 /// }))
 /// #    .unwrap();
 /// ```

@@ -102,7 +102,7 @@ pub mod internal {
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
     pub struct ElementsAre<'a, ContainerT: ?Sized, T: Debug> {
-        elements: Vec<Box<dyn Matcher<ActualT = T> + 'a>>,
+        elements: Vec<Box<dyn Matcher<T> + 'a>>,
         phantom: PhantomData<ContainerT>,
     }
 
@@ -111,17 +111,16 @@ pub mod internal {
         ///
         /// **For internal use only. API stablility is not guaranteed!**
         #[doc(hidden)]
-        pub fn new(elements: Vec<Box<dyn Matcher<ActualT = T> + 'a>>) -> Self {
+        pub fn new(elements: Vec<Box<dyn Matcher<T> + 'a>>) -> Self {
             Self { elements, phantom: Default::default() }
         }
     }
 
-    impl<'a, T: Debug, ContainerT: Debug + ?Sized> Matcher for ElementsAre<'a, ContainerT, T>
+    impl<'a, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
+        for ElementsAre<'a, ContainerT, T>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
-        type ActualT = ContainerT;
-
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
             let mut zipped_iterator = zip(actual.into_iter(), self.elements.iter());
             for (a, e) in zipped_iterator.by_ref() {

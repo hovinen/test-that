@@ -42,6 +42,7 @@ INTEGRATION_TEST_BINARIES=(
   "passing_test_with_should_panic"
   "simple_assertion_failure"
   "simple_assertion_failure_with_assert_that"
+  "test_assert_on_anyhow_source"
   "test_returning_anyhow_error"
   "two_expect_pred_failures"
   "two_expect_that_failures"

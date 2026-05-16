@@ -38,9 +38,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn err<T: Debug, E: Debug>(
-    inner: impl Matcher<ActualT = E>,
-) -> impl Matcher<ActualT = std::result::Result<T, E>> {
+pub fn err<T: Debug, E: Debug>(inner: impl Matcher<E>) -> impl Matcher<std::result::Result<T, E>> {
     ErrMatcher::<T, E, _> { inner, phantom_t: Default::default(), phantom_e: Default::default() }
 }
 
@@ -50,16 +48,14 @@ struct ErrMatcher<T, E, InnerMatcherT> {
     phantom_e: PhantomData<E>,
 }
 
-impl<T: Debug, E: Debug, InnerMatcherT: Matcher<ActualT = E>> Matcher
+impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<std::result::Result<T, E>>
     for ErrMatcher<T, E, InnerMatcherT>
 {
-    type ActualT = std::result::Result<T, E>;
-
-    fn matches(&self, actual: &Self::ActualT) -> MatcherResult {
+    fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
         actual.as_ref().err().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
     }
 
-    fn explain_match(&self, actual: &Self::ActualT) -> Description {
+    fn explain_match(&self, actual: &std::result::Result<T, E>) -> Description {
         match actual {
             Err(e) => {
                 Description::new().text("which is an error").nested(self.inner.explain_match(e))
