@@ -42,12 +42,12 @@ pub mod matchers;
 /// }
 /// ```
 pub mod prelude {
+    pub use super::GoogleTestSupport;
+    pub use super::OrFailExt;
+    pub use super::Result;
     pub use super::matcher::Matcher;
     pub use super::matchers::*;
     pub use super::verify_current_test_outcome;
-    pub use super::GoogleTestSupport;
-    pub use super::IntoTestResult;
-    pub use super::Result;
     // Assert macros
     pub use super::{assert_that, expect_pred, expect_that, fail, verify_pred, verify_that};
 }
@@ -240,30 +240,30 @@ impl<T> GoogleTestSupport for std::result::Result<T, TestAssertionFailure> {
 /// ```ignore
 /// #[test]
 /// fn should_work() -> Result<()> {
-///     let value = something_which_can_fail().into_test_result()?;
+///     let value = something_which_can_fail().or_fail()?;
 ///     ...
 /// }
 ///
 /// fn something_which_can_fail() -> anyhow::Result<...> { ... }
 /// ```
-pub trait IntoTestResult<T> {
+pub trait OrFailExt<T> {
     /// Converts this instance into a [`Result`].
     ///
     /// Typically, the `Self` type is itself a [`std::result::Result`]. This
     /// method should then map the `Err` variant to a [`TestAssertionFailure`]
     /// and leave the `Ok` variant unchanged.
-    fn into_test_result(self) -> Result<T>;
+    fn or_fail(self) -> Result<T>;
 }
 
 #[cfg(feature = "anyhow")]
-impl<T> IntoTestResult<T> for std::result::Result<T, anyhow::Error> {
-    fn into_test_result(self) -> std::result::Result<T, TestAssertionFailure> {
+impl<T> OrFailExt<T> for std::result::Result<T, anyhow::Error> {
+    fn or_fail(self) -> std::result::Result<T, TestAssertionFailure> {
         self.map_err(|e| TestAssertionFailure::create(format!("{e}")))
     }
 }
 
 #[cfg(feature = "proptest")]
-impl<OkT, CaseT: std::fmt::Debug> IntoTestResult<OkT>
+impl<OkT, CaseT: std::fmt::Debug> OrFailExt<OkT>
     for std::result::Result<OkT, proptest::test_runner::TestError<CaseT>>
 {
     fn into_test_result(self) -> std::result::Result<OkT, TestAssertionFailure> {
