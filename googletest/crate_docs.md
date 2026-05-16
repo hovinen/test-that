@@ -442,7 +442,7 @@ GoogleTest Rust includes integrations with the
 errors from those crates into test failures.
 
 To use this, activate the `anyhow`, respectively `proptest` feature in
-GoogleTest Rust and invoke the extension method [`into_test_result()`] on a
+GoogleTest Rust and invoke the extension method [`or_fail()`] on a
 `Result` value in your test. For example:
 
 ```
@@ -454,7 +454,7 @@ GoogleTest Rust and invoke the extension method [`into_test_result()`] on a
 #[test]
 # */
 fn has_anyhow_failure() -> Result<()> {
-    Ok(just_return_error().into_test_result()?)
+    Ok(just_return_error().or_fail()?)
 }
 
 # #[cfg(feature = "anyhow")]
@@ -479,7 +479,7 @@ test is invoked with
 # */
 fn numbers_are_greater_than_zero() -> Result<()> {
     let mut runner = TestRunner::new(Config::default());
-    runner.run(&(1..100i32), |v| Ok(verify_that!(v, gt(0))?)).into_test_result()
+    runner.run(&(1..100i32), |v| Ok(verify_that!(v, gt(0))?)).or_fail()
 }
 # #[cfg(feature = "proptest")]
 # numbers_are_greater_than_zero().unwrap();
@@ -491,5 +491,5 @@ can automatically be converted into Proptest
 through the `?` operator as the example above shows.
 
 [`and_log_failure()`]: GoogleTestSupport::and_log_failure
-[`into_test_result()`]: IntoTestResult::into_test_result
+[`or_fail()`]: IntoTestResult::or_fail
 [`Matcher`]: matcher::Matcher

@@ -12,10 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#![cfg(feature = "supports-color")]
-
 use googletest::prelude::*;
-use indoc::indoc;
 use std::fmt::{Display, Write};
 
 // Make a long text with each element of the iterator on one line.
@@ -39,16 +36,15 @@ fn colors_suppressed_when_both_no_color_and_force_color_are_set() -> Result<()> 
 
     verify_that!(
         result,
-        err(displays_as(contains_substring(indoc! {
+        err(displays_as(contains_substring(
             "
-
-            Difference(-actual / +expected):
-             1
-             2
-             <---- 45 common lines omitted ---->
-             48
-             49
-            +50"
-        })))
+  Difference(-actual / +expected):
+   1
+   2
+   <---- 45 common lines omitted ---->
+   48
+   49
+  +50"
+        )))
     )
 }

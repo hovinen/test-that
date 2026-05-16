@@ -266,7 +266,7 @@ impl<T> OrFailExt<T> for std::result::Result<T, anyhow::Error> {
 impl<OkT, CaseT: std::fmt::Debug> OrFailExt<OkT>
     for std::result::Result<OkT, proptest::test_runner::TestError<CaseT>>
 {
-    fn into_test_result(self) -> std::result::Result<OkT, TestAssertionFailure> {
+    fn or_fail(self) -> std::result::Result<OkT, TestAssertionFailure> {
         self.map_err(|e| TestAssertionFailure::create(format!("{e}")))
     }
 }
