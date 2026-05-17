@@ -46,6 +46,7 @@ pub mod prelude {
     pub use super::OrFailExt;
     pub use super::Result;
     pub use super::matcher::Matcher;
+    pub use super::matcher::MatcherExt;
     pub use super::matchers::*;
     pub use super::verify_current_test_outcome;
     // Assert macros

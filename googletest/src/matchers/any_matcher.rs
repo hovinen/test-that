@@ -40,7 +40,7 @@
 /// ```
 ///
 /// Using this macro is equivalent to using the
-/// [`or`][crate::matcher::Matcher::or] method:
+/// [`or`][crate::matcher::MatcherExt::or] method:
 ///
 /// ```
 /// # use googletest::prelude::*;

@@ -38,7 +38,7 @@
 /// ```
 ///
 /// Using this macro is equivalent to using the
-/// [`and`][crate::matcher::Matcher::and] method:
+/// [`and`][crate::matcher::MatcherExt::and] method:
 ///
 /// ```
 /// # use googletest::prelude::*;

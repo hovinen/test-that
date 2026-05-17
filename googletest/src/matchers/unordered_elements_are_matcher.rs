@@ -1062,7 +1062,6 @@ pub mod internal {
 #[cfg(test)]
 mod tests {
     use super::internal::UnorderedElementsOfMapAreMatcher;
-    use crate::description::Description;
     use crate::matcher::{Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
@@ -1109,19 +1108,25 @@ mod tests {
         let value: HashMap<u32, u32> = HashMap::from_iter([(0, 1), (1, 1), (2, 2)]);
         verify_that!(
             matcher.explain_match(&value),
-            Matcher::<Description>::and(
-                Matcher::<Description>::and(
-                    displays_as(contains_regex(
+                displays_as(
+                    contains_regex(
                         "Actual element 2 => 2 at index [0-2] matched expected element `is anything` => `is equal to 2` at index [0-2]."
-                    )),
-                    displays_as(contains_regex(
-                        "Actual element [0-1] => [0-1] at index [0-2] did not match any remaining expected element."
-                    )),
-                ),
-                displays_as(contains_substring(
-                    "Expected element `is anything` => `is equal to 2` at index 2 did not match any remaining actual element."
-                )),
-            )
+                    )
+                )
+                .and(
+                    displays_as(
+                        contains_regex(
+                            "Actual element [0-1] => [0-1] at index [0-2] did not match any remaining expected element."
+                        )
+                    )
+                )
+                .and(
+                    displays_as(
+                        contains_substring(
+                            "Expected element `is anything` => `is equal to 2` at index 2 did not match any remaining actual element."
+                        )
+                    )
+                )
         )
     }
 }

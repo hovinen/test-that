@@ -21,7 +21,7 @@ use crate::{
 };
 use std::fmt::Debug;
 
-/// Matcher created by [`Matcher::or`].
+/// Matcher created by [`MatcherExt::or`][crate::matcher::MatcherExt::or].
 ///
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]

@@ -140,7 +140,18 @@ pub trait Matcher<ActualT: Debug + ?Sized> {
     fn explain_match(&self, actual: &ActualT) -> Description {
         format!("which {}", self.describe(self.matches(actual))).into()
     }
+}
 
+/// Extension methods for composing matchers.
+///
+/// This trait is implemented for all [`Sized`] types, but the resulting
+/// combinators are only useful when the underlying types implement [`Matcher`].
+///
+/// It is kept separate from [`Matcher`] so that the type parameter `ActualT`
+/// does not need to be known at the `.and()` / `.or()` call site. Type
+/// inference determines `ActualT` later, when the combined matcher is applied
+/// to an actual value.
+pub trait MatcherExt: Sized {
     /// Constructs a matcher that matches both `self` and `right`.
     ///
     /// ```
@@ -164,10 +175,7 @@ pub trait Matcher<ActualT: Debug + ?Sized> {
     // TODO(b/264518763): Replace the return type with impl Matcher and reduce
     // visibility of ConjunctionMatcher once impl in return position in trait
     // methods is stable.
-    fn and<Right: Matcher<ActualT>>(self, right: Right) -> ConjunctionMatcher<Self, Right>
-    where
-        Self: Sized,
-    {
+    fn and<Right>(self, right: Right) -> ConjunctionMatcher<Self, Right> {
         ConjunctionMatcher::new(self, right)
     }
 
@@ -191,13 +199,12 @@ pub trait Matcher<ActualT: Debug + ?Sized> {
     // TODO(b/264518763): Replace the return type with impl Matcher and reduce
     // visibility of DisjunctionMatcher once impl in return position in trait
     // methods is stable.
-    fn or<Right: Matcher<ActualT>>(self, right: Right) -> DisjunctionMatcher<Self, Right>
-    where
-        Self: Sized,
-    {
+    fn or<Right>(self, right: Right) -> DisjunctionMatcher<Self, Right> {
         DisjunctionMatcher::new(self, right)
     }
 }
+
+impl<M: Sized> MatcherExt for M {}
 
 /// Any actual value whose debug length is greater than this value will be
 /// pretty-printed. Otherwise, it will have normal debug output formatting.
