@@ -259,7 +259,7 @@ pub trait OrFailExt<T> {
 #[cfg(feature = "anyhow")]
 impl<T> OrFailExt<T> for std::result::Result<T, anyhow::Error> {
     fn or_fail(self) -> std::result::Result<T, TestAssertionFailure> {
-        self.map_err(|e| TestAssertionFailure::create(format!("{e}")))
+        self.map_err(|e| TestAssertionFailure::create(format!("{e:#}")))
     }
 }
 
