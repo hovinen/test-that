@@ -114,11 +114,11 @@ macro_rules! __property {
 macro_rules! property_internal {
     ($($t:ident)::+.$method:tt($($argument:tt),* $(,)?), $m:expr) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::property_matcher;
-        property_matcher::<$($t)::+, _, _, _>(
+        property_matcher::<$($t)::+, _, _, _, _>(
             stringify!($method($($argument),*)),
-            stringify!($m),
             $m,
             |o: &$($t)::+, inner| inner.matches(&o.$method($($argument),*)),
+            |inner, r| inner.describe(r),
             |o: &$($t)::+, inner| {
                 let actual_inner = o.$method($($argument),*);
                 ::std::convert::Into::into(format!(
@@ -167,35 +167,37 @@ pub mod internal {
     /// when the inner is polymorphic in `T`); instead the macro stringifies
     /// the inner expression for the describe output.
     #[doc(hidden)]
-    pub fn property_matcher<OuterT, InnerT, ApplyFn, ExplainFn>(
+    pub fn property_matcher<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn>(
         property_desc: &'static str,
-        inner_desc: &'static str,
         inner: InnerT,
         apply: ApplyFn,
+        describe: DescribeFn,
         explain: ExplainFn,
     ) -> impl Matcher<OuterT>
     where
         OuterT: Debug,
         ApplyFn: Fn(&OuterT, &InnerT) -> MatcherResult,
+        DescribeFn: Fn(&InnerT, MatcherResult) -> Description,
         ExplainFn: Fn(&OuterT, &InnerT) -> Description,
     {
-        PropertyMatcher { property_desc, inner_desc, inner, apply, explain, phantom: PhantomData }
+        PropertyMatcher { property_desc, inner, apply, describe, explain, phantom: PhantomData }
     }
 
-    struct PropertyMatcher<OuterT, InnerT, ApplyFn, ExplainFn> {
+    struct PropertyMatcher<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn> {
         property_desc: &'static str,
-        inner_desc: &'static str,
         inner: InnerT,
         apply: ApplyFn,
+        describe: DescribeFn,
         explain: ExplainFn,
         phantom: PhantomData<fn(&OuterT)>,
     }
 
-    impl<OuterT, InnerT, ApplyFn, ExplainFn> Matcher<OuterT>
-        for PropertyMatcher<OuterT, InnerT, ApplyFn, ExplainFn>
+    impl<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn> Matcher<OuterT>
+        for PropertyMatcher<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn>
     where
         OuterT: Debug,
         ApplyFn: Fn(&OuterT, &InnerT) -> MatcherResult,
+        DescribeFn: Fn(&InnerT, MatcherResult) -> Description,
         ExplainFn: Fn(&OuterT, &InnerT) -> Description,
     {
         fn matches(&self, actual: &OuterT) -> MatcherResult {
@@ -203,18 +205,12 @@ pub mod internal {
         }
 
         fn describe(&self, matcher_result: MatcherResult) -> Description {
-            match matcher_result {
-                MatcherResult::Match => format!(
-                    "has property `{}`, which matches `{}`",
-                    self.property_desc, self.inner_desc
-                )
-                .into(),
-                MatcherResult::NoMatch => format!(
-                    "has property `{}`, which does not match `{}`",
-                    self.property_desc, self.inner_desc
-                )
-                .into(),
-            }
+            format!(
+                "has property `{}`, which {}",
+                self.property_desc,
+                (self.describe)(&self.inner, matcher_result)
+            )
+            .into()
         }
 
         fn explain_match(&self, actual: &OuterT) -> Description {

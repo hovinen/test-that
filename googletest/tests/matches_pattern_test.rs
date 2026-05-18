@@ -179,7 +179,7 @@ fn has_correct_assertion_failure_message_for_field_and_property() -> Result<()> 
             "
             Value of: actual
             Expected: is AStruct which has all the following properties:
-              * has property `get_field ()`, which matches `eq(234)`
+              * has property `get_field ()`, which is equal to 234
               * has field `another_field`, which is equal to 123
             Actual: AStruct { a_field: 123, another_field: 234 },
               * whose property `get_field ()` is `123`, which isn't equal to 234
