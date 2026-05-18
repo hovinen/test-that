@@ -101,6 +101,7 @@ mod tests {
     use super::eq_deref_of;
     use crate::prelude::*;
     use indoc::indoc;
+    use serial_test::serial;
 
     #[derive(Debug, PartialEq)]
     struct NonCloneNonCopyStruct(i32);
@@ -121,6 +122,7 @@ mod tests {
     }
 
     #[test]
+    #[serial]
     fn shows_structured_diff() -> Result<()> {
         #[derive(Debug, PartialEq)]
         struct Strukt {

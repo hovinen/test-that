@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use googletest::prelude::*;
+use serial_test::serial;
 use std::fmt::{Display, Write};
 
 // Make a long text with each element of the iterator on one line.
@@ -28,16 +29,15 @@ fn build_text<T: Display>(mut collection: impl Iterator<Item = T>) -> String {
 }
 
 #[test]
+#[serial]
 fn colors_suppressed_when_both_no_color_and_force_color_are_set() -> Result<()> {
-    std::env::set_var("NO_COLOR", "1");
-    std::env::set_var("FORCE_COLOR", "1");
+    temp_env::with_vars([("NO_COLOR", Some("1")), ("FORCE_COLOR", Some("1"))], || {
+        let result = verify_that!(build_text(1..50), eq(build_text(1..51)));
 
-    let result = verify_that!(build_text(1..50), eq(build_text(1..51)));
-
-    verify_that!(
-        result,
-        err(displays_as(contains_substring(
-            "
+        verify_that!(
+            result,
+            err(displays_as(contains_substring(
+                "
   Difference(-actual / +expected):
    1
    2
@@ -45,6 +45,7 @@ fn colors_suppressed_when_both_no_color_and_force_color_are_set() -> Result<()> 
    48
    49
   +50"
-        )))
-    )
+            )))
+        )
+    })
 }
