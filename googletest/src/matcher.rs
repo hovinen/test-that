@@ -206,6 +206,19 @@ pub trait MatcherExt: Sized {
 
 impl<M: Sized> MatcherExt for M {}
 
+/// A helper trait for calling `describe` on matchers that implement
+/// [`Matcher<T>`] for multiple `T` values.
+///
+/// Implementing this explicitly (with UFCS to pin a specific `T`) allows
+/// matchers that wrap a poly-T inner matcher to call `describe` without
+/// triggering E0283 type-inference ambiguity.
+///
+/// **For internal use only. API stability is not guaranteed.**
+#[doc(hidden)]
+pub trait MatcherDescribe {
+    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description;
+}
+
 /// Any actual value whose debug length is greater than this value will be
 /// pretty-printed. Otherwise, it will have normal debug output formatting.
 const PRETTY_PRINT_LENGTH_THRESHOLD: usize = 60;

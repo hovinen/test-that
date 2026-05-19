@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Matcher, MatcherDescribe, MatcherResult},
 };
 use std::fmt::Debug;
 
@@ -44,6 +44,28 @@ pub fn some<InnerMatcherT>(inner: InnerMatcherT) -> SomeMatcher<InnerMatcherT> {
 
 pub struct SomeMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
+}
+
+impl<InnerMatcherT: MatcherDescribe> MatcherDescribe for SomeMatcher<InnerMatcherT> {
+    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description {
+        match matcher_result {
+            MatcherResult::Match => {
+                format!("has a value which {}", self.inner.matcher_describe(MatcherResult::Match))
+                    .into()
+            }
+            MatcherResult::NoMatch => format!(
+                "is None or has a value which {}",
+                self.inner.matcher_describe(MatcherResult::NoMatch)
+            )
+            .into(),
+        }
+    }
+}
+
+impl<InnerMatcherT: MatcherDescribe> SomeMatcher<InnerMatcherT> {
+    pub fn describe(&self, matcher_result: MatcherResult) -> Description {
+        self.matcher_describe(matcher_result)
+    }
 }
 
 impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<Option<T>> for SomeMatcher<InnerMatcherT> {
