@@ -97,27 +97,40 @@ pub mod internal {
     use crate::matcher_support::zipped_iterator::zip;
     use std::{fmt::Debug, marker::PhantomData};
 
+    /// Marker: container yields `&T` items. See [`ElementsAre`].
+    ///
+    /// **For internal use only. API stablility is not guaranteed!**
+    #[doc(hidden)]
+    pub struct RefItems;
+
+    /// Marker: container yields owned `T` items. See [`ElementsAre`].
+    ///
+    /// **For internal use only. API stablility is not guaranteed!**
+    #[doc(hidden)]
+    pub struct OwnedItems;
+
     /// This struct is meant to be used only by the macro `elements_are!`.
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub struct ElementsAre<'a, ContainerT: ?Sized, T: Debug> {
+    pub struct ElementsAre<'a, ContainerT: ?Sized, T: Debug, Mode = RefItems> {
         elements: Vec<Box<dyn Matcher<T> + 'a>>,
         phantom: PhantomData<ContainerT>,
+        _mode: PhantomData<Mode>,
     }
 
-    impl<'a, ContainerT: ?Sized, T: Debug> ElementsAre<'a, ContainerT, T> {
+    impl<'a, ContainerT: ?Sized, T: Debug, Mode> ElementsAre<'a, ContainerT, T, Mode> {
         /// Factory only intended for use in the macro `elements_are!`.
         ///
         /// **For internal use only. API stablility is not guaranteed!**
         #[doc(hidden)]
         pub fn new(elements: Vec<Box<dyn Matcher<T> + 'a>>) -> Self {
-            Self { elements, phantom: Default::default() }
+            Self { elements, phantom: PhantomData, _mode: PhantomData }
         }
     }
 
     impl<'a, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
-        for ElementsAre<'a, ContainerT, T>
+        for ElementsAre<'a, ContainerT, T, RefItems>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
@@ -142,6 +155,65 @@ pub mod internal {
             for (idx, (a, e)) in zipped_iterator.by_ref().enumerate() {
                 if e.matches(a).is_no_match() {
                     mismatches.push(format!("element #{idx} is {a:?}, {}", e.explain_match(a)));
+                }
+            }
+            if mismatches.is_empty() {
+                if !zipped_iterator.has_size_mismatch() {
+                    "whose elements all match".into()
+                } else {
+                    format!("whose size is {}", zipped_iterator.left_size()).into()
+                }
+            } else if mismatches.len() == 1 {
+                let mismatches = mismatches.into_iter().collect::<Description>();
+                format!("where {mismatches}").into()
+            } else {
+                let mismatches = mismatches.into_iter().collect::<Description>();
+                format!("where:\n{}", mismatches.bullet_list().indent()).into()
+            }
+        }
+
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            format!(
+                "{} elements:\n{}",
+                if matcher_result.into() { "has" } else { "doesn't have" },
+                &self
+                    .elements
+                    .iter()
+                    .map(|matcher| matcher.describe(MatcherResult::Match))
+                    .collect::<Description>()
+                    .enumerate()
+                    .indent()
+            )
+            .into()
+        }
+    }
+
+    impl<'a, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
+        for ElementsAre<'a, ContainerT, T, OwnedItems>
+    where
+        for<'b> &'b ContainerT: IntoIterator<Item = T>,
+    {
+        fn matches(&self, actual: &ContainerT) -> MatcherResult {
+            let mut zipped_iterator = zip(actual.into_iter(), self.elements.iter());
+            for (a, e) in zipped_iterator.by_ref() {
+                if e.matches(&a).is_no_match() {
+                    return MatcherResult::NoMatch;
+                }
+            }
+            if !zipped_iterator.has_size_mismatch() {
+                MatcherResult::Match
+            } else {
+                MatcherResult::NoMatch
+            }
+        }
+
+        fn explain_match(&self, actual: &ContainerT) -> Description {
+            let actual_iterator = actual.into_iter();
+            let mut zipped_iterator = zip(actual_iterator, self.elements.iter());
+            let mut mismatches = Vec::new();
+            for (idx, (a, e)) in zipped_iterator.by_ref().enumerate() {
+                if e.matches(&a).is_no_match() {
+                    mismatches.push(format!("element #{idx} is {a:?}, {}", e.explain_match(&a)));
                 }
             }
             if mismatches.is_empty() {

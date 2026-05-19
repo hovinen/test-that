@@ -18,6 +18,7 @@ mod colorized_diff_test;
 mod composition_test;
 mod elements_are_matcher_test;
 mod field_matcher_test;
+mod iter_over_owned_container_test;
 mod matches_pattern_test;
 mod pointwise_matcher_test;
 mod property_matcher_test;
