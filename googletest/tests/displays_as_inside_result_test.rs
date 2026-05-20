@@ -15,20 +15,24 @@
 use googletest::prelude::*;
 
 #[derive(Debug)]
-struct IntContainer(Vec<i32>);
+struct StructWithField {
+    field: u32,
+}
 
-impl<'a> IntoIterator for &'a IntContainer {
-    type Item = i32;
-    type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.iter().copied()
+impl StructWithField {
+    fn returns_field_in_result(&self) -> std::result::Result<u32, ()> {
+        Ok(self.field)
     }
 }
 
 #[test]
-fn elements_are_supports_containers_which_iterate_over_owned_values() -> Result<()> {
-    let container = IntContainer(vec![1, 2, 3]);
+fn can_use_displays_as_inside_okay() -> Result<()> {
+    let subject = StructWithField { field: 123 };
 
-    verify_that!(container, elements_are![eq(1), eq(2), eq(3)])
+    verify_that!(
+        subject,
+        matches_pattern!(StructWithField {
+            returns_field_in_result(): ok(displays_as(eq("123")))
+        })
+    )
 }

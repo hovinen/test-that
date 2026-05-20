@@ -16,6 +16,7 @@ mod all_matcher_test;
 mod any_matcher_test;
 mod colorized_diff_test;
 mod composition_test;
+mod displays_as_inside_result_test;
 mod elements_are_matcher_test;
 mod field_matcher_test;
 mod iter_over_owned_container_test;
