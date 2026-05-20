@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Matcher, MatcherDescribe, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -38,18 +38,40 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn err<T: Debug, E: Debug>(inner: impl Matcher<E>) -> impl Matcher<std::result::Result<T, E>> {
-    ErrMatcher::<T, E, _> { inner, phantom_t: Default::default(), phantom_e: Default::default() }
+pub fn err<T: Debug, InnerMatcherT>(inner: InnerMatcherT) -> ErrMatcher<T, InnerMatcherT> {
+    ErrMatcher { inner, phantom_t: PhantomData }
 }
 
-struct ErrMatcher<T, E, InnerMatcherT> {
+#[doc(hidden)]
+pub struct ErrMatcher<T, InnerMatcherT> {
     inner: InnerMatcherT,
     phantom_t: PhantomData<T>,
-    phantom_e: PhantomData<E>,
+}
+
+impl<T: Debug, InnerMatcherT: MatcherDescribe> MatcherDescribe for ErrMatcher<T, InnerMatcherT> {
+    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description {
+        match matcher_result {
+            MatcherResult::Match => {
+                format!("is an error which {}", self.inner.matcher_describe(MatcherResult::Match))
+                    .into()
+            }
+            MatcherResult::NoMatch => format!(
+                "is a success or is an error containing a value which {}",
+                self.inner.matcher_describe(MatcherResult::NoMatch)
+            )
+            .into(),
+        }
+    }
+}
+
+impl<T: Debug, InnerMatcherT: MatcherDescribe> ErrMatcher<T, InnerMatcherT> {
+    pub fn describe(&self, matcher_result: MatcherResult) -> Description {
+        self.matcher_describe(matcher_result)
+    }
 }
 
 impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<std::result::Result<T, E>>
-    for ErrMatcher<T, E, InnerMatcherT>
+    for ErrMatcher<T, InnerMatcherT>
 {
     fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
         actual.as_ref().err().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
@@ -135,11 +157,7 @@ mod tests {
 
     #[test]
     fn err_describe_matches() -> Result<()> {
-        let matcher = super::ErrMatcher::<i32, i32, _> {
-            inner: eq(1),
-            phantom_t: Default::default(),
-            phantom_e: Default::default(),
-        };
+        let matcher: Box<dyn Matcher<std::result::Result<i32, i32>>> = Box::new(err(eq(1)));
         verify_that!(
             matcher.describe(MatcherResult::Match),
             displays_as(eq("is an error which is equal to 1"))

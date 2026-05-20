@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Matcher, MatcherDescribe, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -38,18 +38,41 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn ok<T: Debug, E: Debug>(inner: impl Matcher<T>) -> impl Matcher<std::result::Result<T, E>> {
-    OkMatcher::<T, E, _> { inner, phantom_t: Default::default(), phantom_e: Default::default() }
+pub fn ok<E: Debug, InnerMatcherT>(inner: InnerMatcherT) -> OkMatcher<E, InnerMatcherT> {
+    OkMatcher { inner, phantom_e: PhantomData }
 }
 
-struct OkMatcher<T, E, InnerMatcherT> {
+#[doc(hidden)]
+pub struct OkMatcher<E, InnerMatcherT> {
     inner: InnerMatcherT,
-    phantom_t: PhantomData<T>,
     phantom_e: PhantomData<E>,
 }
 
+impl<E: Debug, InnerMatcherT: MatcherDescribe> MatcherDescribe for OkMatcher<E, InnerMatcherT> {
+    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description {
+        match matcher_result {
+            MatcherResult::Match => format!(
+                "is a success containing a value, which {}",
+                self.inner.matcher_describe(MatcherResult::Match)
+            )
+            .into(),
+            MatcherResult::NoMatch => format!(
+                "is an error or a success containing a value, which {}",
+                self.inner.matcher_describe(MatcherResult::NoMatch)
+            )
+            .into(),
+        }
+    }
+}
+
+impl<E: Debug, InnerMatcherT: MatcherDescribe> OkMatcher<E, InnerMatcherT> {
+    pub fn describe(&self, matcher_result: MatcherResult) -> Description {
+        self.matcher_describe(matcher_result)
+    }
+}
+
 impl<T: Debug, E: Debug, InnerMatcherT: Matcher<T>> Matcher<std::result::Result<T, E>>
-    for OkMatcher<T, E, InnerMatcherT>
+    for OkMatcher<E, InnerMatcherT>
 {
     fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
         actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
@@ -137,11 +160,7 @@ mod tests {
 
     #[test]
     fn ok_describe_matches() -> Result<()> {
-        let matcher = super::OkMatcher::<i32, i32, _> {
-            inner: eq(1),
-            phantom_t: Default::default(),
-            phantom_e: Default::default(),
-        };
+        let matcher: Box<dyn Matcher<std::result::Result<i32, i32>>> = Box::new(ok(eq(1)));
         verify_that!(
             matcher.describe(MatcherResult::Match),
             displays_as(eq("is a success containing a value, which is equal to 1"))

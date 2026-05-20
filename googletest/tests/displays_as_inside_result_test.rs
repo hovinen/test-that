@@ -20,19 +20,35 @@ struct StructWithField {
 }
 
 impl StructWithField {
-    fn returns_field_in_result(&self) -> std::result::Result<u32, ()> {
-        Ok(self.field)
+    fn returns_field_in_result(&self) -> std::result::Result<&u32, ()> {
+        Ok(&self.field)
+    }
+
+    fn returns_field_in_result_err(&self) -> std::result::Result<(), &u32> {
+        Err(&self.field)
     }
 }
 
 #[test]
-fn can_use_displays_as_inside_okay() -> Result<()> {
+fn can_use_displays_as_inside_ok() -> Result<()> {
     let subject = StructWithField { field: 123 };
 
     verify_that!(
         subject,
         matches_pattern!(StructWithField {
             returns_field_in_result(): ok(displays_as(eq("123")))
+        })
+    )
+}
+
+#[test]
+fn can_use_displays_as_inside_err() -> Result<()> {
+    let subject = StructWithField { field: 123 };
+
+    verify_that!(
+        subject,
+        matches_pattern!(StructWithField {
+            returns_field_in_result_err(): err(displays_as(eq("123")))
         })
     )
 }
