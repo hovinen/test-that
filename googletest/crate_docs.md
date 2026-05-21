@@ -485,5 +485,5 @@ can automatically be converted into Proptest
 through the `?` operator as the example above shows.
 
 [`and_log_failure()`]: GoogleTestSupport::and_log_failure
-[`or_fail()`]: IntoTestResult::or_fail
+[`or_fail()`]: OrFailExt::or_fail
 [`Matcher`]: matcher::Matcher
