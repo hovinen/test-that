@@ -143,7 +143,7 @@ macro_rules! field_internal {
 pub mod internal {
     use crate::{
         description::Description,
-        matcher::{Matcher, MatcherResult},
+        matcher::{Describable, Matcher, MatcherResult},
     };
     use std::fmt::Debug;
 
@@ -192,7 +192,11 @@ pub mod internal {
                 format!("which has the wrong enum variant `{without_fields}`").into()
             }
         }
+    }
 
+    impl<OuterT, InnerT, InnerMatcher: Describable> Describable
+        for FieldMatcher<OuterT, InnerT, InnerMatcher>
+    {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "has field `{}`, which {}",

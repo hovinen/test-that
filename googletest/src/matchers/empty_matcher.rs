@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -68,7 +68,9 @@ where
     fn matches(&self, actual: &T) -> MatcherResult {
         actual.into_iter().next().is_none().into()
     }
+}
 
+impl<T: Debug + ?Sized> Describable for EmptyMatcher<T> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         if matcher_result.into() { "is empty" } else { "isn't empty" }.into()
     }

@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherDescribe, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::fmt::Debug;
 
@@ -46,28 +46,6 @@ pub struct SomeMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
 }
 
-impl<InnerMatcherT: MatcherDescribe> MatcherDescribe for SomeMatcher<InnerMatcherT> {
-    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("has a value which {}", self.inner.matcher_describe(MatcherResult::Match))
-                    .into()
-            }
-            MatcherResult::NoMatch => format!(
-                "is None or has a value which {}",
-                self.inner.matcher_describe(MatcherResult::NoMatch)
-            )
-            .into(),
-        }
-    }
-}
-
-impl<InnerMatcherT: MatcherDescribe> SomeMatcher<InnerMatcherT> {
-    pub fn describe(&self, matcher_result: MatcherResult) -> Description {
-        self.matcher_describe(matcher_result)
-    }
-}
-
 impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<Option<T>> for SomeMatcher<InnerMatcherT> {
     fn matches(&self, actual: &Option<T>) -> MatcherResult {
         actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
@@ -81,7 +59,9 @@ impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<Option<T>> for SomeMatcher<Inn
             (_, None) => "which is None".into(),
         }
     }
+}
 
+impl<InnerMatcherT: Describable> Describable for SomeMatcher<InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -99,7 +79,7 @@ impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<Option<T>> for SomeMatcher<Inn
 #[cfg(test)]
 mod tests {
     use super::some;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
 

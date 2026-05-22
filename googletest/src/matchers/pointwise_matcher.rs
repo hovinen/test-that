@@ -152,7 +152,7 @@ macro_rules! __pointwise {
 #[doc(hidden)]
 pub mod internal {
     use crate::description::Description;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
     use std::{fmt::Debug, marker::PhantomData};
 
@@ -220,7 +220,11 @@ pub mod internal {
                 format!("where:\n{}", mismatches.bullet_list().indent()).into()
             }
         }
+    }
 
+    impl<MatcherT: Describable, ContainerT: ?Sized> Describable
+        for PointwiseMatcher<ContainerT, MatcherT>
+    {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "{} elements satisfying respectively:\n{}",

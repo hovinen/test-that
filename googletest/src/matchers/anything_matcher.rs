@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -42,7 +42,9 @@ impl<T: Debug + ?Sized> Matcher<T> for Anything<T> {
     fn matches(&self, _: &T) -> MatcherResult {
         MatcherResult::Match
     }
+}
 
+impl<T: Debug + ?Sized> Describable for Anything<T> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => "is anything".into(),

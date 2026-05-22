@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use crate::matcher_support::count_elements::count_elements;
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -69,6 +69,14 @@ where
         self.expected.matches(&count_elements(actual))
     }
 
+    fn explain_match(&self, actual: &T) -> Description {
+        let actual_size = count_elements(actual);
+        format!("which has length {}, {}", actual_size, self.expected.explain_match(&actual_size))
+            .into()
+    }
+}
+
+impl<T: ?Sized, E: Describable> Describable for LenMatcher<T, E> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -80,19 +88,13 @@ where
             }
         }
     }
-
-    fn explain_match(&self, actual: &T) -> Description {
-        let actual_size = count_elements(actual);
-        format!("which has length {}, {}", actual_size, self.expected.explain_match(&actual_size))
-            .into()
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::len;
     use crate::description::Description;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
     use std::collections::{
@@ -182,12 +184,13 @@ mod tests {
                 false.into()
             }
 
-            fn describe(&self, _: MatcherResult) -> Description {
-                "called described".into()
-            }
-
             fn explain_match(&self, _: &T) -> Description {
                 "called explain_match".into()
+            }
+        }
+        impl<T> Describable for TestMatcher<T> {
+            fn describe(&self, _: MatcherResult) -> Description {
+                "called described".into()
             }
         }
         verify_that!(

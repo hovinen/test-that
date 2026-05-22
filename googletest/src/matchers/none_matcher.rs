@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
@@ -44,7 +44,9 @@ impl<T: Debug> Matcher<Option<T>> for NoneMatcher<T> {
     fn matches(&self, actual: &Option<T>) -> MatcherResult {
         (actual.is_none()).into()
     }
+}
 
+impl<T> Describable for NoneMatcher<T> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => "is none".into(),

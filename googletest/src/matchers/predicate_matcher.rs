@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -124,22 +124,6 @@ where
 #[doc(hidden)]
 pub struct NoDescription;
 
-impl<T: Debug, P> Matcher<T> for PredicateMatcher<T, P, NoDescription, NoDescription>
-where
-    for<'a> P: Fn(&'a T) -> bool,
-{
-    fn matches(&self, actual: &T) -> MatcherResult {
-        (self.predicate)(actual).into()
-    }
-
-    fn describe(&self, result: MatcherResult) -> Description {
-        match result {
-            MatcherResult::Match => "matches".into(),
-            MatcherResult::NoMatch => "does not match".into(),
-        }
-    }
-}
-
 impl<T: Debug, P, D1: PredicateDescription, D2: PredicateDescription> Matcher<T>
     for PredicateMatcher<T, P, D1, D2>
 where
@@ -148,7 +132,29 @@ where
     fn matches(&self, actual: &T) -> MatcherResult {
         (self.predicate)(actual).into()
     }
+}
 
+impl<T: Debug, P> Matcher<T> for PredicateMatcher<T, P, NoDescription, NoDescription>
+where
+    for<'a> P: Fn(&'a T) -> bool,
+{
+    fn matches(&self, actual: &T) -> MatcherResult {
+        (self.predicate)(actual).into()
+    }
+}
+
+impl<T: Debug, P> Describable for PredicateMatcher<T, P, NoDescription, NoDescription> {
+    fn describe(&self, result: MatcherResult) -> Description {
+        match result {
+            MatcherResult::Match => "matches".into(),
+            MatcherResult::NoMatch => "does not match".into(),
+        }
+    }
+}
+
+impl<T: Debug, P, D1: PredicateDescription, D2: PredicateDescription> Describable
+    for PredicateMatcher<T, P, D1, D2>
+{
     fn describe(&self, result: MatcherResult) -> Description {
         match result {
             MatcherResult::Match => self.positive_description.to_description(),

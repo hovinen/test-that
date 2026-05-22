@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use num_traits::float::Float;
 use std::{fmt::Debug, marker::PhantomData};
@@ -30,7 +30,9 @@ impl<T: Float + Debug> Matcher<T> for IsNanMatcher<T> {
     fn matches(&self, actual: &T) -> MatcherResult {
         actual.is_nan().into()
     }
+}
 
+impl<T> Describable for IsNanMatcher<T> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         if matcher_result.into() { "is NaN" } else { "isn't NaN" }.into()
     }

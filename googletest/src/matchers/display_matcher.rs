@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherDescribe, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::fmt::{Debug, Display};
 
 /// Matches the string representation of types that implement `Display`.
@@ -32,23 +32,6 @@ pub struct DisplayMatcher<InnerMatcher> {
     inner: InnerMatcher,
 }
 
-impl<InnerMatcher: Matcher<String>> MatcherDescribe for DisplayMatcher<InnerMatcher> {
-    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!(
-                "displays as a string which {}",
-                <InnerMatcher as Matcher<String>>::describe(&self.inner, MatcherResult::Match)
-            )
-            .into(),
-            MatcherResult::NoMatch => format!(
-                "doesn't display as a string which {}",
-                <InnerMatcher as Matcher<String>>::describe(&self.inner, MatcherResult::Match)
-            )
-            .into(),
-        }
-    }
-}
-
 impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
     for DisplayMatcher<InnerMatcher>
 {
@@ -60,7 +43,9 @@ impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
         format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
             .into()
     }
+}
 
+impl<InnerMatcher: Describable> Describable for DisplayMatcher<InnerMatcher> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {

@@ -93,7 +93,7 @@ macro_rules! __elements_are {
 #[doc(hidden)]
 pub mod internal {
     use crate::description::Description;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
     use std::{fmt::Debug, marker::PhantomData};
 
@@ -171,21 +171,6 @@ pub mod internal {
                 format!("where:\n{}", mismatches.bullet_list().indent()).into()
             }
         }
-
-        fn describe(&self, matcher_result: MatcherResult) -> Description {
-            format!(
-                "{} elements:\n{}",
-                if matcher_result.into() { "has" } else { "doesn't have" },
-                &self
-                    .elements
-                    .iter()
-                    .map(|matcher| matcher.describe(MatcherResult::Match))
-                    .collect::<Description>()
-                    .enumerate()
-                    .indent()
-            )
-            .into()
-        }
     }
 
     impl<'a, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
@@ -230,7 +215,9 @@ pub mod internal {
                 format!("where:\n{}", mismatches.bullet_list().indent()).into()
             }
         }
+    }
 
+    impl<'a, T: Debug, ContainerT: ?Sized, Mode> Describable for ElementsAre<'a, ContainerT, T, Mode> {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "{} elements:\n{}",

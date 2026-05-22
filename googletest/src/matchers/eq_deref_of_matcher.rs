@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
     matcher_support::{edit_distance, summarize_diff::create_diff},
 };
 use std::{fmt::Debug, marker::PhantomData, ops::Deref};
@@ -75,13 +75,6 @@ where
         (self.expected.deref() == actual).into()
     }
 
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
-            MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
-        }
-    }
-
     fn explain_match(&self, actual: &ActualT) -> Description {
         format!(
             "which {}{}",
@@ -93,6 +86,15 @@ where
             )
         )
         .into()
+    }
+}
+
+impl<ActualT: ?Sized, ExpectedRefT: Debug> Describable for EqDerefOfMatcher<ActualT, ExpectedRefT> {
+    fn describe(&self, matcher_result: MatcherResult) -> Description {
+        match matcher_result {
+            MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
+            MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
+        }
     }
 }
 

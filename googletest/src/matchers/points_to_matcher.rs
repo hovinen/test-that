@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Deref;
@@ -59,7 +59,9 @@ where
     fn explain_match(&self, actual: &ActualT) -> Description {
         self.expected.explain_match(actual.deref())
     }
+}
 
+impl<MatcherT: Describable, ActualT: ?Sized> Describable for PointsToMatcher<ActualT, MatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         self.expected.describe(matcher_result)
     }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use regex::Regex;
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -75,7 +75,9 @@ impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher<ActualT> for ContainsRegexMat
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         self.regex.is_match(actual.as_ref()).into()
     }
+}
 
+impl<ActualT: ?Sized> Describable for ContainsRegexMatcher<ActualT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -91,7 +93,7 @@ impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher<ActualT> for ContainsRegexMat
 #[cfg(test)]
 mod tests {
     use super::{ContainsRegexMatcher, contains_regex};
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
 
     #[test]
@@ -140,7 +142,7 @@ mod tests {
         let matcher: ContainsRegexMatcher<&str> = contains_regex("\n");
 
         verify_that!(
-            Matcher::describe(&matcher, MatcherResult::Match),
+            matcher.describe(MatcherResult::Match),
             displays_as(eq("contains the regular expression \"\\n\""))
         )
     }

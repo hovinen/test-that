@@ -366,7 +366,7 @@ macro_rules! __is_contained_in {
 #[doc(hidden)]
 pub mod internal {
     use crate::description::Description;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
     use std::collections::HashSet;
     use std::fmt::{Debug, Display};
@@ -429,7 +429,11 @@ pub mod internal {
                 .get_explanation(actual, &self.elements, self.requirements)
                 .unwrap_or("whose elements all match".into())
         }
+    }
 
+    impl<'a, T: Debug, ContainerT: ?Sized, const N: usize> Describable
+        for UnorderedElementsAreMatcher<'a, ContainerT, T, N>
+    {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "{} elements matching in any order:\n{}",
@@ -505,7 +509,11 @@ pub mod internal {
                 .get_explanation_for_map(actual, &self.elements, self.requirements)
                 .unwrap_or("whose elements all match".into())
         }
+    }
 
+    impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: ?Sized, const N: usize> Describable
+        for UnorderedElementsOfMapAreMatcher<'a, ContainerT, KeyT, ValueT, N>
+    {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "{} elements matching in any order:\n{}",
@@ -1062,7 +1070,7 @@ pub mod internal {
 #[cfg(test)]
 mod tests {
     use super::internal::UnorderedElementsOfMapAreMatcher;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
     use std::collections::HashMap;
@@ -1074,14 +1082,15 @@ mod tests {
         // compiler takes care of that, but when the matcher is created separately,
         // we must create the constitute matchers separately so that they
         // aren't dropped too early.
-        let matchers = ((eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
+        let matchers =
+            ((eq::<i32, _>(2), eq::<&str, _>("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
         let matcher: UnorderedElementsOfMapAreMatcher<HashMap<i32, &str>, _, _, 3> = unordered_elements_are![
             (matchers.0.0, matchers.0.1),
             (matchers.1.0, matchers.1.1),
             (matchers.2.0, matchers.2.1)
         ];
         verify_that!(
-            Matcher::describe(&matcher, MatcherResult::Match),
+            matcher.describe(MatcherResult::Match),
             displays_as(eq(indoc!(
                 "
                 contains elements matching in any order:

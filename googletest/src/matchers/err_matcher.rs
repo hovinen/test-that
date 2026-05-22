@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherDescribe, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -48,28 +48,6 @@ pub struct ErrMatcher<T, InnerMatcherT> {
     phantom_t: PhantomData<T>,
 }
 
-impl<T: Debug, InnerMatcherT: MatcherDescribe> MatcherDescribe for ErrMatcher<T, InnerMatcherT> {
-    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("is an error which {}", self.inner.matcher_describe(MatcherResult::Match))
-                    .into()
-            }
-            MatcherResult::NoMatch => format!(
-                "is a success or is an error containing a value which {}",
-                self.inner.matcher_describe(MatcherResult::NoMatch)
-            )
-            .into(),
-        }
-    }
-}
-
-impl<T: Debug, InnerMatcherT: MatcherDescribe> ErrMatcher<T, InnerMatcherT> {
-    pub fn describe(&self, matcher_result: MatcherResult) -> Description {
-        self.matcher_describe(matcher_result)
-    }
-}
-
 impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<std::result::Result<T, E>>
     for ErrMatcher<T, InnerMatcherT>
 {
@@ -85,7 +63,9 @@ impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<std::result::Result<
             Ok(_) => "which is a success".into(),
         }
     }
+}
 
+impl<T, InnerMatcherT: Describable> Describable for ErrMatcher<T, InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {

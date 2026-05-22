@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use regex::Regex;
 use std::fmt::Debug;
 use std::marker::PhantomData;
@@ -92,7 +92,11 @@ where
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         self.regex.is_match(actual.as_ref()).into()
     }
+}
 
+impl<PatternT: Deref<Target = str>, ActualT: ?Sized> Describable
+    for MatchesRegexMatcher<ActualT, PatternT>
+{
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -108,7 +112,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::{MatchesRegexMatcher, matches_regex};
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
 
     #[test]
@@ -202,7 +206,7 @@ mod tests {
         let matcher: MatchesRegexMatcher<&str, _> = matches_regex("\n");
 
         verify_that!(
-            Matcher::describe(&matcher, MatcherResult::Match),
+            matcher.describe(MatcherResult::Match),
             displays_as(eq("matches the regular expression \"\\n\""))
         )
     }

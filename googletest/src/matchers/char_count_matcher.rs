@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -72,6 +72,18 @@ impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMa
         self.expected.matches(&actual.as_ref().chars().count())
     }
 
+    fn explain_match(&self, actual: &T) -> Description {
+        let actual_size = actual.as_ref().chars().count();
+        format!(
+            "which has character count {}, {}",
+            actual_size,
+            self.expected.explain_match(&actual_size)
+        )
+        .into()
+    }
+}
+
+impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Describable for CharLenMatcher<T, E> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(
@@ -86,23 +98,13 @@ impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMa
             .into(),
         }
     }
-
-    fn explain_match(&self, actual: &T) -> Description {
-        let actual_size = actual.as_ref().chars().count();
-        format!(
-            "which has character count {}, {}",
-            actual_size,
-            self.expected.explain_match(&actual_size)
-        )
-        .into()
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::char_count;
     use crate::description::Description;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
     use std::fmt::Debug;
@@ -134,12 +136,13 @@ mod tests {
                 false.into()
             }
 
-            fn describe(&self, _: MatcherResult) -> Description {
-                "called described".into()
-            }
-
             fn explain_match(&self, _: &T) -> Description {
                 "called explain_match".into()
+            }
+        }
+        impl<T: Debug> Describable for TestMatcher<T> {
+            fn describe(&self, _: MatcherResult) -> Description {
+                "called described".into()
             }
         }
         verify_that!(

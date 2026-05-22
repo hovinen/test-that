@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::{fmt::Debug, marker::PhantomData};
 
 /// Matches a container all of whose elements are matched by the matcher
@@ -119,7 +119,9 @@ where
             .indent();
         format!("whose elements {failed_indexes} don't match\n{element_explanations}").into()
     }
+}
 
+impl<ActualT: ?Sized, MatcherT: Describable> Describable for EachMatcher<ActualT, MatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {

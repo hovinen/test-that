@@ -209,7 +209,7 @@ a struct holding the matcher's data and have it implement the trait
 [`Matcher`]:
 
 ```no_run
-use googletest::{description::Description, matcher::{Matcher, MatcherResult}};
+use googletest::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
 use std::fmt::Debug;
 
 struct MyEqMatcher<T> {
@@ -224,7 +224,9 @@ impl<T: PartialEq + Debug> Matcher<T> for MyEqMatcher<T> {
             MatcherResult::NoMatch
         }
     }
+}
 
+impl<T: Debug> Describable for MyEqMatcher<T> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -241,7 +243,7 @@ impl<T: PartialEq + Debug> Matcher<T> for MyEqMatcher<T> {
  It is recommended to expose a function which constructs the matcher:
 
  ```no_run
- # use googletest::{description::Description, matcher::{Matcher, MatcherResult}};
+ # use googletest::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
  # use std::fmt::Debug;
  #
  # struct MyEqMatcher<T> {
@@ -256,7 +258,9 @@ impl<T: PartialEq + Debug> Matcher<T> for MyEqMatcher<T> {
  #            MatcherResult::NoMatch
  #        }
  #    }
+ # }
  #
+ # impl<T: Debug> Describable for MyEqMatcher<T> {
  #    fn describe(&self, matcher_result: MatcherResult) -> Description {
  #        match matcher_result {
  #            MatcherResult::Match => {
@@ -278,7 +282,7 @@ impl<T: PartialEq + Debug> Matcher<T> for MyEqMatcher<T> {
 
 ```
 # use googletest::prelude::*;
-# use googletest::{description::Description, matcher::{Matcher, MatcherResult}};
+# use googletest::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
 # use std::fmt::Debug;
 #
 # struct MyEqMatcher<T> {
@@ -293,7 +297,9 @@ impl<T: PartialEq + Debug> Matcher<T> for MyEqMatcher<T> {
 #            MatcherResult::NoMatch
 #        }
 #    }
+# }
 #
+# impl<T: Debug> Describable for MyEqMatcher<T> {
 #    fn describe(&self, matcher_result: MatcherResult) -> Description {
 #        match matcher_result {
 #            MatcherResult::Match => {

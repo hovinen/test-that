@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use num_traits::{Float, FloatConst};
 use std::fmt::Debug;
@@ -179,7 +179,9 @@ impl<T: Debug + Float> Matcher<T> for NearMatcher<T> {
             MatcherResult::NoMatch
         }
     }
+}
 
+impl<T: Debug> Describable for NearMatcher<T> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {

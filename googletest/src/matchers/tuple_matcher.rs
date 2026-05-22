@@ -23,7 +23,7 @@
 pub mod internal {
     use crate::{
         description::Description,
-        matcher::{Matcher, MatcherResult},
+        matcher::{Describable, Matcher, MatcherResult},
     };
     use std::fmt::Debug;
 
@@ -33,7 +33,9 @@ pub mod internal {
         fn matches(&self, _: &()) -> MatcherResult {
             MatcherResult::Match
         }
+    }
 
+    impl Describable for () {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             match matcher_result {
                 MatcherResult::Match => "is the empty tuple".into(),
@@ -50,7 +52,8 @@ pub mod internal {
         ($([$field_number:tt, $matcher_type:ident, $field_type:ident]),*) => {
             impl<$($field_type: Debug, $matcher_type: Matcher<$field_type>),*>
                 Matcher<($($field_type,)*)> for ($($matcher_type,)*)
-            {                fn matches(&self, actual: &($($field_type,)*)) -> MatcherResult {
+            {
+                fn matches(&self, actual: &($($field_type,)*)) -> MatcherResult {
                     $(match self.$field_number.matches(&actual.$field_number) {
                         MatcherResult::Match => {},
                         MatcherResult::NoMatch => {
@@ -73,6 +76,9 @@ pub mod internal {
                     explanation
                 }
 
+            }
+
+            impl<$($matcher_type: Describable),*> Describable for ($($matcher_type,)*) {
                 fn describe(&self, matcher_result: MatcherResult) -> Description {
                     match matcher_result {
                         MatcherResult::Match => {

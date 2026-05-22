@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -91,7 +91,9 @@ impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         (*actual < self.expected).into()
     }
+}
 
+impl<ActualT, ExpectedT: Debug> Describable for LtMatcher<ActualT, ExpectedT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is less than {:?}", self.expected).into(),

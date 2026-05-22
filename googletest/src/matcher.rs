@@ -29,7 +29,7 @@ use std::fmt::Debug;
 /// inner matcher applies to an unsized type) `Matcher<Option<&T>>`. Property
 /// extractors returning `Option<&T>` rely on the latter impl so that the
 /// borrow's lifetime can thread through type inference.
-pub trait Matcher<ActualT: Debug + ?Sized> {
+pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
     /// Returns whether the condition matches the datum `actual`.
     ///
     /// The trait implementation defines what it means to "match". Often the
@@ -37,52 +37,6 @@ pub trait Matcher<ActualT: Debug + ?Sized> {
     /// `eq` matches when its stored expected value is equal (in the sense of
     /// the `==` operator) to the value `actual`.
     fn matches(&self, actual: &ActualT) -> MatcherResult;
-
-    /// Returns a description of `self` or a negative description if
-    /// `matcher_result` is `DoesNotMatch`.
-    ///
-    /// The function should print a verb phrase that describes the property a
-    /// value matching, respectively not matching, this matcher should have.
-    /// The subject of the verb phrase is the value being matched.
-    ///
-    /// The output appears next to `Expected` in an assertion failure message.
-    /// For example:
-    ///
-    /// ```text
-    /// Value of: ...
-    /// Expected: is equal to 7
-    ///           ^^^^^^^^^^^^^
-    /// Actual: ...
-    /// ```
-    ///
-    /// When the matcher contains one or more inner matchers, the implementation
-    /// should invoke [`Self::describe`] on the inner matchers to complete the
-    /// description. It should place the inner description at a point where a
-    /// verb phrase would fit. For example, the matcher
-    /// [`some`][crate::matchers::some] implements `describe` as follows:
-    ///
-    /// ```ignore
-    /// fn describe(&self, matcher_result: MatcherResult) -> Description {
-    ///     match matcher_result {
-    ///         MatcherResult::Matches => {
-    ///             Description::new()
-    ///                 .text("has a value which")
-    ///                 .nested(self.inner.describe(MatcherResult::Matches))
-    ///       // Inner matcher: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ///         }
-    ///         MatcherResult::DoesNotMatch => {...} // Similar to the above
-    ///     }
-    /// }
-    /// ```
-    ///
-    /// The output expectation differs from that of
-    /// [`explain_match`][Self::explain_match] in that it is a verb phrase
-    /// (beginning with a verb like "is") rather than a relative clause
-    /// (beginning with "which" or "whose"). This difference is because the
-    /// output of `explain_match` is always used adjectivally to describe the
-    /// actual value, while `describe` is used in contexts where a relative
-    /// clause would not make sense.
-    fn describe(&self, matcher_result: MatcherResult) -> Description;
 
     /// Prepares a [`String`] describing how the expected value
     /// encoded in this instance matches or does not match the given value
@@ -206,17 +160,54 @@ pub trait MatcherExt: Sized {
 
 impl<M: Sized> MatcherExt for M {}
 
-/// A helper trait for calling `describe` on matchers that implement
-/// [`Matcher<T>`] for multiple `T` values.
-///
-/// Implementing this explicitly (with UFCS to pin a specific `T`) allows
-/// matchers that wrap a poly-T inner matcher to call `describe` without
-/// triggering E0283 type-inference ambiguity.
-///
-/// **For internal use only. API stability is not guaranteed.**
-#[doc(hidden)]
-pub trait MatcherDescribe {
-    fn matcher_describe(&self, matcher_result: MatcherResult) -> Description;
+/// An item, normally a [Matcher] with positive and negative valences which can
+/// be turned into a [Description] for human consumption.
+pub trait Describable {
+    /// Returns a description of `self` or a negative description if
+    /// `matcher_result` is `DoesNotMatch`.
+    ///
+    /// The function should print a verb phrase that describes the property a
+    /// value matching, respectively not matching, this matcher should have.
+    /// The subject of the verb phrase is the value being matched.
+    ///
+    /// The output appears next to `Expected` in an assertion failure message.
+    /// For example:
+    ///
+    /// ```text
+    /// Value of: ...
+    /// Expected: is equal to 7
+    ///           ^^^^^^^^^^^^^
+    /// Actual: ...
+    /// ```
+    ///
+    /// When the matcher contains one or more inner matchers, the implementation
+    /// should invoke [`Self::describe`] on the inner matchers to complete the
+    /// description. It should place the inner description at a point where a
+    /// verb phrase would fit. For example, the matcher
+    /// [`some`][crate::matchers::some] implements `describe` as follows:
+    ///
+    /// ```ignore
+    /// fn describe(&self, matcher_result: MatcherResult) -> Description {
+    ///     match matcher_result {
+    ///         MatcherResult::Matches => {
+    ///             Description::new()
+    ///                 .text("has a value which")
+    ///                 .nested(self.inner.describe(MatcherResult::Matches))
+    ///       // Inner matcher: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ///         }
+    ///         MatcherResult::DoesNotMatch => {...} // Similar to the above
+    ///     }
+    /// }
+    /// ```
+    ///
+    /// The output expectation differs from that of
+    /// [`explain_match`][Self::explain_match] in that it is a verb phrase
+    /// (beginning with a verb like "is") rather than a relative clause
+    /// (beginning with "which" or "whose"). This difference is because the
+    /// output of `explain_match` is always used adjectivally to describe the
+    /// actual value, while `describe` is used in contexts where a relative
+    /// clause would not make sense.
+    fn describe(&self, matcher_result: MatcherResult) -> Description;
 }
 
 /// Any actual value whose debug length is greater than this value will be

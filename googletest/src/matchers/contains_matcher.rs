@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -112,7 +112,11 @@ where
             (_, None) => "which contains a matching element".into(),
         }
     }
+}
 
+impl<InnerMatcherT: Describable, ContainerT: Debug + ?Sized> Describable
+    for ContainsMatcher<ContainerT, InnerMatcherT>
+{
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match (matcher_result, &self.count) {
             (MatcherResult::Match, Some(count)) => format!(
@@ -159,7 +163,7 @@ impl<ActualT: ?Sized, InnerMatcherT> ContainsMatcher<ActualT, InnerMatcherT> {
 #[cfg(test)]
 mod tests {
     use super::{ContainsMatcher, contains};
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
 
     #[test]
@@ -236,20 +240,20 @@ mod tests {
 
     #[test]
     fn contains_formats_without_multiplicity_by_default() -> Result<()> {
-        let matcher: ContainsMatcher<Vec<i32>, _> = contains(eq(1));
+        let matcher: ContainsMatcher<Vec<i32>, _> = contains(eq::<i32, _>(1));
 
         verify_that!(
-            Matcher::describe(&matcher, MatcherResult::Match),
+            matcher.describe(MatcherResult::Match),
             displays_as(eq("contains at least one element which is equal to 1"))
         )
     }
 
     #[test]
     fn contains_formats_with_multiplicity_when_specified() -> Result<()> {
-        let matcher: ContainsMatcher<Vec<i32>, _> = contains(eq(1)).times(eq(2));
+        let matcher: ContainsMatcher<Vec<i32>, _> = contains(eq::<i32, _>(1)).times(eq(2));
 
         verify_that!(
-            Matcher::describe(&matcher, MatcherResult::Match),
+            matcher.describe(MatcherResult::Match),
             displays_as(eq("contains n elements which is equal to 1\n  where n is equal to 2"))
         )
     }

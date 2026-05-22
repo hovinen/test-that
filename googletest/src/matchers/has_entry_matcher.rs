@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::description::Description;
-use crate::matcher::{Matcher, MatcherResult};
+use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
@@ -99,7 +99,11 @@ impl<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>
             format!("which doesn't contain key {:?}", self.key).into()
         }
     }
+}
 
+impl<KeyT: Debug, ValueT, MatcherT: Describable> Describable
+    for HasEntryMatcher<KeyT, ValueT, MatcherT>
+{
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(

@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -73,6 +73,19 @@ where
             .unwrap_or(MatcherResult::NoMatch)
     }
 
+    fn explain_match(&self, actual: &ActualT) -> Description {
+        match String::from_utf8(actual.as_ref().to_vec()) {
+            Ok(s) => {
+                format!("which is a UTF-8 encoded string {}", self.inner.explain_match(&s)).into()
+            }
+            Err(e) => format!("which is not a UTF-8 encoded string: {e}").into(),
+        }
+    }
+}
+
+impl<ActualT, InnerMatcherT: Describable> Describable
+    for IsEncodedStringMatcher<ActualT, InnerMatcherT>
+{
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(
@@ -87,20 +100,11 @@ where
             .into(),
         }
     }
-
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        match String::from_utf8(actual.as_ref().to_vec()) {
-            Ok(s) => {
-                format!("which is a UTF-8 encoded string {}", self.inner.explain_match(&s)).into()
-            }
-            Err(e) => format!("which is not a UTF-8 encoded string: {e}").into(),
-        }
-    }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::matcher::MatcherResult;
+    use crate::matcher::{Describable as _, MatcherResult};
     use crate::prelude::*;
 
     #[test]

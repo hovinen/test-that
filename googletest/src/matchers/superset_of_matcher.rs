@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -127,7 +127,9 @@ where
             _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
         }
     }
+}
 
+impl<ActualT: ?Sized, ExpectedT: Debug> Describable for SupersetOfMatcher<ActualT, ExpectedT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is a superset of {:#?}", self.subset).into(),

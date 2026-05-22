@@ -118,7 +118,7 @@ macro_rules! property_internal {
             stringify!($method($($argument),*)),
             $m,
             |o: &$($t)::+, inner| inner.matches(&o.$method($($argument),*)),
-            |inner, r| inner.describe(r),
+            |inner, r| $crate::matcher::Describable::describe(inner, r),
             |o: &$($t)::+, inner| {
                 let actual_inner = o.$method($($argument),*);
                 ::std::convert::Into::into(format!(
@@ -147,7 +147,7 @@ macro_rules! property_internal {
 pub mod internal {
     use crate::{
         description::Description,
-        matcher::{Matcher, MatcherResult},
+        matcher::{Describable, Matcher, MatcherResult},
     };
     use std::{fmt::Debug, marker::PhantomData};
 
@@ -167,25 +167,26 @@ pub mod internal {
     /// when the inner is polymorphic in `T`); instead the macro stringifies
     /// the inner expression for the describe output.
     #[doc(hidden)]
-    pub fn property_matcher<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn>(
+    pub fn property_matcher<OuterT, InnerMatcherT, ApplyFn, DescribeFn, ExplainFn>(
         property_desc: &'static str,
-        inner: InnerT,
+        inner: InnerMatcherT,
         apply: ApplyFn,
         describe: DescribeFn,
         explain: ExplainFn,
     ) -> impl Matcher<OuterT>
     where
         OuterT: Debug,
-        ApplyFn: Fn(&OuterT, &InnerT) -> MatcherResult,
-        DescribeFn: Fn(&InnerT, MatcherResult) -> Description,
-        ExplainFn: Fn(&OuterT, &InnerT) -> Description,
+        InnerMatcherT: Describable,
+        ApplyFn: Fn(&OuterT, &InnerMatcherT) -> MatcherResult,
+        DescribeFn: Fn(&InnerMatcherT, MatcherResult) -> Description,
+        ExplainFn: Fn(&OuterT, &InnerMatcherT) -> Description,
     {
         PropertyMatcher { property_desc, inner, apply, describe, explain, phantom: PhantomData }
     }
 
-    struct PropertyMatcher<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn> {
+    struct PropertyMatcher<OuterT, InnerMatcherT, ApplyFn, DescribeFn, ExplainFn> {
         property_desc: &'static str,
-        inner: InnerT,
+        inner: InnerMatcherT,
         apply: ApplyFn,
         describe: DescribeFn,
         explain: ExplainFn,
@@ -204,6 +205,16 @@ pub mod internal {
             (self.apply)(actual, &self.inner)
         }
 
+        fn explain_match(&self, actual: &OuterT) -> Description {
+            (self.explain)(actual, &self.inner)
+        }
+    }
+
+    impl<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn> Describable
+        for PropertyMatcher<OuterT, InnerT, ApplyFn, DescribeFn, ExplainFn>
+    where
+        DescribeFn: Fn(&InnerT, MatcherResult) -> Description,
+    {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "has property `{}`, which {}",
@@ -211,10 +222,6 @@ pub mod internal {
                 (self.describe)(&self.inner, matcher_result)
             )
             .into()
-        }
-
-        fn explain_match(&self, actual: &OuterT) -> Description {
-            (self.explain)(actual, &self.inner)
         }
     }
 
@@ -246,15 +253,6 @@ pub mod internal {
             self.inner.matches((self.extractor)(actual))
         }
 
-        fn describe(&self, matcher_result: MatcherResult) -> Description {
-            format!(
-                "has property `{}`, which {}",
-                self.property_desc,
-                self.inner.describe(matcher_result)
-            )
-            .into()
-        }
-
         fn explain_match(&self, actual: &OuterT) -> Description {
             let actual_inner = (self.extractor)(actual);
             format!(
@@ -262,6 +260,19 @@ pub mod internal {
                 self.property_desc,
                 actual_inner,
                 self.inner.explain_match(actual_inner)
+            )
+            .into()
+        }
+    }
+
+    impl<InnerT: ?Sized, OuterT, MatcherT: Describable> Describable
+        for PropertyRefMatcher<InnerT, OuterT, MatcherT>
+    {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            format!(
+                "has property `{}`, which {}",
+                self.property_desc,
+                self.inner.describe(matcher_result)
             )
             .into()
         }

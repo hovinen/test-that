@@ -16,7 +16,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -45,6 +45,14 @@ impl<'a, ActualT: Debug, InnerMatcherT: Matcher<ActualT>> Matcher<ActualT>
         self.inner.matches(actual)
     }
 
+    fn explain_match(&self, actual: &ActualT) -> Description {
+        self.inner.explain_match(actual)
+    }
+}
+
+impl<'a, ActualT, InnerMatcherT: Describable> Describable
+    for IsMatcher<'a, ActualT, InnerMatcherT>
+{
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(
@@ -60,9 +68,5 @@ impl<'a, ActualT: Debug, InnerMatcherT: Matcher<ActualT>> Matcher<ActualT>
             )
             .into(),
         }
-    }
-
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        self.inner.explain_match(actual)
     }
 }

@@ -65,7 +65,7 @@ macro_rules! __all {
 #[doc(hidden)]
 pub mod internal {
     use crate::description::Description;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matchers::anything;
     use std::fmt::Debug;
 
@@ -125,7 +125,9 @@ pub mod internal {
                 }
             }
         }
+    }
 
+    impl<'a, T: Debug + ?Sized, const N: usize> Describable for AllMatcher<'a, T, N> {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             match N {
                 0 => anything::<T>().describe(matcher_result),
@@ -150,7 +152,7 @@ pub mod internal {
 #[cfg(test)]
 mod tests {
     use super::internal;
-    use crate::matcher::{Matcher, MatcherResult};
+    use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
 

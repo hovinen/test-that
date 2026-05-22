@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -53,7 +53,9 @@ impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<T, InnerMatc
     fn explain_match(&self, actual: &T) -> Description {
         self.inner.explain_match(actual)
     }
+}
 
+impl<T, InnerMatcherT: Describable> Describable for NotMatcher<T, InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         self.inner.describe(if matcher_result.into() {
             MatcherResult::NoMatch

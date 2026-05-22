@@ -14,7 +14,7 @@
 
 use crate::{
     description::Description,
-    matcher::{Matcher, MatcherResult},
+    matcher::{Describable, Matcher, MatcherResult},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -127,7 +127,9 @@ where
             _ => format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into(),
         }
     }
+}
 
+impl<ActualT: ?Sized, ExpectedT: Debug> Describable for SubsetOfMatcher<ActualT, ExpectedT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is a subset of {:#?}", self.superset).into(),
