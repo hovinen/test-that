@@ -62,10 +62,10 @@ fn pointwise_works_as_inner_matcher() -> Result<()> {
 fn elements_are_works_as_inner_matcher() -> Result<()> {
     #[derive(Debug)]
     struct AStruct(Vec<i32>);
-    verify_that!(AStruct(vec![123]), matches_pattern!(AStruct(elements_are![eq(123)])))
+    verify_that!(AStruct(vec![123]), matches_pattern!(AStruct(contains_exactly![eq(123)])))
 }
 
 #[test]
 fn tuple_works_as_inner_matcher() -> Result<()> {
-    verify_that!(vec![(123,)], elements_are![(eq(123),)])
+    verify_that!(vec![(123,)], contains_exactly![(eq(123),)])
 }

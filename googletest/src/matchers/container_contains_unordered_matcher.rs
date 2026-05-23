@@ -23,19 +23,19 @@
 /// ```
 /// # use googletest::prelude::*;
 /// # fn should_pass() -> Result<()> {
-/// verify_that!(vec![3, 2, 1], unordered_elements_are![eq(1), ge(2), anything()])?;   // Passes
+/// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(2), anything()])?;   // Passes
 /// #     Ok(())
 /// # }
 /// # fn should_fail_1() -> Result<()> {
-/// verify_that!(vec![1], unordered_elements_are![eq(1), ge(2)])?;              // Fails: container has wrong size
+/// verify_that!(vec![1], contains_exactly![eq(1), ge(2)])?;              // Fails: container has wrong size
 /// #     Ok(())
 /// # }
 /// # fn should_fail_2() -> Result<()> {
-/// verify_that!(vec![3, 2, 1], unordered_elements_are![eq(1), ge(4), eq(2)])?; // Fails: second matcher not matched
+/// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(4), eq(2)])?; // Fails: second matcher not matched
 /// #     Ok(())
 /// # }
 /// # fn should_fail_3() -> Result<()> {
-/// verify_that!(vec![3, 2, 1], unordered_elements_are![ge(3), ge(3), ge(3)])?; // Fails: no 1:1 correspondence
+/// verify_that!(vec![3, 2, 1], contains_exactly![ge(3), ge(3), ge(3)])?; // Fails: no 1:1 correspondence
 /// #     Ok(())
 /// # }
 /// # should_pass().unwrap();
@@ -59,7 +59,7 @@
 ///     HashMap::from_iter([(1, "One"), (2, "Two"), (3, "Three")]);
 /// verify_that!(
 ///     value,
-///     unordered_elements_are![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))]
+///     contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))]
 /// )
 /// #     .unwrap();
 /// ```
@@ -75,7 +75,7 @@
 ///
 /// Note: This behavior is only possible in [`verify_that!`] macros. In any
 /// other cases, it is still necessary to use the
-/// [`unordered_elements_are!`][crate::matchers::unordered_elements_are] macro.
+/// [`contains_exactly!`][crate::matchers::contains_exactly] macro.
 ///
 /// ```compile_fail
 /// # use googletest::prelude::*;
@@ -87,7 +87,7 @@
 /// ```
 /// # use googletest::prelude::*;
 /// verify_that!(vec![vec![1,2], vec![3]],
-///   {unordered_elements_are![eq(2), eq(1)], unordered_elements_are![eq(3)]})
+///   {contains_exactly![eq(2), eq(1)], contains_exactly![eq(3)]})
 /// # .unwrap();
 /// ```
 ///
@@ -118,21 +118,21 @@
 /// [`Vec`]: std::vec::Vec
 #[macro_export]
 #[doc(hidden)]
-macro_rules! __unordered_elements_are {
+macro_rules! __contains_exactly {
     ($(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsAreMatcher, Requirements
+            ContainerContainsUnorderedMatcher, Requirements
         };
-        UnorderedElementsAreMatcher::new([], Requirements::PerfectMatch)
+        ContainerContainsUnorderedMatcher::new([], Requirements::PerfectMatch)
     }};
 
     // TODO: Consider an alternative map-like syntax here similar to that used in
     // https://crates.io/crates/maplit.
     ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsOfMapAreMatcher, Requirements
+            MapContainsMatcher, Requirements
         };
-        UnorderedElementsOfMapAreMatcher::new(
+        MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
             Requirements::PerfectMatch
         )
@@ -140,9 +140,9 @@ macro_rules! __unordered_elements_are {
 
     ($($matcher:expr),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsAreMatcher, Requirements
+            ContainerContainsUnorderedMatcher, Requirements
         };
-        UnorderedElementsAreMatcher::new([$(Box::new($matcher)),*], Requirements::PerfectMatch)
+        ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::PerfectMatch)
     }};
 }
 
@@ -155,7 +155,7 @@ macro_rules! __unordered_elements_are {
 ///
 /// Put another way, `contains_each!` matches if there is a subset of the actual
 /// container which
-/// [`unordered_elements_are`][crate::matchers::unordered_elements_are] would
+/// [`contains_exactly`][crate::matchers::contains_exactly] would
 /// match.
 ///
 /// ```
@@ -227,18 +227,18 @@ macro_rules! __unordered_elements_are {
 macro_rules! __contains_each {
     ($(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsAreMatcher, Requirements
+            ContainerContainsUnorderedMatcher, Requirements
         };
-        UnorderedElementsAreMatcher::new([], Requirements::Superset)
+        ContainerContainsUnorderedMatcher::new([], Requirements::Superset)
     }};
 
     // TODO: Consider an alternative map-like syntax here similar to that used in
     // https://crates.io/crates/maplit.
     ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsOfMapAreMatcher, Requirements
+            MapContainsMatcher, Requirements
         };
-        UnorderedElementsOfMapAreMatcher::new(
+        MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
             Requirements::Superset
         )
@@ -246,9 +246,9 @@ macro_rules! __contains_each {
 
     ($($matcher:expr),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsAreMatcher, Requirements
+            ContainerContainsUnorderedMatcher, Requirements
         };
-        UnorderedElementsAreMatcher::new([$(Box::new($matcher)),*], Requirements::Superset)
+        ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::Superset)
     }}
 }
 
@@ -263,7 +263,7 @@ macro_rules! __contains_each {
 ///
 /// Put another way, `is_contained_in!` matches if there is a subset of the
 /// matchers which would match with
-/// [`unordered_elements_are`][crate::matchers::unordered_elements_are].
+/// [`contains_exactly`][crate::matchers::contains_exactly].
 ///
 /// ```
 /// # use googletest::prelude::*;
@@ -336,18 +336,18 @@ macro_rules! __contains_each {
 macro_rules! __is_contained_in {
     ($(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsAreMatcher, Requirements
+            ContainerContainsUnorderedMatcher, Requirements
         };
-        UnorderedElementsAreMatcher::new([], Requirements::Subset)
+        ContainerContainsUnorderedMatcher::new([], Requirements::Subset)
     }};
 
     // TODO: Consider an alternative map-like syntax here similar to that used in
     // https://crates.io/crates/maplit.
     ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsOfMapAreMatcher, Requirements
+            MapContainsMatcher, Requirements
         };
-        UnorderedElementsOfMapAreMatcher::new(
+        MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
             Requirements::Subset
         )
@@ -355,9 +355,9 @@ macro_rules! __is_contained_in {
 
     ($($matcher:expr),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            UnorderedElementsAreMatcher, Requirements
+            ContainerContainsUnorderedMatcher, Requirements
         };
-        UnorderedElementsAreMatcher::new([$(Box::new($matcher)),*], Requirements::Subset)
+        ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::Subset)
     }}
 }
 
@@ -369,45 +369,67 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
+    use crate::matchers::container_contains_ordered_matcher::internal::{OwnedItems, RefItems};
+    use crate::prelude::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
     use std::collections::HashSet;
     use std::fmt::{Debug, Display};
     use std::marker::PhantomData;
 
-    /// This struct is meant to be used only through the
-    /// `unordered_elements_are![...]` macro.
+    /// Matches elements of an iterable collection with a sequence of matchers, in any order.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
-    #[doc(hidden)]
-    pub struct UnorderedElementsAreMatcher<'a, ContainerT: ?Sized, T: Debug, const N: usize> {
+    /// This struct is meant to be used only through the `contains_exactly![...]` macro.
+    pub struct ContainerContainsUnorderedMatcher<
+        'a,
+        ContainerT: ?Sized,
+        T: Debug,
+        Mode,
+        const N: usize,
+    > {
         elements: [Box<dyn Matcher<T> + 'a>; N],
         requirements: Requirements,
-        phantom: PhantomData<ContainerT>,
+        _container: PhantomData<ContainerT>,
+        _mode: PhantomData<Mode>,
     }
 
-    impl<'a, ContainerT: ?Sized, T: Debug, const N: usize>
-        UnorderedElementsAreMatcher<'a, ContainerT, T, N>
+    impl<'a, ContainerT: ?Sized, T: Debug, Mode, const N: usize>
+        ContainerContainsUnorderedMatcher<'a, ContainerT, T, Mode, N>
     {
+        /// Constructs a [ContainerContainsUnorderedMatcher] with the given matchers.
+        ///
+        /// This is not inteded to be invoked directly, but rather through the macris
+        /// [contains_exactly], [contains_each] and [is_contained_in].
+        #[doc(hidden)]
         pub fn new(elements: [Box<dyn Matcher<T> + 'a>; N], requirements: Requirements) -> Self {
-            Self { elements, requirements, phantom: Default::default() }
+            Self {
+                elements,
+                requirements,
+                _mode: Default::default(),
+                _container: Default::default(),
+            }
+        }
+
+        /// Asserts that the matchers must match the elements of the collection in the same order
+        /// as they appear when iterating.
+        pub fn in_order(self) -> ContainerContainsOrderedMatcher<'a, ContainerT, T, Mode, N> {
+            ContainerContainsOrderedMatcher::new(self.elements)
         }
     }
 
     // This matcher performs the checks in three different steps in both `matches`
     // and `explain_match`. This is useful for performance but also to produce
     // an actionable error message.
-    // 1. `UnorderedElementsAreMatcher` verifies that both collections have the same
-    // size
-    // 2. `UnorderedElementsAreMatcher` verifies that each actual element matches at
-    // least one expected element and vice versa.
-    // 3. `UnorderedElementsAreMatcher` verifies that a perfect matching exists
-    // using Ford-Fulkerson.
+    // 1. `ContainerContainsUnorderedMatcher` verifies that both collections have the same size
+    // 2. `ContainerContainsUnorderedMatcher` verifies that each actual element matches at least
+    //    one expected element and vice versa.
+    // 3. `ContainerContainsUnorderedMatcher` verifies that a perfect matching exists using
+    //    Ford-Fulkerson.
     impl<'a, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
-        for UnorderedElementsAreMatcher<'a, ContainerT, T, N>
+        for ContainerContainsUnorderedMatcher<'a, ContainerT, T, RefItems, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let match_matrix = MatchMatrix::generate(actual, &self.elements);
+            let match_matrix = MatchMatrix::<RefItems, N>::generate(actual, &self.elements);
             match_matrix.is_match_for(self.requirements).into()
         }
 
@@ -418,7 +440,7 @@ pub mod internal {
                 return size_mismatch_explanation;
             }
 
-            let match_matrix = MatchMatrix::generate(actual, &self.elements);
+            let match_matrix = MatchMatrix::<RefItems, N>::generate(actual, &self.elements);
             if let Some(unmatchable_explanation) =
                 match_matrix.explain_unmatchable(self.requirements)
             {
@@ -432,8 +454,47 @@ pub mod internal {
         }
     }
 
-    impl<'a, T: Debug, ContainerT: ?Sized, const N: usize> Describable
-        for UnorderedElementsAreMatcher<'a, ContainerT, T, N>
+    // This matcher performs the checks in three different steps in both `matches`
+    // and `explain_match`. This is useful for performance but also to produce
+    // an actionable error message.
+    // 1. `ContainerContainsUnorderedMatcher` verifies that both collections have the same size
+    // 2. `ContainerContainsUnorderedMatcher` verifies that each actual element matches at least
+    //    one expected element and vice versa.
+    // 3. `ContainerContainsUnorderedMatcher` verifies that a perfect matching exists using
+    //    Ford-Fulkerson.
+    impl<'a, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
+        for ContainerContainsUnorderedMatcher<'a, ContainerT, T, OwnedItems, N>
+    where
+        for<'b> &'b ContainerT: IntoIterator<Item = T>,
+    {
+        fn matches(&self, actual: &ContainerT) -> MatcherResult {
+            let match_matrix = MatchMatrix::<OwnedItems, N>::generate(actual, &self.elements);
+            match_matrix.is_match_for(self.requirements).into()
+        }
+
+        fn explain_match(&self, actual: &ContainerT) -> Description {
+            if let Some(size_mismatch_explanation) =
+                self.requirements.explain_size_mismatch(actual, N)
+            {
+                return size_mismatch_explanation;
+            }
+
+            let match_matrix = MatchMatrix::<OwnedItems, N>::generate(actual, &self.elements);
+            if let Some(unmatchable_explanation) =
+                match_matrix.explain_unmatchable(self.requirements)
+            {
+                return unmatchable_explanation;
+            }
+
+            let best_match = match_matrix.find_best_match();
+            best_match
+                .get_explanation(&actual, &self.elements, self.requirements)
+                .unwrap_or("whose elements all match".into())
+        }
+    }
+
+    impl<'a, T: Debug, ContainerT: ?Sized, Mode, const N: usize> Describable
+        for ContainerContainsUnorderedMatcher<'a, ContainerT, T, Mode, N>
     {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
@@ -453,12 +514,12 @@ pub mod internal {
     type KeyValueMatcher<'a, KeyT, ValueT> =
         (Box<dyn Matcher<KeyT> + 'a>, Box<dyn Matcher<ValueT> + 'a>);
 
-    /// This is the analogue to [UnorderedElementsAreMatcher] for maps and
+    /// This is the analogue to [ContainerContainsUnorderedMatcher] for maps and
     /// map-like collections.
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub struct UnorderedElementsOfMapAreMatcher<'a, ContainerT, KeyT, ValueT, const N: usize>
+    pub struct MapContainsMatcher<'a, ContainerT, KeyT, ValueT, const N: usize>
     where
         ContainerT: ?Sized,
         KeyT: Debug,
@@ -470,7 +531,7 @@ pub mod internal {
     }
 
     impl<'a, ContainerT, KeyT: Debug, ValueT: Debug, const N: usize>
-        UnorderedElementsOfMapAreMatcher<'a, ContainerT, KeyT, ValueT, N>
+        MapContainsMatcher<'a, ContainerT, KeyT, ValueT, N>
     {
         pub fn new(
             elements: [KeyValueMatcher<'a, KeyT, ValueT>; N],
@@ -481,12 +542,12 @@ pub mod internal {
     }
 
     impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: Debug + ?Sized, const N: usize>
-        Matcher<ContainerT> for UnorderedElementsOfMapAreMatcher<'a, ContainerT, KeyT, ValueT, N>
+        Matcher<ContainerT> for MapContainsMatcher<'a, ContainerT, KeyT, ValueT, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = (&'b KeyT, &'b ValueT)>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let match_matrix = MatchMatrix::generate_for_map(actual, &self.elements);
+            let match_matrix = MatchMatrix::<RefItems, N>::generate_for_map(actual, &self.elements);
             match_matrix.is_match_for(self.requirements).into()
         }
 
@@ -497,7 +558,7 @@ pub mod internal {
                 return size_mismatch_explanation;
             }
 
-            let match_matrix = MatchMatrix::generate_for_map(actual, &self.elements);
+            let match_matrix = MatchMatrix::<RefItems, N>::generate_for_map(actual, &self.elements);
             if let Some(unmatchable_explanation) =
                 match_matrix.explain_unmatchable(self.requirements)
             {
@@ -513,7 +574,7 @@ pub mod internal {
     }
 
     impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: ?Sized, const N: usize> Describable
-        for UnorderedElementsOfMapAreMatcher<'a, ContainerT, KeyT, ValueT, N>
+        for MapContainsMatcher<'a, ContainerT, KeyT, ValueT, N>
     {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
@@ -600,9 +661,9 @@ pub mod internal {
     }
 
     /// The bipartite matching graph between actual and expected elements.
-    struct MatchMatrix<const N: usize>(Vec<[MatcherResult; N]>);
+    struct MatchMatrix<Mode, const N: usize>(Vec<[MatcherResult; N]>, PhantomData<Mode>);
 
-    impl<const N: usize> MatchMatrix<N> {
+    impl<const N: usize> MatchMatrix<RefItems, N> {
         fn generate<'a, T: Debug + 'a, ContainerT: Debug + ?Sized>(
             actual: &ContainerT,
             expected: &[Box<dyn Matcher<T> + 'a>; N],
@@ -610,7 +671,10 @@ pub mod internal {
         where
             for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
         {
-            let mut matrix = MatchMatrix(vec![[MatcherResult::NoMatch; N]; count_elements(actual)]);
+            let mut matrix = MatchMatrix(
+                vec![[MatcherResult::NoMatch; N]; count_elements(actual)],
+                Default::default(),
+            );
             for (actual_idx, actual) in actual.into_iter().enumerate() {
                 for (expected_idx, expected) in expected.iter().enumerate() {
                     matrix.0[actual_idx][expected_idx] = expected.matches(actual);
@@ -626,7 +690,10 @@ pub mod internal {
         where
             for<'b> &'b ContainerT: IntoIterator<Item = (&'b KeyT, &'b ValueT)>,
         {
-            let mut matrix = MatchMatrix(vec![[MatcherResult::NoMatch; N]; count_elements(actual)]);
+            let mut matrix = MatchMatrix(
+                vec![[MatcherResult::NoMatch; N]; count_elements(actual)],
+                Default::default(),
+            );
             for (actual_idx, (actual_key, actual_value)) in actual.into_iter().enumerate() {
                 for (expected_idx, (expected_key, expected_value)) in expected.iter().enumerate() {
                     matrix.0[actual_idx][expected_idx] = (expected_key.matches(actual_key).into()
@@ -636,7 +703,30 @@ pub mod internal {
             }
             matrix
         }
+    }
 
+    impl<const N: usize> MatchMatrix<OwnedItems, N> {
+        fn generate<'a, T: Debug + 'a, ContainerT: Debug + ?Sized>(
+            actual: &ContainerT,
+            expected: &[Box<dyn Matcher<T> + 'a>; N],
+        ) -> Self
+        where
+            for<'b> &'b ContainerT: IntoIterator<Item = T>,
+        {
+            let mut matrix = MatchMatrix(
+                vec![[MatcherResult::NoMatch; N]; count_elements(actual)],
+                Default::default(),
+            );
+            for (actual_idx, actual) in actual.into_iter().enumerate() {
+                for (expected_idx, expected) in expected.iter().enumerate() {
+                    matrix.0[actual_idx][expected_idx] = expected.matches(&actual);
+                }
+            }
+            matrix
+        }
+    }
+
+    impl<Mode, const N: usize> MatchMatrix<Mode, N> {
         fn is_match_for(&self, requirements: Requirements) -> bool {
             match requirements {
                 Requirements::PerfectMatch => {
@@ -755,7 +845,7 @@ pub mod internal {
         //       "Introduction to Algorithms (Second ed.)", pp. 651-664.
         //   [2] "Ford-Fulkerson algorithm", Wikipedia,
         //       'http://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm'
-        fn find_best_match(&self) -> BestMatch<N> {
+        fn find_best_match(&self) -> BestMatch<Mode, N> {
             let mut actual_match = vec![None; self.0.len()];
             let mut expected_match: [Option<usize>; N] = [None; N];
             // Searches the residual flow graph for a path from each actual node to
@@ -776,7 +866,7 @@ pub mod internal {
                 let mut seen = [false; N];
                 self.try_augment(actual_idx, &mut seen, &mut actual_match, &mut expected_match);
             }
-            BestMatch(actual_match)
+            BestMatch(actual_match, Default::default())
         }
 
         // Perform a depth-first search from actual node `actual_idx` to the sink by
@@ -927,9 +1017,9 @@ pub mod internal {
     ///  * The 0th element in actual matches the 0th element in expected.
     ///  * The 1st element in actual does not match.
     ///  * The 2nd element in actual matches the 1st element in expected.
-    struct BestMatch<const N: usize>(Vec<Option<usize>>);
+    struct BestMatch<Mode, const N: usize>(Vec<Option<usize>>, PhantomData<Mode>);
 
-    impl<const N: usize> BestMatch<N> {
+    impl<Mode, const N: usize> BestMatch<Mode, N> {
         fn is_full_match(&self) -> bool {
             self.0.iter().all(|o| o.is_some())
         }
@@ -960,7 +1050,9 @@ pub mod internal {
             let matched_expected: HashSet<_> = self.0.iter().flatten().collect();
             (0..N).filter(|expected_idx| !matched_expected.contains(expected_idx)).collect()
         }
+    }
 
+    impl<const N: usize> BestMatch<RefItems, N> {
         fn get_explanation<'a, T: Debug, ContainerT: Debug + ?Sized>(
             &self,
             actual: &ContainerT,
@@ -1066,11 +1158,60 @@ pub mod internal {
             ).into())
         }
     }
+
+    impl<const N: usize> BestMatch<OwnedItems, N> {
+        fn get_explanation<'a, T: Debug, ContainerT: Debug + ?Sized>(
+            &self,
+            actual: &ContainerT,
+            expected: &[Box<dyn Matcher<T> + 'a>; N],
+            requirements: Requirements,
+        ) -> Option<Description>
+        where
+            for<'b> &'b ContainerT: IntoIterator<Item = T>,
+        {
+            let actual: Vec<_> = actual.into_iter().collect();
+            if self.is_full_match() {
+                return None;
+            }
+            let mut error_message =
+                format!("which does not have a {requirements} match with the expected elements.");
+
+            error_message.push_str("\n  The best match found was: ");
+
+            let matches = self.get_matches().map(|(actual_idx, expected_idx)|{
+                format!(
+                    "Actual element {:?} at index {actual_idx} matched expected element `{}` at index {expected_idx}.",
+                    actual[actual_idx],
+                    expected[expected_idx].describe(MatcherResult::Match),
+            )});
+
+            let unmatched_actual = self.get_unmatched_actual().map(|actual_idx| {
+                format!(
+                    "Actual element {:#?} at index {actual_idx} did not match any remaining expected element.",
+                    actual[actual_idx]
+                )
+            });
+
+            let unmatched_expected = self.get_unmatched_expected().into_iter().map(|expected_idx|{format!(
+                "Expected element `{}` at index {expected_idx} did not match any remaining actual element.",
+                expected[expected_idx].describe(MatcherResult::Match)
+            )});
+
+            let best_match = matches
+                .chain(unmatched_actual)
+                .chain(unmatched_expected)
+                .collect::<Description>()
+                .indent();
+            Some(format!(
+                "which does not have a {requirements} match with the expected elements. The best match found was:\n{best_match}"
+            ).into())
+        }
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::internal::UnorderedElementsOfMapAreMatcher;
+    use super::internal::MapContainsMatcher;
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
@@ -1078,14 +1219,14 @@ mod tests {
 
     #[test]
     fn has_correct_description_for_map() -> Result<()> {
-        // UnorderedElementsAreMatcher maintains references to the matchers, so the
+        // ContainerContainsUnorderedMatcher maintains references to the matchers, so the
         // constituent matchers must live longer. Inside a verify_that! macro, the
         // compiler takes care of that, but when the matcher is created separately,
         // we must create the constitute matchers separately so that they
         // aren't dropped too early.
         let matchers =
             ((eq::<i32, _>(2), eq::<&str, _>("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
-        let matcher: UnorderedElementsOfMapAreMatcher<HashMap<i32, &str>, _, _, 3> = unordered_elements_are![
+        let matcher: MapContainsMatcher<HashMap<i32, &str>, _, _, 3> = contains_exactly![
             (matchers.0.0, matchers.0.1),
             (matchers.1.0, matchers.1.1),
             (matchers.2.0, matchers.2.1)
@@ -1103,14 +1244,14 @@ mod tests {
     }
 
     #[test]
-    fn unordered_elements_are_description_no_full_match_with_map() -> Result<()> {
-        // UnorderedElementsAreMatcher maintains references to the matchers, so the
+    fn contains_exactly_description_no_full_match_with_map() -> Result<()> {
+        // ContainerContainsUnorderedMatcher maintains references to the matchers, so the
         // constituent matchers must live longer. Inside a verify_that! macro, the
         // compiler takes care of that, but when the matcher is created separately,
         // we must create the constitute matchers separately so that they
         // aren't dropped too early.
         let matchers = ((anything(), eq(1)), (anything(), eq(2)), (anything(), eq(2)));
-        let matcher: UnorderedElementsOfMapAreMatcher<HashMap<u32, u32>, _, _, 3> = unordered_elements_are![
+        let matcher: MapContainsMatcher<HashMap<u32, u32>, _, _, 3> = contains_exactly![
             (matchers.0.0, matchers.0.1),
             (matchers.1.0, matchers.1.1),
             (matchers.2.0, matchers.2.1),

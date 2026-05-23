@@ -30,5 +30,5 @@ impl<'a> IntoIterator for &'a IntContainer {
 fn elements_are_supports_containers_which_iterate_over_owned_values() -> Result<()> {
     let container = IntContainer(vec![1, 2, 3]);
 
-    verify_that!(container, elements_are![eq(1), eq(2), eq(3)])
+    verify_that!(container, contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }

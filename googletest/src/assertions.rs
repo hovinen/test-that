@@ -60,9 +60,9 @@
 ///
 /// This macro has special support for matching against container. Namely:
 ///   * `verify_that!(actual, [m1, m2, ...])` is equivalent to
-///     `verify_that!(actual, elements_are![m1, m2, ...])`
+///     `verify_that!(actual, contains_exactly![m1, m2, ...].in_order())`
 ///   * `verify_that!(actual, {m1, m2, ...})` is equivalent to
-///     `verify_that!(actual, unordered_elements_are![m1, m2, ...])`
+///     `verify_that!(actual, contains_exactly![m1, m2, ...])`
 ///
 /// ## Matching against tuples
 ///
@@ -124,7 +124,7 @@ macro_rules! verify_that {
     ($actual:expr, [$($expecteds:expr),+ $(,)?]) => {
         $crate::assertions::internal::check_matcher(
             &$actual,
-            $crate::matchers::elements_are![$($expecteds),+],
+            $crate::matchers::contains_exactly![$($expecteds),+].in_order(),
             stringify!($actual),
             $crate::internal::source_location::SourceLocation::new(file!(), line!(), column!()),
         )
@@ -132,7 +132,7 @@ macro_rules! verify_that {
     ($actual:expr, {$($expecteds:expr),+ $(,)?}) => {
         $crate::assertions::internal::check_matcher(
             &$actual,
-            $crate::matchers::unordered_elements_are![$($expecteds),+],
+            $crate::matchers::contains_exactly![$($expecteds),+],
             stringify!($actual),
             $crate::internal::source_location::SourceLocation::new(file!(), line!(), column!()),
         )

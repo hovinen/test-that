@@ -25,7 +25,7 @@
 ///
 /// ```
 /// # use googletest::prelude::*;
-/// verify_that!(vec![1, 2, 3], elements_are![eq(1), anything(), gt(0).and(lt(123))])
+/// verify_that!(vec![1, 2, 3], contains_exactly![eq(1), anything(), gt(0).and(lt(123))].in_order())
 /// #    .unwrap();
 /// ```
 ///
@@ -37,7 +37,7 @@
 /// # use googletest::prelude::*;
 /// let vector = vec![1, 2, 3];
 /// let slice = vector.as_slice();
-/// verify_that!(*slice, elements_are![eq(1), anything(), gt(0).and(lt(123))])
+/// verify_that!(*slice, contains_exactly![eq(1), anything(), gt(0).and(lt(123))].in_order())
 /// #    .unwrap();
 /// ```
 ///
@@ -46,7 +46,7 @@
 ///
 /// ```
 /// # use googletest::prelude::*;
-///  verify_that!(vec![1, 2], [eq(1), eq(2)])
+/// verify_that!(vec![1, 2], [eq(1), eq(2)])
 /// #     .unwrap();
 /// ```
 ///
@@ -63,7 +63,7 @@
 /// Use this instead:
 /// ```
 /// # use googletest::prelude::*;
-/// verify_that!(vec![vec![1,2], vec![3]], [elements_are![eq(1), eq(2)], elements_are![eq(3)]])
+/// verify_that!(vec![vec![1,2], vec![3]], [contains_exactly![eq(1), eq(2)].in_order(), contains_exactly![eq(3)]])
 /// # .unwrap();
 /// ```
 ///
@@ -72,7 +72,7 @@
 ///
 /// Do not use this with unordered containers, since that will lead to flaky
 /// tests. Use
-/// [`unordered_elements_are!`][crate::matchers::unordered_elements_are]
+/// [`contains_exactly!`][crate::matchers::contains_exactly]
 /// instead.
 ///
 /// [`IntoIterator`]: std::iter::IntoIterator
@@ -83,8 +83,8 @@
 #[doc(hidden)]
 macro_rules! __elements_are {
     ($($matcher:expr),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::ElementsAre;
-        ElementsAre::new(vec![$(Box::new($matcher)),*])
+        use $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
+        ContainerContainsOrderedMatcher::new([$(Box::new($matcher)),*])
     }}
 }
 
@@ -98,13 +98,13 @@ pub mod internal {
     use crate::matcher_support::zipped_iterator::zip;
     use std::{fmt::Debug, marker::PhantomData};
 
-    /// Marker: container yields `&T` items. See [`ElementsAre`].
+    /// Marker: container yields `&T` items. See [`ContainerContainsOrderedMatcher`].
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
     pub struct RefItems;
 
-    /// Marker: container yields owned `T` items. See [`ElementsAre`].
+    /// Marker: container yields owned `T` items. See [`ContainerContainsOrderedMatcher`].
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
@@ -114,24 +114,32 @@ pub mod internal {
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub struct ElementsAre<'a, ContainerT: ?Sized, T: Debug, Mode = RefItems> {
-        elements: Vec<Box<dyn Matcher<T> + 'a>>,
+    pub struct ContainerContainsOrderedMatcher<
+        'a,
+        ContainerT: ?Sized,
+        T: Debug,
+        Mode,
+        const N: usize,
+    > {
+        elements: [Box<dyn Matcher<T> + 'a>; N],
         phantom: PhantomData<ContainerT>,
         _mode: PhantomData<Mode>,
     }
 
-    impl<'a, ContainerT: ?Sized, T: Debug, Mode> ElementsAre<'a, ContainerT, T, Mode> {
+    impl<'a, ContainerT: ?Sized, T: Debug, Mode, const N: usize>
+        ContainerContainsOrderedMatcher<'a, ContainerT, T, Mode, N>
+    {
         /// Factory only intended for use in the macro `elements_are!`.
         ///
         /// **For internal use only. API stablility is not guaranteed!**
         #[doc(hidden)]
-        pub fn new(elements: Vec<Box<dyn Matcher<T> + 'a>>) -> Self {
+        pub fn new(elements: [Box<dyn Matcher<T> + 'a>; N]) -> Self {
             Self { elements, phantom: PhantomData, _mode: PhantomData }
         }
     }
 
-    impl<'a, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
-        for ElementsAre<'a, ContainerT, T, RefItems>
+    impl<'a, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
+        for ContainerContainsOrderedMatcher<'a, ContainerT, T, RefItems, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
@@ -174,8 +182,8 @@ pub mod internal {
         }
     }
 
-    impl<'a, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
-        for ElementsAre<'a, ContainerT, T, OwnedItems>
+    impl<'a, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
+        for ContainerContainsOrderedMatcher<'a, ContainerT, T, OwnedItems, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = T>,
     {
@@ -218,7 +226,9 @@ pub mod internal {
         }
     }
 
-    impl<'a, T: Debug, ContainerT: ?Sized, Mode> Describable for ElementsAre<'a, ContainerT, T, Mode> {
+    impl<'a, T: Debug, ContainerT: ?Sized, Mode, const N: usize> Describable
+        for ContainerContainsOrderedMatcher<'a, ContainerT, T, Mode, N>
+    {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "{} elements:\n{}",

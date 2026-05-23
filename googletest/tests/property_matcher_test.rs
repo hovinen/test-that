@@ -215,6 +215,6 @@ fn matches_struct_with_vec_with_elements_are_value() -> Result<()> {
     let value = SomeStructWithAVec { a_vec_property: vec![10] };
     verify_that!(
         value,
-        property!(*SomeStructWithAVec.get_property_as_slice(), elements_are![eq(10)])
+        property!(*SomeStructWithAVec.get_property_as_slice(), contains_exactly![eq(10)].in_order())
     )
 }

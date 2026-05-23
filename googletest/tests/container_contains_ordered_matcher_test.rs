@@ -18,46 +18,47 @@ use googletest::prelude::*;
 use indoc::indoc;
 
 #[test]
-fn elements_are_matches_vector() -> Result<()> {
+fn contains_exactly_in_order_matches_vector() -> Result<()> {
     let value = vec![1, 2, 3];
-    verify_that!(value, elements_are![eq(1), eq(2), eq(3)])
+    verify_that!(value, contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }
 
 #[test]
-fn elements_are_matches_slice() -> Result<()> {
+fn contains_exactly_in_order_matches_slice() -> Result<()> {
     let value = vec![1, 2, 3];
     let slice = value.as_slice();
-    verify_that!(*slice, elements_are![eq(1), eq(2), eq(3)])
+    verify_that!(*slice, contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }
 
 #[test]
-fn elements_are_matches_array() -> Result<()> {
-    verify_that!([1, 2, 3], elements_are![eq(1), eq(2), eq(3)])
+fn contains_exactly_in_order_matches_array() -> Result<()> {
+    verify_that!([1, 2, 3], contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }
 
 #[test]
-fn elements_are_supports_trailing_comma() -> Result<()> {
+fn contains_exactly_in_order_supports_trailing_comma() -> Result<()> {
     let value = vec![1, 2, 3];
-    verify_that!(value, elements_are![eq(1), eq(2), eq(3),])
+    verify_that!(value, contains_exactly![eq(1), eq(2), eq(3),].in_order())
 }
 
 #[test]
-fn elements_are_returns_no_match_when_expected_and_actual_sizes_differ() -> Result<()> {
+fn contains_exactly_in_order_returns_no_match_when_expected_and_actual_sizes_differ() -> Result<()>
+{
     let value = vec![1, 2];
-    verify_that!(value, not(elements_are![eq(1), eq(2), eq(3)]))
+    verify_that!(value, not(contains_exactly![eq(1), eq(2), eq(3)].in_order()))
 }
 
 #[test]
-fn elements_are_admits_matchers_without_static_lifetime() -> Result<()> {
+fn contains_exactly_in_order_admits_matchers_without_static_lifetime() -> Result<()> {
     #[derive(Debug, PartialEq)]
     struct AStruct(i32);
     let expected_value = AStruct(123);
-    verify_that!(vec![AStruct(123)], elements_are![eq_deref_of(&expected_value)])
+    verify_that!(vec![AStruct(123)], contains_exactly![eq_deref_of(&expected_value)].in_order())
 }
 
 #[test]
-fn elements_are_produces_correct_failure_message() -> Result<()> {
-    let result = verify_that!(vec![1, 4, 3], elements_are![eq(1), eq(2), eq(3)]);
+fn contains_exactly_in_order_produces_correct_failure_message() -> Result<()> {
+    let result = verify_that!(vec![1, 4, 3], contains_exactly![eq(1), eq(2), eq(3)].in_order());
     verify_that!(
         result,
         err(displays_as(contains_substring(indoc!(
@@ -74,10 +75,14 @@ fn elements_are_produces_correct_failure_message() -> Result<()> {
 }
 
 #[test]
-fn elements_are_produces_correct_failure_message_nested() -> Result<()> {
+fn contains_exactly_in_order_produces_correct_failure_message_nested() -> Result<()> {
     let result = verify_that!(
         vec![vec![0, 1], vec![1, 2]],
-        elements_are![elements_are![eq(1), eq(2)], elements_are![eq(2), eq(3)]]
+        contains_exactly![
+            contains_exactly![eq(1), eq(2)].in_order(),
+            contains_exactly![eq(2), eq(3)].in_order()
+        ]
+        .in_order()
     );
     verify_that!(
         result,
@@ -103,23 +108,23 @@ fn elements_are_produces_correct_failure_message_nested() -> Result<()> {
 }
 
 #[test]
-fn elements_are_explain_match_wrong_size() -> Result<()> {
+fn contains_exactly_in_order_explain_match_wrong_size() -> Result<()> {
     verify_that!(
-        elements_are![eq(1)].explain_match(&vec![1, 2]),
+        contains_exactly![eq(1)].in_order().explain_match(&vec![1, 2]),
         displays_as(eq("whose size is 2"))
     )
 }
 
 fn create_matcher() -> impl Matcher<Vec<i32>> {
-    elements_are![eq(1)]
+    contains_exactly![eq(1)].in_order()
 }
 
 #[test]
-fn elements_are_works_when_matcher_is_created_in_subroutine() -> Result<()> {
+fn contains_exactly_in_order_works_when_matcher_is_created_in_subroutine() -> Result<()> {
     verify_that!(vec![1], create_matcher())
 }
 
 #[test]
-fn elements_are_implicitly_called() -> Result<()> {
+fn contains_exactly_in_order_implicitly_called() -> Result<()> {
     verify_that!(vec![1, 2, 3], [eq(1), eq(2), eq(3)])
 }
