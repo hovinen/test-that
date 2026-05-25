@@ -20,6 +20,7 @@ mod any_matcher;
 mod anything_matcher;
 mod char_count_matcher;
 mod conjunction_matcher;
+mod container_contains;
 mod container_contains_ordered_matcher;
 mod container_contains_unordered_matcher;
 mod container_eq_matcher;
@@ -109,11 +110,10 @@ pub mod __internal_unstable_do_not_depend_on_these {
     pub use super::all_matcher::internal::AllMatcher;
     pub use super::any_matcher::internal::AnyMatcher;
     pub use super::conjunction_matcher::ConjunctionMatcher;
-    pub use super::container_contains_ordered_matcher::internal::{
-        ContainerContainsOrderedMatcher, RefItems,
-    };
+    pub use super::container_contains::Requirements;
+    pub use super::container_contains_ordered_matcher::internal::ContainerContainsOrderedMatcher;
     pub use super::container_contains_unordered_matcher::internal::{
-        ContainerContainsUnorderedMatcher, MapContainsMatcher, Requirements,
+        ContainerContainsUnorderedMatcher, MapContainsMatcher,
     };
     pub use super::disjunction_matcher::DisjunctionMatcher;
     pub use super::field_matcher::internal::field_matcher;

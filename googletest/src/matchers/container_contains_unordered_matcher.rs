@@ -369,10 +369,10 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
-    use crate::matchers::container_contains_ordered_matcher::internal::{OwnedItems, RefItems};
+    use crate::matchers::container_contains::{OwnedItems, RefItems, Requirements};
     use crate::prelude::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
     use std::collections::HashSet;
-    use std::fmt::{Debug, Display};
+    use std::fmt::Debug;
     use std::marker::PhantomData;
 
     /// Matches elements of an iterable collection with a sequence of matchers, in any order.
@@ -591,72 +591,6 @@ pub mod internal {
                     .indent()
             )
             .into()
-        }
-    }
-
-    /// The requirements of the mapping between matchers and actual values by
-    /// which [`UnorderedElemetnsAre`] is deemed to match its input.
-    ///
-    /// **For internal use only. API stablility is not guaranteed!**
-    #[doc(hidden)]
-    #[derive(Clone, Copy)]
-    pub enum Requirements {
-        /// There must be a 1:1 correspondence between the actual values and the
-        /// matchers.
-        PerfectMatch,
-
-        /// The mapping from matched actual values to their corresponding
-        /// matchers must be surjective.
-        Superset,
-
-        /// The mapping from matchers to matched actual values must be
-        /// surjective.
-        Subset,
-    }
-
-    impl Requirements {
-        fn explain_size_mismatch<ContainerT: ?Sized>(
-            &self,
-            actual: &ContainerT,
-            expected_size: usize,
-        ) -> Option<Description>
-        where
-            for<'b> &'b ContainerT: IntoIterator,
-        {
-            let actual_size = count_elements(actual);
-            match self {
-                Requirements::PerfectMatch if actual_size != expected_size => Some(
-                    format!("which has size {} (expected {})", actual_size, expected_size).into(),
-                ),
-
-                Requirements::Superset if actual_size < expected_size => Some(
-                    format!("which has size {} (expected at least {})", actual_size, expected_size)
-                        .into(),
-                ),
-
-                Requirements::Subset if actual_size > expected_size => Some(
-                    format!("which has size {} (expected at most {})", actual_size, expected_size)
-                        .into(),
-                ),
-
-                _ => None,
-            }
-        }
-    }
-
-    impl Display for Requirements {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            match self {
-                Requirements::PerfectMatch => {
-                    write!(f, "perfect")
-                }
-                Requirements::Superset => {
-                    write!(f, "superset")
-                }
-                Requirements::Subset => {
-                    write!(f, "subset")
-                }
-            }
         }
     }
 

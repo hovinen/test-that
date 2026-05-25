@@ -96,19 +96,8 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
+    use crate::matchers::container_contains::{OwnedItems, RefItems};
     use std::{fmt::Debug, marker::PhantomData};
-
-    /// Marker: container yields `&T` items. See [`ContainerContainsOrderedMatcher`].
-    ///
-    /// **For internal use only. API stablility is not guaranteed!**
-    #[doc(hidden)]
-    pub struct RefItems;
-
-    /// Marker: container yields owned `T` items. See [`ContainerContainsOrderedMatcher`].
-    ///
-    /// **For internal use only. API stablility is not guaranteed!**
-    #[doc(hidden)]
-    pub struct OwnedItems;
 
     /// This struct is meant to be used only by the macro `elements_are!`.
     ///
