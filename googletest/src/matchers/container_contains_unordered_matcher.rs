@@ -369,8 +369,9 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
-    use crate::matchers::container_contains::{OwnedItems, RefItems, Requirements};
+    use crate::matchers::container_contains::{OwnedItems, PairBorrow, RefItems, Requirements};
     use crate::prelude::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
+    use std::borrow::Borrow;
     use std::collections::HashSet;
     use std::fmt::Debug;
     use std::marker::PhantomData;
@@ -382,35 +383,29 @@ pub mod internal {
         'a,
         ContainerT: ?Sized,
         T: Debug,
-        Mode,
+        ModeT,
         const N: usize,
     > {
         elements: [Box<dyn Matcher<T> + 'a>; N],
         requirements: Requirements,
-        _container: PhantomData<ContainerT>,
-        _mode: PhantomData<Mode>,
+        _phantom: PhantomData<(*const ContainerT, ModeT)>,
     }
 
-    impl<'a, ContainerT: ?Sized, T: Debug, Mode, const N: usize>
-        ContainerContainsUnorderedMatcher<'a, ContainerT, T, Mode, N>
+    impl<'a, ContainerT: ?Sized, T: Debug, ModeT, const N: usize>
+        ContainerContainsUnorderedMatcher<'a, ContainerT, T, ModeT, N>
     {
         /// Constructs a [ContainerContainsUnorderedMatcher] with the given matchers.
         ///
-        /// This is not inteded to be invoked directly, but rather through the macris
+        /// This is not intended to be invoked directly, but rather through the macros
         /// [contains_exactly], [contains_each] and [is_contained_in].
         #[doc(hidden)]
         pub fn new(elements: [Box<dyn Matcher<T> + 'a>; N], requirements: Requirements) -> Self {
-            Self {
-                elements,
-                requirements,
-                _mode: Default::default(),
-                _container: Default::default(),
-            }
+            Self { elements, requirements, _phantom: PhantomData }
         }
 
         /// Asserts that the matchers must match the elements of the collection in the same order
         /// as they appear when iterating.
-        pub fn in_order(self) -> ContainerContainsOrderedMatcher<'a, ContainerT, T, Mode, N> {
+        pub fn in_order(self) -> ContainerContainsOrderedMatcher<'a, ContainerT, T, ModeT, N> {
             ContainerContainsOrderedMatcher::new(self.elements)
         }
     }
@@ -429,72 +424,56 @@ pub mod internal {
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let match_matrix = MatchMatrix::<RefItems, N>::generate(actual, &self.elements);
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
             match_matrix.is_match_for(self.requirements).into()
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            if let Some(size_mismatch_explanation) =
-                self.requirements.explain_size_mismatch(actual, N)
-            {
-                return size_mismatch_explanation;
+            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
+                return size_mismatch;
             }
-
-            let match_matrix = MatchMatrix::<RefItems, N>::generate(actual, &self.elements);
-            if let Some(unmatchable_explanation) =
-                match_matrix.explain_unmatchable(self.requirements)
-            {
-                return unmatchable_explanation;
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
+            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
+                return unmatchable;
             }
-
             let best_match = match_matrix.find_best_match();
             best_match
-                .get_explanation(actual, &self.elements, self.requirements)
+                .get_explanation(actual.into_iter(), &self.elements, self.requirements)
                 .unwrap_or("whose elements all match".into())
         }
     }
 
-    // This matcher performs the checks in three different steps in both `matches`
-    // and `explain_match`. This is useful for performance but also to produce
-    // an actionable error message.
-    // 1. `ContainerContainsUnorderedMatcher` verifies that both collections have the same size
-    // 2. `ContainerContainsUnorderedMatcher` verifies that each actual element matches at least
-    //    one expected element and vice versa.
-    // 3. `ContainerContainsUnorderedMatcher` verifies that a perfect matching exists using
-    //    Ford-Fulkerson.
     impl<'a, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
         for ContainerContainsUnorderedMatcher<'a, ContainerT, T, OwnedItems, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = T>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let match_matrix = MatchMatrix::<OwnedItems, N>::generate(actual, &self.elements);
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
             match_matrix.is_match_for(self.requirements).into()
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            if let Some(size_mismatch_explanation) =
-                self.requirements.explain_size_mismatch(actual, N)
-            {
-                return size_mismatch_explanation;
+            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
+                return size_mismatch;
             }
-
-            let match_matrix = MatchMatrix::<OwnedItems, N>::generate(actual, &self.elements);
-            if let Some(unmatchable_explanation) =
-                match_matrix.explain_unmatchable(self.requirements)
-            {
-                return unmatchable_explanation;
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
+            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
+                return unmatchable;
             }
-
             let best_match = match_matrix.find_best_match();
             best_match
-                .get_explanation(&actual, &self.elements, self.requirements)
+                .get_explanation(actual.into_iter(), &self.elements, self.requirements)
                 .unwrap_or("whose elements all match".into())
         }
     }
 
-    impl<'a, T: Debug, ContainerT: ?Sized, Mode, const N: usize> Describable
-        for ContainerContainsUnorderedMatcher<'a, ContainerT, T, Mode, N>
+    impl<'a, T: Debug, ContainerT: ?Sized, ModeT, const N: usize> Describable
+        for ContainerContainsUnorderedMatcher<'a, ContainerT, T, ModeT, N>
     {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
@@ -519,7 +498,7 @@ pub mod internal {
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub struct MapContainsMatcher<'a, ContainerT, KeyT, ValueT, const N: usize>
+    pub struct MapContainsMatcher<'a, ContainerT, KeyT, ValueT, ModeT, const N: usize>
     where
         ContainerT: ?Sized,
         KeyT: Debug,
@@ -527,54 +506,76 @@ pub mod internal {
     {
         elements: [KeyValueMatcher<'a, KeyT, ValueT>; N],
         requirements: Requirements,
-        phantom: PhantomData<ContainerT>,
+        phantom: PhantomData<(ModeT, ContainerT)>,
     }
 
-    impl<'a, ContainerT, KeyT: Debug, ValueT: Debug, const N: usize>
-        MapContainsMatcher<'a, ContainerT, KeyT, ValueT, N>
+    impl<'a, ContainerT, KeyT: Debug, ValueT: Debug, ModeT, const N: usize>
+        MapContainsMatcher<'a, ContainerT, KeyT, ValueT, ModeT, N>
     {
         pub fn new(
             elements: [KeyValueMatcher<'a, KeyT, ValueT>; N],
             requirements: Requirements,
         ) -> Self {
-            Self { elements, requirements, phantom: Default::default() }
+            Self { elements, requirements, phantom: PhantomData }
         }
     }
 
     impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: Debug + ?Sized, const N: usize>
-        Matcher<ContainerT> for MapContainsMatcher<'a, ContainerT, KeyT, ValueT, N>
+        Matcher<ContainerT> for MapContainsMatcher<'a, ContainerT, KeyT, ValueT, RefItems, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = (&'b KeyT, &'b ValueT)>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let match_matrix = MatchMatrix::<RefItems, N>::generate_for_map(actual, &self.elements);
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
             match_matrix.is_match_for(self.requirements).into()
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            if let Some(size_mismatch_explanation) =
-                self.requirements.explain_size_mismatch(actual, N)
-            {
-                return size_mismatch_explanation;
+            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
+                return size_mismatch;
             }
-
-            let match_matrix = MatchMatrix::<RefItems, N>::generate_for_map(actual, &self.elements);
-            if let Some(unmatchable_explanation) =
-                match_matrix.explain_unmatchable(self.requirements)
-            {
-                return unmatchable_explanation;
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
+            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
+                return unmatchable;
             }
-
             let best_match = match_matrix.find_best_match();
-
             best_match
-                .get_explanation_for_map(actual, &self.elements, self.requirements)
+                .get_explanation_for_map(actual.into_iter(), &self.elements, self.requirements)
                 .unwrap_or("whose elements all match".into())
         }
     }
 
-    impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: ?Sized, const N: usize> Describable
-        for MapContainsMatcher<'a, ContainerT, KeyT, ValueT, N>
+    impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: Debug + ?Sized, const N: usize>
+        Matcher<ContainerT> for MapContainsMatcher<'a, ContainerT, KeyT, ValueT, OwnedItems, N>
+    where
+        for<'b> &'b ContainerT: IntoIterator<Item = (KeyT, ValueT)>,
+    {
+        fn matches(&self, actual: &ContainerT) -> MatcherResult {
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
+            match_matrix.is_match_for(self.requirements).into()
+        }
+
+        fn explain_match(&self, actual: &ContainerT) -> Description {
+            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
+                return size_mismatch;
+            }
+            let n = count_elements(actual);
+            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
+            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
+                return unmatchable;
+            }
+            let best_match = match_matrix.find_best_match();
+            best_match
+                .get_explanation_for_map(actual.into_iter(), &self.elements, self.requirements)
+                .unwrap_or("whose elements all match".into())
+        }
+    }
+
+    impl<'a, KeyT: Debug, ValueT: Debug, ContainerT: ?Sized, ModeT, const N: usize> Describable
+        for MapContainsMatcher<'a, ContainerT, KeyT, ValueT, ModeT, N>
     {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
@@ -595,72 +596,40 @@ pub mod internal {
     }
 
     /// The bipartite matching graph between actual and expected elements.
-    struct MatchMatrix<Mode, const N: usize>(Vec<[MatcherResult; N]>, PhantomData<Mode>);
+    struct MatchMatrix<const N: usize>(Vec<[MatcherResult; N]>);
 
-    impl<const N: usize> MatchMatrix<RefItems, N> {
-        fn generate<'a, T: Debug + 'a, ContainerT: Debug + ?Sized>(
-            actual: &ContainerT,
+    impl<const N: usize> MatchMatrix<N> {
+        fn generate<'a, T: Debug + 'a, ItemT: Borrow<T>>(
+            actual_items: impl Iterator<Item = ItemT>,
+            n_actual: usize,
             expected: &[Box<dyn Matcher<T> + 'a>; N],
-        ) -> Self
-        where
-            for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
-        {
-            let mut matrix = MatchMatrix(
-                vec![[MatcherResult::NoMatch; N]; count_elements(actual)],
-                Default::default(),
-            );
-            for (actual_idx, actual) in actual.into_iter().enumerate() {
+        ) -> Self {
+            let mut matrix = MatchMatrix(vec![[MatcherResult::NoMatch; N]; n_actual]);
+            for (actual_idx, actual_item) in actual_items.enumerate() {
                 for (expected_idx, expected) in expected.iter().enumerate() {
-                    matrix.0[actual_idx][expected_idx] = expected.matches(actual);
+                    matrix.0[actual_idx][expected_idx] = expected.matches(actual_item.borrow());
                 }
             }
             matrix
         }
 
-        fn generate_for_map<'a, KeyT: Debug, ValueT: Debug, ContainerT: Debug + ?Sized>(
-            actual: &ContainerT,
+        fn generate_for_map<'a, KeyT: Debug, ValueT: Debug, ItemT: PairBorrow<KeyT, ValueT>>(
+            actual_items: impl Iterator<Item = ItemT>,
+            n_actual: usize,
             expected: &[KeyValueMatcher<'a, KeyT, ValueT>; N],
-        ) -> Self
-        where
-            for<'b> &'b ContainerT: IntoIterator<Item = (&'b KeyT, &'b ValueT)>,
-        {
-            let mut matrix = MatchMatrix(
-                vec![[MatcherResult::NoMatch; N]; count_elements(actual)],
-                Default::default(),
-            );
-            for (actual_idx, (actual_key, actual_value)) in actual.into_iter().enumerate() {
+        ) -> Self {
+            let mut matrix = MatchMatrix(vec![[MatcherResult::NoMatch; N]; n_actual]);
+            for (actual_idx, actual_item) in actual_items.enumerate() {
                 for (expected_idx, (expected_key, expected_value)) in expected.iter().enumerate() {
-                    matrix.0[actual_idx][expected_idx] = (expected_key.matches(actual_key).into()
-                        && expected_value.matches(actual_value).into())
-                    .into();
+                    matrix.0[actual_idx][expected_idx] =
+                        (expected_key.matches(actual_item.borrow_key()).into()
+                            && expected_value.matches(actual_item.borrow_value()).into())
+                        .into();
                 }
             }
             matrix
         }
-    }
 
-    impl<const N: usize> MatchMatrix<OwnedItems, N> {
-        fn generate<'a, T: Debug + 'a, ContainerT: Debug + ?Sized>(
-            actual: &ContainerT,
-            expected: &[Box<dyn Matcher<T> + 'a>; N],
-        ) -> Self
-        where
-            for<'b> &'b ContainerT: IntoIterator<Item = T>,
-        {
-            let mut matrix = MatchMatrix(
-                vec![[MatcherResult::NoMatch; N]; count_elements(actual)],
-                Default::default(),
-            );
-            for (actual_idx, actual) in actual.into_iter().enumerate() {
-                for (expected_idx, expected) in expected.iter().enumerate() {
-                    matrix.0[actual_idx][expected_idx] = expected.matches(&actual);
-                }
-            }
-            matrix
-        }
-    }
-
-    impl<Mode, const N: usize> MatchMatrix<Mode, N> {
         fn is_match_for(&self, requirements: Requirements) -> bool {
             match requirements {
                 Requirements::PerfectMatch => {
@@ -779,7 +748,7 @@ pub mod internal {
         //       "Introduction to Algorithms (Second ed.)", pp. 651-664.
         //   [2] "Ford-Fulkerson algorithm", Wikipedia,
         //       'http://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm'
-        fn find_best_match(&self) -> BestMatch<Mode, N> {
+        fn find_best_match(&self) -> BestMatch<N> {
             let mut actual_match = vec![None; self.0.len()];
             let mut expected_match: [Option<usize>; N] = [None; N];
             // Searches the residual flow graph for a path from each actual node to
@@ -800,7 +769,7 @@ pub mod internal {
                 let mut seen = [false; N];
                 self.try_augment(actual_idx, &mut seen, &mut actual_match, &mut expected_match);
             }
-            BestMatch(actual_match, Default::default())
+            BestMatch(actual_match)
         }
 
         // Perform a depth-first search from actual node `actual_idx` to the sink by
@@ -951,9 +920,9 @@ pub mod internal {
     ///  * The 0th element in actual matches the 0th element in expected.
     ///  * The 1st element in actual does not match.
     ///  * The 2nd element in actual matches the 1st element in expected.
-    struct BestMatch<Mode, const N: usize>(Vec<Option<usize>>, PhantomData<Mode>);
+    struct BestMatch<const N: usize>(Vec<Option<usize>>);
 
-    impl<Mode, const N: usize> BestMatch<Mode, N> {
+    impl<const N: usize> BestMatch<N> {
         fn is_full_match(&self) -> bool {
             self.0.iter().all(|o| o.is_some())
         }
@@ -984,97 +953,90 @@ pub mod internal {
             let matched_expected: HashSet<_> = self.0.iter().flatten().collect();
             (0..N).filter(|expected_idx| !matched_expected.contains(expected_idx)).collect()
         }
-    }
 
-    impl<const N: usize> BestMatch<RefItems, N> {
-        fn get_explanation<'a, T: Debug, ContainerT: Debug + ?Sized>(
+        fn get_explanation<'a, T: Debug, ItemT: Borrow<T>>(
             &self,
-            actual: &ContainerT,
+            actual_items: impl Iterator<Item = ItemT>,
             expected: &[Box<dyn Matcher<T> + 'a>; N],
             requirements: Requirements,
-        ) -> Option<Description>
-        where
-            for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
-        {
-            let actual: Vec<_> = actual.into_iter().collect();
+        ) -> Option<Description> {
+            let actual: Vec<ItemT> = actual_items.collect();
             if self.is_full_match() {
                 return None;
             }
-            let mut error_message =
-                format!("which does not have a {requirements} match with the expected elements.");
 
-            error_message.push_str("\n  The best match found was: ");
-
-            let matches = self.get_matches().map(|(actual_idx, expected_idx)|{
+            let matches = self.get_matches().map(|(actual_idx, expected_idx)| {
                 format!(
                     "Actual element {:?} at index {actual_idx} matched expected element `{}` at index {expected_idx}.",
-                    actual[actual_idx],
+                    actual[actual_idx].borrow(),
                     expected[expected_idx].describe(MatcherResult::Match),
-            )});
+                )
+            });
 
             let unmatched_actual = self.get_unmatched_actual().map(|actual_idx| {
                 format!(
                     "Actual element {:#?} at index {actual_idx} did not match any remaining expected element.",
-                    actual[actual_idx]
+                    actual[actual_idx].borrow()
                 )
             });
 
-            let unmatched_expected = self.get_unmatched_expected().into_iter().map(|expected_idx|{format!(
-                "Expected element `{}` at index {expected_idx} did not match any remaining actual element.",
-                expected[expected_idx].describe(MatcherResult::Match)
-            )});
+            let unmatched_expected =
+                self.get_unmatched_expected().into_iter().map(|expected_idx| {
+                    format!(
+                        "Expected element `{}` at index {expected_idx} did not match any remaining actual element.",
+                        expected[expected_idx].describe(MatcherResult::Match)
+                    )
+                });
 
             let best_match = matches
                 .chain(unmatched_actual)
                 .chain(unmatched_expected)
                 .collect::<Description>()
                 .indent();
-            Some(format!(
-                "which does not have a {requirements} match with the expected elements. The best match found was:\n{best_match}"
-            ).into())
+            Some(
+                format!(
+                    "which does not have a {requirements} match with the expected elements. The best match found was:\n{best_match}"
+                )
+                .into(),
+            )
         }
 
-        fn get_explanation_for_map<'a, KeyT: Debug, ValueT: Debug, ContainerT: Debug + ?Sized>(
+        fn get_explanation_for_map<
+            'a,
+            KeyT: Debug,
+            ValueT: Debug,
+            ItemT: PairBorrow<KeyT, ValueT>,
+        >(
             &self,
-            actual: &ContainerT,
+            actual_items: impl Iterator<Item = ItemT>,
             expected: &[KeyValueMatcher<'a, KeyT, ValueT>; N],
             requirements: Requirements,
-        ) -> Option<Description>
-        where
-            for<'b> &'b ContainerT: IntoIterator<Item = (&'b KeyT, &'b ValueT)>,
-        {
-            let actual: Vec<_> = actual.into_iter().collect();
+        ) -> Option<Description> {
+            let actual: Vec<ItemT> = actual_items.collect();
             if self.is_full_match() {
                 return None;
             }
-            let mut error_message =
-                format!("which does not have a {requirements} match with the expected elements.");
 
-            error_message.push_str("\n  The best match found was: ");
+            let matches = self.get_matches().map(|(actual_idx, expected_idx)| {
+                format!(
+                    "Actual element {:?} => {:?} at index {actual_idx} matched expected element `{}` => `{}` at index {expected_idx}.",
+                    actual[actual_idx].borrow_key(),
+                    actual[actual_idx].borrow_value(),
+                    expected[expected_idx].0.describe(MatcherResult::Match),
+                    expected[expected_idx].1.describe(MatcherResult::Match),
+                )
+            });
 
-            let matches = self.get_matches()
-                .map(|(actual_idx, expected_idx)| {
-                    format!(
-                        "Actual element {:?} => {:?} at index {actual_idx} matched expected element `{}` => `{}` at index {expected_idx}.",
-                        actual[actual_idx].0,
-                        actual[actual_idx].1,
-                        expected[expected_idx].0.describe(MatcherResult::Match),
-                        expected[expected_idx].1.describe(MatcherResult::Match),
-                    )
-                });
+            let unmatched_actual = self.get_unmatched_actual().map(|actual_idx| {
+                format!(
+                    "Actual element {:#?} => {:#?} at index {actual_idx} did not match any remaining expected element.",
+                    actual[actual_idx].borrow_key(),
+                    actual[actual_idx].borrow_value(),
+                )
+            });
 
-            let unmatched_actual = self.get_unmatched_actual()
-                .map(|actual_idx| {
-                    format!(
-                        "Actual element {:#?} => {:#?} at index {actual_idx} did not match any remaining expected element.",
-                        actual[actual_idx].0,
-                        actual[actual_idx].1,
-                    )
-                });
-
-            let unmatched_expected = self.get_unmatched_expected()
-                .into_iter()
-                .map(|expected_idx| {
+            let unmatched_expected =
+                self.get_unmatched_expected().into_iter().map(|expected_idx| {
                     format!(
                         "Expected element `{}` => `{}` at index {expected_idx} did not match any remaining actual element.",
                         expected[expected_idx].0.describe(MatcherResult::Match),
@@ -1087,58 +1049,12 @@ pub mod internal {
                 .chain(unmatched_expected)
                 .collect::<Description>()
                 .indent();
-            Some(format!(
-                "which does not have a {requirements} match with the expected elements. The best match found was:\n{best_match}"
-            ).into())
-        }
-    }
-
-    impl<const N: usize> BestMatch<OwnedItems, N> {
-        fn get_explanation<'a, T: Debug, ContainerT: Debug + ?Sized>(
-            &self,
-            actual: &ContainerT,
-            expected: &[Box<dyn Matcher<T> + 'a>; N],
-            requirements: Requirements,
-        ) -> Option<Description>
-        where
-            for<'b> &'b ContainerT: IntoIterator<Item = T>,
-        {
-            let actual: Vec<_> = actual.into_iter().collect();
-            if self.is_full_match() {
-                return None;
-            }
-            let mut error_message =
-                format!("which does not have a {requirements} match with the expected elements.");
-
-            error_message.push_str("\n  The best match found was: ");
-
-            let matches = self.get_matches().map(|(actual_idx, expected_idx)|{
+            Some(
                 format!(
-                    "Actual element {:?} at index {actual_idx} matched expected element `{}` at index {expected_idx}.",
-                    actual[actual_idx],
-                    expected[expected_idx].describe(MatcherResult::Match),
-            )});
-
-            let unmatched_actual = self.get_unmatched_actual().map(|actual_idx| {
-                format!(
-                    "Actual element {:#?} at index {actual_idx} did not match any remaining expected element.",
-                    actual[actual_idx]
+                    "which does not have a {requirements} match with the expected elements. The best match found was:\n{best_match}"
                 )
-            });
-
-            let unmatched_expected = self.get_unmatched_expected().into_iter().map(|expected_idx|{format!(
-                "Expected element `{}` at index {expected_idx} did not match any remaining actual element.",
-                expected[expected_idx].describe(MatcherResult::Match)
-            )});
-
-            let best_match = matches
-                .chain(unmatched_actual)
-                .chain(unmatched_expected)
-                .collect::<Description>()
-                .indent();
-            Some(format!(
-                "which does not have a {requirements} match with the expected elements. The best match found was:\n{best_match}"
-            ).into())
+                .into(),
+            )
         }
     }
 }
@@ -1147,6 +1063,7 @@ pub mod internal {
 mod tests {
     use super::internal::MapContainsMatcher;
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
+    use crate::matchers::container_contains::RefItems;
     use crate::prelude::*;
     use indoc::indoc;
     use std::collections::HashMap;
@@ -1160,7 +1077,7 @@ mod tests {
         // aren't dropped too early.
         let matchers =
             ((eq::<i32, _>(2), eq::<&str, _>("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
-        let matcher: MapContainsMatcher<HashMap<i32, &str>, _, _, 3> = contains_exactly![
+        let matcher: MapContainsMatcher<HashMap<i32, &str>, _, _, RefItems, 3> = contains_exactly![
             (matchers.0.0, matchers.0.1),
             (matchers.1.0, matchers.1.1),
             (matchers.2.0, matchers.2.1)
@@ -1185,7 +1102,7 @@ mod tests {
         // we must create the constitute matchers separately so that they
         // aren't dropped too early.
         let matchers = ((anything(), eq(1)), (anything(), eq(2)), (anything(), eq(2)));
-        let matcher: MapContainsMatcher<HashMap<u32, u32>, _, _, 3> = contains_exactly![
+        let matcher: MapContainsMatcher<HashMap<u32, u32>, _, _, RefItems, 3> = contains_exactly![
             (matchers.0.0, matchers.0.1),
             (matchers.1.0, matchers.1.1),
             (matchers.2.0, matchers.2.1),

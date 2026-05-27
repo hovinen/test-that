@@ -27,8 +27,34 @@ impl<'a> IntoIterator for &'a IntContainer {
 }
 
 #[test]
-fn elements_are_supports_containers_which_iterate_over_owned_values() -> Result<()> {
+fn contains_exactly_supports_containers_which_iterate_over_owned_values() -> Result<()> {
+    let container = IntContainer(vec![1, 2, 3]);
+
+    verify_that!(container, contains_exactly![eq(1), eq(2), eq(3)])
+}
+
+#[test]
+fn contains_exactly_in_order_supports_containers_which_iterate_over_owned_values() -> Result<()> {
     let container = IntContainer(vec![1, 2, 3]);
 
     verify_that!(container, contains_exactly![eq(1), eq(2), eq(3)].in_order())
+}
+
+#[derive(Debug)]
+struct IntMap(Vec<(i32, i32)>);
+
+impl<'a> IntoIterator for &'a IntMap {
+    type Item = (i32, i32);
+    type IntoIter = std::iter::Copied<std::slice::Iter<'a, (i32, i32)>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter().copied()
+    }
+}
+
+#[test]
+fn contains_exactly_with_map_supports_containers_which_iterate_over_owned_values() -> Result<()> {
+    let container = IntMap(vec![(1, 1), (2, 2), (3, 3)]);
+
+    verify_that!(container, contains_exactly![(eq(1), eq(1)), (eq(2), eq(2)), (eq(3), eq(3))])
 }

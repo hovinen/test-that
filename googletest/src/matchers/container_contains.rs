@@ -1,19 +1,50 @@
+// Copyright 2022 Google LLC
+// Copyright 2026 Bradford Hovinen <bradford@hovinen.me>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #![doc(hidden)]
 
 use crate::{description::Description, matcher_support::count_elements::count_elements};
 use std::fmt::Display;
 
-/// Marker: container yields `&T` items. See [`ContainerContainsOrderedMatcher`].
+/// Abstracts over map iterator items, allowing both reference pairs `(&K, &V)`
+/// and owned pairs `(K, V)` to be matched uniformly.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
-pub struct RefItems;
+pub trait PairBorrow<K, V> {
+    fn borrow_key(&self) -> &K;
+    fn borrow_value(&self) -> &V;
+}
 
-/// Marker: container yields owned `T` items. See [`ContainerContainsOrderedMatcher`].
-///
-/// **For internal use only. API stablility is not guaranteed!**
-#[doc(hidden)]
-pub struct OwnedItems;
+impl<K, V> PairBorrow<K, V> for (&K, &V) {
+    fn borrow_key(&self) -> &K {
+        self.0
+    }
+    fn borrow_value(&self) -> &V {
+        self.1
+    }
+}
+
+impl<K, V> PairBorrow<K, V> for (K, V) {
+    fn borrow_key(&self) -> &K {
+        &self.0
+    }
+    fn borrow_value(&self) -> &V {
+        &self.1
+    }
+}
 
 /// The requirements of the mapping between matchers and actual values by
 /// which [`UnorderedElemetnsAre`] is deemed to match its input.
@@ -80,3 +111,15 @@ impl Display for Requirements {
         }
     }
 }
+
+/// Marker for containers whose iterator over `&ContainerT` yields `&T` items.
+///
+/// **For internal use only. API stability is not guaranteed!**
+#[doc(hidden)]
+pub struct RefItems;
+
+/// Marker for containers whose iterator over `&ContainerT` yields owned `T` items.
+///
+/// **For internal use only. API stability is not guaranteed!**
+#[doc(hidden)]
+pub struct OwnedItems;
