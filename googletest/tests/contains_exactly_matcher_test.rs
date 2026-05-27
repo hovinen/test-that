@@ -54,7 +54,7 @@ fn contains_exactly_matches_hash_map() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]);
     verify_that!(
         value,
-        contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))]
+        contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
     )
 }
 
@@ -63,7 +63,7 @@ fn contains_exactly_matches_hash_map_with_trailing_comma() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]);
     verify_that!(
         value,
-        contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three")),]
+        contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three")),]
     )
 }
 
@@ -72,7 +72,7 @@ fn contains_exactly_does_not_match_hash_map_with_wrong_key() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two"), (4, "Three")]);
     verify_that!(
         value,
-        not(contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))])
+        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
     )
 }
 
@@ -81,7 +81,7 @@ fn contains_exactly_does_not_match_hash_map_with_wrong_value() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two"), (3, "Four")]);
     verify_that!(
         value,
-        not(contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))])
+        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
     )
 }
 
@@ -90,14 +90,14 @@ fn contains_exactly_does_not_match_hash_map_missing_element() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two")]);
     verify_that!(
         value,
-        not(contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))])
+        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
     )
 }
 
 #[test]
 fn contains_exactly_does_not_match_hash_map_with_extra_element() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]);
-    verify_that!(value, not(contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One"))]))
+    verify_that!(value, not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One"))]))
 }
 
 #[test]
@@ -105,7 +105,7 @@ fn contains_exactly_does_not_match_hash_map_with_mismatched_key_and_value() -> R
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Three"), (3, "Two")]);
     verify_that!(
         value,
-        not(contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))])
+        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
     )
 }
 
@@ -136,7 +136,7 @@ fn contains_exactly_with_map_admits_matchers_without_static_lifetime() -> Result
     let expected_value = AStruct(123);
     verify_that!(
         HashMap::from([(1, AStruct(123))]),
-        contains_exactly![(eq(1), eq_deref_of(&expected_value))]
+        contains_exactly![(eq(1) => eq_deref_of(&expected_value))]
     )
 }
 
@@ -219,7 +219,7 @@ fn contains_exactly_works_when_matcher_is_created_in_subroutine() -> Result<()> 
 }
 
 fn create_matcher_for_map() -> impl Matcher<HashMap<i32, i32>> {
-    contains_exactly![(eq(1), eq(1))]
+    contains_exactly![(eq(1) => eq(1))]
 }
 
 #[test]
@@ -240,13 +240,13 @@ fn contains_each_supports_trailing_comma() -> Result<()> {
 #[test]
 fn contains_each_matches_hash_map() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]);
-    verify_that!(value, contains_each![(eq(2), eq("Two")), (eq(1), eq("One"))])
+    verify_that!(value, contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One"))])
 }
 
 #[test]
 fn contains_each_matches_hash_map_with_trailing_comma() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]);
-    verify_that!(value, contains_each![(eq(2), eq("Two")), (eq(1), eq("One")),])
+    verify_that!(value, contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One")),])
 }
 
 #[test]
@@ -338,7 +338,7 @@ fn is_contained_in_matches_hash_map() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two")]);
     verify_that!(
         value,
-        is_contained_in![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))]
+        is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
     )
 }
 
@@ -347,7 +347,7 @@ fn is_contained_in_matches_hash_map_with_trailing_comma() -> Result<()> {
     let value: HashMap<u32, &'static str> = HashMap::from([(1, "One"), (2, "Two")]);
     verify_that!(
         value,
-        is_contained_in![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three")),]
+        is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three")),]
     )
 }
 

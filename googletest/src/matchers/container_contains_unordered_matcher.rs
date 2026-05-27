@@ -49,17 +49,16 @@
 /// implement [`IntoIterator`].
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
-/// similar collections. The arguments are a sequence of pairs of matchers
+/// similar collections. The arguments are a sequence of mappings of matchers
 /// corresponding to the keys and their respective values.
 ///
 /// ```
 /// # use googletest::prelude::*;
 /// # use std::collections::HashMap;
-/// let value: HashMap<u32, &'static str> =
-///     HashMap::from_iter([(1, "One"), (2, "Two"), (3, "Three")]);
+/// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
 /// verify_that!(
 ///     value,
-///     contains_exactly![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))]
+///     contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
 /// )
 /// #     .unwrap();
 /// ```
@@ -126,9 +125,7 @@ macro_rules! __contains_exactly {
         ContainerContainsUnorderedMatcher::new([], Requirements::PerfectMatch)
     }};
 
-    // TODO: Consider an alternative map-like syntax here similar to that used in
-    // https://crates.io/crates/maplit.
-    ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
+    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
             MapContainsMatcher, Requirements
         };
@@ -188,15 +185,14 @@ macro_rules! __contains_exactly {
 /// implement [`IntoIterator`].
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
-/// similar collections. The arguments are a sequence of pairs of matchers
+/// similar collections. The arguments are a sequence of mappings of matchers
 /// corresponding to the keys and their respective values.
 ///
 /// ```
 /// # use googletest::prelude::*;
 /// # use std::collections::HashMap;
-/// let value: HashMap<u32, &'static str> =
-///     HashMap::from_iter([(1, "One"), (2, "Two"), (3, "Three")]);
-/// verify_that!(value, contains_each![(eq(2), eq("Two")), (eq(1), eq("One"))])
+/// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
+/// verify_that!(value, contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One"))])
 /// #     .unwrap();
 /// ```
 ///
@@ -232,9 +228,7 @@ macro_rules! __contains_each {
         ContainerContainsUnorderedMatcher::new([], Requirements::Superset)
     }};
 
-    // TODO: Consider an alternative map-like syntax here similar to that used in
-    // https://crates.io/crates/maplit.
-    ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
+    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
             MapContainsMatcher, Requirements
         };
@@ -295,16 +289,16 @@ macro_rules! __contains_each {
 /// implement [`IntoIterator`].
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
-/// similar collections. The arguments are a sequence of pairs of matchers
+/// similar collections. The arguments are a sequence of mappings of matchers
 /// corresponding to the keys and their respective values.
 ///
 /// ```
 /// # use googletest::prelude::*;
 /// # use std::collections::HashMap;
-/// let value: HashMap<u32, &'static str> = HashMap::from_iter([(1, "One"), (2, "Two")]);
+/// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two")].into();
 /// verify_that!(
 ///     value,
-///     is_contained_in![(eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three"))]
+///     is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
 /// )
 /// #     .unwrap();
 /// ```
@@ -341,9 +335,7 @@ macro_rules! __is_contained_in {
         ContainerContainsUnorderedMatcher::new([], Requirements::Subset)
     }};
 
-    // TODO: Consider an alternative map-like syntax here similar to that used in
-    // https://crates.io/crates/maplit.
-    ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
+    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
             MapContainsMatcher, Requirements
         };
@@ -1078,9 +1070,9 @@ mod tests {
         let matchers =
             ((eq::<i32, _>(2), eq::<&str, _>("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
         let matcher: MapContainsMatcher<HashMap<i32, &str>, _, _, RefItems, 3> = contains_exactly![
-            (matchers.0.0, matchers.0.1),
-            (matchers.1.0, matchers.1.1),
-            (matchers.2.0, matchers.2.1)
+            (matchers.0.0 => matchers.0.1),
+            (matchers.1.0 => matchers.1.1),
+            (matchers.2.0 => matchers.2.1)
         ];
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -1103,9 +1095,9 @@ mod tests {
         // aren't dropped too early.
         let matchers = ((anything(), eq(1)), (anything(), eq(2)), (anything(), eq(2)));
         let matcher: MapContainsMatcher<HashMap<u32, u32>, _, _, RefItems, 3> = contains_exactly![
-            (matchers.0.0, matchers.0.1),
-            (matchers.1.0, matchers.1.1),
-            (matchers.2.0, matchers.2.1),
+            (matchers.0.0 => matchers.0.1),
+            (matchers.1.0 => matchers.1.1),
+            (matchers.2.0 => matchers.2.1),
         ];
         let value: HashMap<u32, u32> = HashMap::from_iter([(0, 1), (1, 1), (2, 2)]);
         verify_that!(
