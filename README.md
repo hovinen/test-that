@@ -8,9 +8,9 @@
 [docs-badge]: https://img.shields.io/badge/docs.rs-test_that-66c2a5
 [docs-url]: https://docs.rs/test_that/*/test_that/
 [license-badge]: https://img.shields.io/badge/license-Apache-blue.svg
-[license-url]: https://github.com/google/test_that-rust/blob/main/LICENSE
-[actions-badge]: https://github.com/hovinen/test_that/workflows/CI/badge.svg
-[actions-url]: https://github.com/hovinen/test_that/actions?query=workflow%3ACI+branch%3Amain
+[license-url]: https://github.com/hovinen/test_that/blob/main/LICENSE
+[actions-badge]: https://github.com/hovinen/test-that/workflows/CI/badge.svg
+[actions-url]: https://github.com/hovinen/test-that/actions?query=workflow%3ACI+branch%3Amain
 
 This library brings the rich assertion types of Google's C++ testing library
 [GoogleTest](https://github.com/google/googletest) to Rust. It provides:
@@ -18,10 +18,10 @@ This library brings the rich assertion types of Google's C++ testing library
  * A framework for writing matchers which can be combined to make a wide range
    of assertions on data,
  * A rich set of matchers providing similar functionality to those included in
-   [GoogleTest](https://google.github.io/test_that/reference/matchers.html),
+   [GoogleTest](https://google.github.io/googletest/reference/matchers.html),
    and
  * A new set of assertion macros offering similar functionality to those of
-   [GoogleTest](https://google.github.io/test_that/primer.html#assertions).
+   [GoogleTest](https://google.github.io/googletest/primer.html#assertions).
 
 **The minimum supported Rust version is 1.71**.
 
