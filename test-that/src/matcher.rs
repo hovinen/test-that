@@ -54,8 +54,8 @@ pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
     ///                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     ///
-    /// The default implementation relies on [`describe`][Self::describe]. Thus
-    /// it does not make any use of the actual value itself, but rather only
+    /// The default implementation relies on [`describe`][Describable::describe].
+    /// Thus it does not make any use of the actual value itself, but rather only
     /// whether the value is matched.
     ///
     /// Override the default implementation to provide additional context on why
@@ -202,7 +202,7 @@ pub trait Describable {
     /// ```
     ///
     /// The output expectation differs from that of
-    /// [`explain_match`][Self::explain_match] in that it is a verb phrase
+    /// [`explain_match`][Matcher::explain_match] in that it is a verb phrase
     /// (beginning with a verb like "is") rather than a relative clause
     /// (beginning with "which" or "whose"). This difference is because the
     /// output of `explain_match` is always used adjectivally to describe the

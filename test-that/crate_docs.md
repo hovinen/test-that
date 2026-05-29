@@ -118,11 +118,11 @@ The following matchers are provided in GoogleTest Rust:
 | [`container_eq`]     | Same as [`eq`], but for containers (with a better mismatch description). |
 | [`contains`]         | A container containing an element matched by the given matcher.          |
 | [`contains_each!`]   | A container containing distinct elements each of the arguments match.    |
+| [`contains_exactly!`] | A container whose elements the arguments match, in any order.     |
 | [`contains_regex`]   | A string containing a substring matching the given regular expression.   |
 | [`contains_substring`] | A string containing the given substring.                               |
 | [`displays_as`]      | A [`Display`] value whose formatted string is matched by the argument.   |
 | [`each`]             | A container all of whose elements the given argument matches.            |
-| [`elements_are!`]    | A container whose elements the arguments match, in order.                |
 | [`empty`]            | An empty collection.                                                     |
 | [`ends_with`]        | A string ending with the given suffix.                                   |
 | [`eq`]               | A value equal to the argument, in the sense of the [`PartialEq`] trait.  |
@@ -151,7 +151,6 @@ The following matchers are provided in GoogleTest Rust:
 | [`starts_with`]      | A string starting with the given prefix.                                 |
 | [`subset_of`]        | A container all of whose elements are contained in the argument.         |
 | [`superset_of`]      | A container containing all elements of the argument.                     |
-| [`unordered_elements_are!`] | A container whose elements the arguments match, in any order.     |
 
 [`all!`]: matchers::all
 [`any!`]: matchers::any
@@ -161,11 +160,11 @@ The following matchers are provided in GoogleTest Rust:
 [`container_eq`]: matchers::container_eq
 [`contains`]: matchers::contains
 [`contains_each!`]: matchers::contains_each
+[`contains_exactly!`]: matchers::contains_exactly
 [`contains_regex`]: matchers::contains_regex
 [`contains_substring`]: matchers::contains_substring
 [`displays_as`]: matchers::displays_as
 [`each`]: matchers::each
-[`elements_are!`]: matchers::elements_are
 [`empty`]: matchers::empty
 [`ends_with`]: matchers::ends_with
 [`eq`]: matchers::eq
@@ -194,7 +193,6 @@ The following matchers are provided in GoogleTest Rust:
 [`starts_with`]: matchers::starts_with
 [`subset_of`]: matchers::subset_of
 [`superset_of`]: matchers::superset_of
-[`unordered_elements_are!`]: matchers::unordered_elements_are
 [`Deref`]: std::ops::Deref
 [`Display`]: std::fmt::Display
 [`HashMap`]: std::collections::HashMap
