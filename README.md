@@ -1,7 +1,5 @@
-# GoogleTest Rust
+# test-that
 
-[![crates.io][crates-badge]][crates-url]
-[![docs.rs][docs-badge]][docs-url]
 [![Apache licensed][license-badge]][license-url]
 [![Build Status][actions-badge]][actions-url]
 
@@ -15,7 +13,7 @@
 [actions-url]: https://github.com/google/test_that-rust/actions?query=workflow%3ACI+branch%3Amain
 
 This library brings the rich assertion types of Google's C++ testing library
-[GoogleTest](https://github.com/google/test_that) to Rust. It provides:
+[GoogleTest](https://github.com/google/googletest) to Rust. It provides:
 
  * A framework for writing matchers which can be combined to make a wide range
    of assertions on data,
