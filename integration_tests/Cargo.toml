@@ -15,14 +15,14 @@
 
 [package]
 name = "integration_tests"
-version = "0.11.0"
+version = "0.99.0"
 description = "Integration tests for GoogleTest Rust"
-repository = "https://github.com/google/googletest-rust"
+repository = "https://github.com/hovinen/test-that"
 license = "Apache-2.0"
 edition = "2021"
-rust-version = "1.66.0"
+rust-version = "1.68.0"
 authors = [
-  "Bradford Hovinen <hovinen@google.com>",
+  "Bradford Hovinen <bradford@hovinen.me>",
   "Bastien Jacot-Guillarmod <bjacotg@google.com>",
   "Maciej Pietrzak <mpi@google.com>",
   "Martin Geisler <mgeisler@google.com>",
