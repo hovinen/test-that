@@ -21,7 +21,7 @@ use std::marker::PhantomData;
 /// Matches an `Option` containing `None`.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(None::<()>, none())?;   // Passes
 /// #     Ok(())

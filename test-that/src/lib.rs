@@ -15,7 +15,7 @@
 
 #![doc = include_str!("../crate_docs.md")]
 
-extern crate googletest_macro;
+extern crate test_that_macro;
 
 #[cfg(test)]
 extern crate quickcheck;
@@ -39,7 +39,7 @@ pub mod matchers;
 ///
 /// ```
 /// mod tests {
-///     use googletest::prelude::*;
+///     use test_that::prelude::*;
 /// }
 /// ```
 pub mod prelude {
@@ -54,7 +54,7 @@ pub mod prelude {
     pub use super::{assert_that, expect_pred, expect_that, fail, verify_pred, verify_that};
 }
 
-pub use googletest_macro::test;
+pub use test_that_macro::test;
 
 use internal::test_outcome::{TestAssertionFailure, TestOutcome};
 
@@ -91,18 +91,18 @@ pub type Result<T> = std::result::Result<T, TestAssertionFailure>;
 /// `?` operator to continue execution of the test conditionally on there not
 /// having been any failure yet.
 ///
-/// This requires the use of the [`#[googletest::test]`][crate::test] attribute
+/// This requires the use of the [`#[test_that::test]`][crate::test] attribute
 /// macro.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # /* Make sure this also compiles as a doctest.
-/// #[googletest::test]
+/// #[test_that::test]
 /// # */
 /// # fn foo() -> u32 { 1 }
 /// # fn bar() -> u32 { 2 }
 /// fn should_fail_and_not_execute_last_assertion() -> Result<()> {
-/// #   googletest::internal::test_outcome::TestOutcome::init_current_test_outcome();
+/// #   test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
 ///     expect_that!(foo(), eq(2));     // May fail, but will not abort the test.
 ///     expect_that!(bar(), gt(1));     // May fail, but will not abort the test.
 ///     verify_current_test_outcome()?; // Aborts the test if one of the previous assertions failed.
@@ -122,8 +122,8 @@ pub trait GoogleTestSupport {
     /// This can be used for non-fatal test assertions, for example:
     ///
     /// ```
-    /// # use googletest::prelude::*;
-    /// # use googletest::internal::test_outcome::TestOutcome;
+    /// # use test_that::prelude::*;
+    /// # use test_that::internal::test_outcome::TestOutcome;
     /// # TestOutcome::init_current_test_outcome();
     /// let actual = 42;
     /// verify_that!(actual, eq(42)).and_log_failure();
@@ -145,7 +145,7 @@ pub trait GoogleTestSupport {
     /// For example:
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_fail() -> Result<()> {
     /// let actual = 0;
     /// verify_that!(actual, eq(42)).failure_message("Actual was wrong!")?;
@@ -166,7 +166,7 @@ pub trait GoogleTestSupport {
     /// One can pass a `String` too:
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_fail() -> Result<()> {
     /// let actual = 0;
     /// verify_that!(actual, eq(42))
@@ -190,7 +190,7 @@ pub trait GoogleTestSupport {
     /// message, thus saving possible memory allocation.
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_fail() -> Result<()> {
     /// let actual = 0;
     /// verify_that!(actual, eq(42))

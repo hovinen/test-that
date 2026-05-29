@@ -17,7 +17,7 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    #[googletest::test]
+    #[test_that::test]
     fn should_fail_due_to_returned_error() -> Result<(), i32> {
         Err(123)
     }

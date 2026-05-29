@@ -26,7 +26,7 @@ use std::ops::Deref;
 /// For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(Box::new(123), points_to(eq(123)))?;
 /// #     Ok(())

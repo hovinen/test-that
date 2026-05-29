@@ -22,16 +22,16 @@ use std::{fmt::Debug, marker::PhantomData};
 /// Matches a `Result` containing `Err` with a value matched by `inner`.
 ///
 /// ```
-/// # use googletest::prelude::*;
-/// # fn should_pass() -> googletest::Result<()> {
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> test_that::Result<()> {
 /// verify_that!(Err::<(), _>("Some error"), err(eq("Some error")))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> googletest::Result<()> {
+/// # fn should_fail_1() -> test_that::Result<()> {
 /// verify_that!(Ok::<_, &str>("A value"), err(eq("A value")))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> googletest::Result<()> {
+/// # fn should_fail_2() -> test_that::Result<()> {
 /// verify_that!(Err::<(), _>("Some error"), err(eq("Some other error")))?;   // Fails
 /// #     Ok(())
 /// # }

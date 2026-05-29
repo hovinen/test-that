@@ -21,7 +21,7 @@
 /// with the provided element matchers.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(2), anything()])?;   // Passes
 /// #     Ok(())
@@ -53,7 +53,7 @@
 /// corresponding to the keys and their respective values.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
 /// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
 /// verify_that!(
@@ -67,7 +67,7 @@
 /// brackets.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 ///  verify_that!(vec![1, 2], {eq(2), eq(1)})
 /// #     .unwrap();
 /// ```
@@ -77,14 +77,14 @@
 /// [`contains_exactly!`][crate::matchers::contains_exactly] macro.
 ///
 /// ```compile_fail
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// verify_that!(vec![vec![1,2], vec![3]], {{eq(2), eq(1)}, {eq(3)}})
 /// # .unwrap();
 /// ```
 ///
 /// Use this instead:
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// verify_that!(vec![vec![1,2], vec![3]],
 ///   {contains_exactly![eq(2), eq(1)], contains_exactly![eq(3)]})
 /// # .unwrap();
@@ -156,7 +156,7 @@ macro_rules! __contains_exactly {
 /// match.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(vec![3, 2, 1], contains_each![eq(2), ge(3)])?;   // Passes
 /// verify_that!(vec![3, 2, 1], contains_each![ge(2), ge(2)])?;   // Passes
@@ -189,7 +189,7 @@ macro_rules! __contains_exactly {
 /// corresponding to the keys and their respective values.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
 /// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
 /// verify_that!(value, contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One"))])
@@ -260,7 +260,7 @@ macro_rules! __contains_each {
 /// [`contains_exactly`][crate::matchers::contains_exactly].
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(vec![2, 1], is_contained_in![eq(1), ge(2)])?;   // Passes
 /// verify_that!(vec![2, 1], is_contained_in![ge(1), ge(1)])?;   // Passes
@@ -293,7 +293,7 @@ macro_rules! __contains_each {
 /// corresponding to the keys and their respective values.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
 /// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two")].into();
 /// verify_that!(

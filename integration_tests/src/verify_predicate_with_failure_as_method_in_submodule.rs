@@ -17,9 +17,9 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
-    #[googletest::test]
+    #[test_that::test]
     fn verify_predicate_on_method_in_submodule_with_failure() -> Result<()> {
         let a = 1;
         let b = 2;

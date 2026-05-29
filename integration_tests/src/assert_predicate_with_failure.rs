@@ -17,7 +17,7 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::assert_pred;
+    use test_that::assert_pred;
 
     #[test]
     fn assert_predicate_with_failure() {

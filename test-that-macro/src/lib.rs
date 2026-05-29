@@ -21,20 +21,20 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// Annotate tests the same way ordinary Rust tests are annotated:
 ///
 /// ```ignore
-/// #[googletest::test]
+/// #[test_that::test]
 /// fn should_work() {
 ///     ...
 /// }
 /// ```
 ///
 /// The test function is not required to have a return type. If it does have a
-/// return type, that type must be [`googletest::Result`]. One may do this if
+/// return type, that type must be [`test_that::Result`]. One may do this if
 /// one wishes to use both fatal and non-fatal assertions in the same test. For
 /// example:
 ///
 /// ```ignore
-/// #[googletest::test]
-/// fn should_work() -> googletest::Result<()> {
+/// #[test_that::test]
+/// fn should_work() -> test_that::Result<()> {
 ///     let value = 2;
 ///     expect_that!(value, gt(0));
 ///     verify_that!(value, eq(2))
@@ -45,7 +45,7 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// expected to panic. For example:
 ///
 /// ```ignore
-/// #[googletest::test]
+/// #[test_that::test]
 /// #[should_panic]
 /// fn passes_due_to_should_panic() {
 ///     let value = 2;
@@ -54,12 +54,12 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// }
 /// ```
 ///
-/// Using `#[should_panic]` modifies the behaviour of `#[googletest::test]` so
+/// Using `#[should_panic]` modifies the behaviour of `#[test_that::test]` so
 /// that the test panics (and passes) if any non-fatal assertion occurs.
 /// For example, the following test passes:
 ///
 /// ```ignore
-/// #[googletest::test]
+/// #[test_that::test]
 /// #[should_panic]
 /// fn passes_due_to_should_panic_and_failing_assertion() {
 ///     let value = 2;
@@ -67,7 +67,7 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// }
 /// ```
 ///
-/// [`googletest::Result`]: type.Result.html
+/// [`test_that::Result`]: type.Result.html
 #[proc_macro_attribute]
 pub fn test(
     _args: proc_macro::TokenStream,
@@ -81,7 +81,7 @@ pub fn test(
             (quote! { () }, quote! { .unwrap(); })
         } else {
             (
-                quote! { std::result::Result<(), googletest::internal::test_outcome::TestFailure> },
+                quote! { std::result::Result<(), test_that::internal::test_outcome::TestFailure> },
                 quote! {},
             )
         };
@@ -119,7 +119,7 @@ pub fn test(
             #(#attrs)*
             #sig -> #outer_return_type {
                 #maybe_closure
-                use googletest::internal::test_outcome::TestOutcome;
+                use test_that::internal::test_outcome::TestOutcome;
                 TestOutcome::init_current_test_outcome();
                 let result: #output_type = #invocation;
                 TestOutcome::close_current_test_outcome(result)
@@ -131,10 +131,10 @@ pub fn test(
             #(#attrs)*
             #sig -> #outer_return_type {
                 #maybe_closure
-                use googletest::internal::test_outcome::TestOutcome;
+                use test_that::internal::test_outcome::TestOutcome;
                 TestOutcome::init_current_test_outcome();
                 #invocation;
-                TestOutcome::close_current_test_outcome(googletest::Result::Ok(()))
+                TestOutcome::close_current_test_outcome(test_that::Result::Ok(()))
                 #trailer
             }
         }

@@ -15,7 +15,7 @@
 
 #![cfg(feature = "proptest")]
 
-use googletest::prelude::*;
+use test_that::prelude::*;
 use proptest::test_runner::{Config, TestRunner};
 
 #[test]

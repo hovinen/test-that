@@ -22,7 +22,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// Matches the actual value exactly when the inner matcher does _not_ match.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(0, not(eq(1)))?; // Passes
 /// #     Ok(())

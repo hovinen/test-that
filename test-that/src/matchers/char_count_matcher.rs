@@ -33,7 +33,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// This matches against owned strings and string slices.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let string_slice = "A string";
 /// verify_that!(string_slice, char_count(eq(8)))?;
@@ -49,7 +49,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// The parameter `expected` can be any integer numeric matcher.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let string_slice = "A string";
 /// verify_that!(string_slice, char_count(gt(4)))?;

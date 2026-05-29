@@ -22,7 +22,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// Creates a matcher based on the predicate provided.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(3, predicate(|x: &i32| x % 2 == 1))?;  // Passes
 /// #     Ok(())
@@ -57,7 +57,7 @@ impl<T, P> PredicateMatcher<T, P, NoDescription, NoDescription> {
     /// For example, to make sure the error message is more useful
     ///
     /// ```
-    /// # use googletest::matchers::{predicate, PredicateMatcher};
+    /// # use test_that::matchers::{predicate, PredicateMatcher};
     /// # let _ =
     /// predicate(|x: &i32| x % 2 == 1)
     ///     .with_description("is odd", "is even")

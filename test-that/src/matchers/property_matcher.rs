@@ -25,7 +25,7 @@
 /// extracted through a method call. For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// pub struct MyStruct {
 ///     a_field: u32,
@@ -48,7 +48,7 @@
 /// If the method returns a *reference*, then it must be preceded by a `*`:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # #[derive(Debug)]
 /// # pub struct MyStruct {
 /// #     a_field: u32,
@@ -65,7 +65,7 @@
 /// The method may also take additional arguments:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # #[derive(Debug)]
 /// # pub struct MyStruct {
 /// #     a_field: u32,
@@ -83,7 +83,7 @@
 /// slices:
 ///
 /// ```compile_fail
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// pub struct MyStruct {
 ///     a_string: String,

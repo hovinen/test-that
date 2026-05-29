@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use googletest::prelude::*;
+use test_that::prelude::*;
 
 #[test]
 fn all_matcher_works_as_inner_matcher() -> Result<()> {

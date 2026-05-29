@@ -26,7 +26,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// [`IntoIterator`].
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let array = [1,2,3];
 /// verify_that!(array, len(eq(3)))?;
@@ -42,7 +42,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// The parameter `expected` can be any integer numeric matcher.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let vec = vec![1,2,3];
 /// verify_that!(vec, len(gt(1)))?;

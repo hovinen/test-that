@@ -30,5 +30,5 @@ quote = "1.0.33"
 syn = {version = "2.0.39", features = ["full"]}
 
 [lib]
-name = "test-that-macro"
+name = "test_that_macro"
 proc-macro = true

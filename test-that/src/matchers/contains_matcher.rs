@@ -26,7 +26,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// matched containers to a specific number of matching elements.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(["Some value"], contains(eq("Some value")))?;  // Passes
 /// verify_that!(vec!["Some value"], contains(eq("Some value")))?;  // Passes

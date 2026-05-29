@@ -22,7 +22,7 @@ use std::fmt::Debug;
 /// Matches an `Option` containing a value matched by `inner`.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(Some("Some value"), some(eq("Some value")))?;  // Passes
 /// #     Ok(())

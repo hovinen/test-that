@@ -27,8 +27,8 @@ use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 /// new line. For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
-/// # use googletest::description::Description;
+/// # use test_that::prelude::*;
+/// # use test_that::description::Description;
 /// let description = Description::new()
 ///     .text("A block")
 ///     .text("Another block");
@@ -41,8 +41,8 @@ use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 /// indentation. For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
-/// # use googletest::description::Description;
+/// # use test_that::prelude::*;
+/// # use test_that::description::Description;
 /// let inner_description = Description::new()
 ///     .text("A block")
 ///     .text("Another block");
@@ -59,8 +59,8 @@ use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 /// One can also enumerate or bullet list the elements of a `Description`:
 ///
 /// ```
-/// # use googletest::prelude::*;
-/// # use googletest::description::Description;
+/// # use test_that::prelude::*;
+/// # use test_that::description::Description;
 /// let description = Description::new()
 ///     .text("First item")
 ///     .text("Second item")
@@ -75,7 +75,7 @@ use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 /// iterator thereof, or from an iterator over other `Description`s:
 ///
 /// ```
-/// # use googletest::description::Description;
+/// # use test_that::description::Description;
 /// let single_element_description: Description =
 ///     "A single block description".into();
 /// let two_element_description: Description =
@@ -133,8 +133,8 @@ impl Description {
     /// For example:
     ///
     /// ```
-    /// # use googletest::prelude::*;
-    /// # use googletest::description::Description;
+    /// # use test_that::prelude::*;
+    /// # use test_that::description::Description;
     /// let description = std::iter::once("A B C\nD E F".to_string()).collect::<Description>();
     /// verify_that!(description.indent(), displays_as(eq("  A B C\n  D E F")))
     /// # .unwrap();
@@ -153,8 +153,8 @@ impl Description {
     /// For instance:
     ///
     /// ```
-    /// # use googletest::prelude::*;
-    /// # use googletest::description::Description;
+    /// # use test_that::prelude::*;
+    /// # use test_that::description::Description;
     /// let description = Description::new()
     ///     .text("First line\nsecond line")
     ///     .bullet_list();
@@ -177,8 +177,8 @@ impl Description {
     /// For instance:
     ///
     /// ```
-    /// # use googletest::prelude::*;
-    /// # use googletest::description::Description;
+    /// # use test_that::prelude::*;
+    /// # use test_that::description::Description;
     /// let description = Description::new()
     ///     .text("First line\nsecond line")
     ///     .enumerate();

@@ -32,7 +32,7 @@ use std::{fmt::Debug, marker::PhantomData, ops::Deref};
 ///    owned value from it.
 ///
 /// ```
-/// # use googletest::{matchers::eq_deref_of, verify_that};
+/// # use test_that::{matchers::eq_deref_of, verify_that};
 /// #[derive(Debug, PartialEq)]
 /// struct NonCloneableStruct(i32);
 /// let expected = NonCloneableStruct(123);
@@ -46,7 +46,7 @@ use std::{fmt::Debug, marker::PhantomData, ops::Deref};
 /// a smart pointer to a string.
 ///
 /// ```compile_fail
-/// # use googletest::{matchers::{eq_deref_of, str_matcher::StrMatcherConfigurator}, verify_that};
+/// # use test_that::{matchers::{eq_deref_of, str_matcher::StrMatcherConfigurator}, verify_that};
 /// verify_that!("A string", eq_deref_of(Box::new("A STRING")).ignoring_ascii_case()) // Does not compile
 /// #    .unwrap()
 /// ```

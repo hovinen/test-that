@@ -18,7 +18,7 @@ To make an assertion using a matcher, GoogleTest offers three macros:
  * [`assert_that!`] panics if the assertion fails, aborting the test.
  * [`expect_that!`] logs an assertion failure, marking the test as having
    failed, but allows the test to continue running (called a _non-fatal
-   assertion_). It requires the use of the [`googletest::test`][crate::test]
+   assertion_). It requires the use of the [`test_that::test`][crate::test]
    attribute macro on the test itself.
  * [`verify_that!`] has no side effects and evaluates to a [`Result`] whose
    `Err` variant describes the assertion failure, if there is one. In
@@ -30,7 +30,7 @@ To make an assertion using a matcher, GoogleTest offers three macros:
 For example:
 
 ```
-use googletest::prelude::*;
+use test_that::prelude::*;
 
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test]
@@ -41,7 +41,7 @@ fn fails_and_panics() {
 }
 
 # /* The attribute macro would prevent the function from being compiled in a doctest.
-#[googletest::test]
+#[test_that::test]
 # */
 fn two_logged_failures() {
     let value = 2;
@@ -71,16 +71,16 @@ fn simple_assertion() -> Result<()> {
 Matchers are composable:
 
 ```
-use googletest::prelude::*;
+use test_that::prelude::*;
 
 # /* The attribute macro would prevent the function from being compiled in a doctest.
-#[googletest::test]
+#[test_that::test]
 # */
 fn contains_at_least_one_item_at_least_3() {
-# googletest::internal::test_outcome::TestOutcome::init_current_test_outcome();
+# test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
     let value = vec![1, 2, 3];
     expect_that!(value, contains(ge(3)));
-# googletest::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
+# test_that::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
 #     .unwrap();
 }
 # contains_at_least_one_item_at_least_3();
@@ -89,16 +89,16 @@ fn contains_at_least_one_item_at_least_3() {
 They can also be logically combined:
 
 ```
-use googletest::prelude::*;
+use test_that::prelude::*;
 
 # /* The attribute macro would prevent the function from being compiled in a doctest.
-#[googletest::test]
+#[test_that::test]
 # */
 fn strictly_between_9_and_11() {
-# googletest::internal::test_outcome::TestOutcome::init_current_test_outcome();
+# test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
     let value = 10;
     expect_that!(value, gt(9).and(not(ge(11))));
-# googletest::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
+# test_that::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
 #     .unwrap();
 }
 # strictly_between_9_and_11();
@@ -209,7 +209,7 @@ a struct holding the matcher's data and have it implement the trait
 [`Matcher`]:
 
 ```no_run
-use googletest::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
+use test_that::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
 use std::fmt::Debug;
 
 struct MyEqMatcher<T> {
@@ -243,7 +243,7 @@ impl<T: Debug> Describable for MyEqMatcher<T> {
  It is recommended to expose a function which constructs the matcher:
 
  ```no_run
- # use googletest::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
+ # use test_that::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
  # use std::fmt::Debug;
  #
  # struct MyEqMatcher<T> {
@@ -281,8 +281,8 @@ impl<T: Debug> Describable for MyEqMatcher<T> {
  The new matcher can then be used in the assertion macros:
 
 ```
-# use googletest::prelude::*;
-# use googletest::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
+# use test_that::prelude::*;
+# use test_that::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
 # use std::fmt::Debug;
 #
 # struct MyEqMatcher<T> {
@@ -316,12 +316,12 @@ impl<T: Debug> Describable for MyEqMatcher<T> {
 #    MyEqMatcher { expected }
 # }
 # /* The attribute macro would prevent the function from being compiled in a doctest.
-#[googletest::test]
+#[test_that::test]
 # */
 fn should_be_equal_by_my_definition() {
-# googletest::internal::test_outcome::TestOutcome::init_current_test_outcome();
+# test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
     expect_that!(10, eq_my_way(10));
-# googletest::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
+# test_that::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
 #     .unwrap();
 }
 # should_be_equal_by_my_definition();
@@ -335,13 +335,13 @@ having failed, but execution continues until the test completes or otherwise
 aborts.
 
 To make a non-fatal assertion, use the macro [`expect_that!`]. The test must
-also be marked with [`googletest::test`][crate::test] instead of the
+also be marked with [`test_that::test`][crate::test] instead of the
 Rust-standard `#[test]`.
 
 ```no_run
-use googletest::prelude::*;
+use test_that::prelude::*;
 
-#[googletest::test]
+#[test_that::test]
 fn three_non_fatal_assertions() {
     let value = 2;
     expect_that!(value, eq(2));  // Passes; test still considered passing.
@@ -354,10 +354,10 @@ This can be used in the same tests as `verify_that!`, in which case the test
 function must also return [`Result<()>`]:
 
 ```no_run
-use googletest::prelude::*;
+use test_that::prelude::*;
 
 # /* Make sure this also compiles as a doctest.
-#[googletest::test]
+#[test_that::test]
 # */
 fn failing_non_fatal_assertion() -> Result<()> {
     let value = 2;
@@ -369,9 +369,9 @@ fn failing_non_fatal_assertion() -> Result<()> {
 ```
 
 ```no_run
-use googletest::prelude::*;
+use test_that::prelude::*;
 
-#[googletest::test]
+#[test_that::test]
 fn failing_fatal_assertion_after_non_fatal_assertion() -> Result<()> {
     let value = 2;
     expect_that!(value, eq(2));  // Passes; test still considered passing.
@@ -389,7 +389,7 @@ predicate in a `verify_pred!` invocation to turn that into a test assertion
 which passes precisely when the predicate returns `true`:
 
 ```
-# use googletest::prelude::*;
+# use test_that::prelude::*;
 fn stuff_is_correct(x: i32, y: i32) -> bool {
     x == y
 }
@@ -424,7 +424,7 @@ test failure. It can be used analogously to [`verify_that!`] and
 message:
 
 ```
-# use googletest::prelude::*;
+# use test_that::prelude::*;
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test]
 # */
@@ -446,7 +446,7 @@ GoogleTest Rust and invoke the extension method [`or_fail()`] on a
 `Result` value in your test. For example:
 
 ```
-# use googletest::prelude::*;
+# use test_that::prelude::*;
 # #[cfg(feature = "anyhow")]
 # use anyhow::anyhow;
 # #[cfg(feature = "anyhow")]
@@ -470,7 +470,7 @@ test is invoked with
 [`TestRunner::run`](https://docs.rs/proptest/latest/proptest/test_runner/struct.TestRunner.html#method.run):
 
 ```
-# use googletest::prelude::*;
+# use test_that::prelude::*;
 # #[cfg(feature = "proptest")]
 # use proptest::test_runner::{Config, TestRunner};
 # #[cfg(feature = "proptest")]

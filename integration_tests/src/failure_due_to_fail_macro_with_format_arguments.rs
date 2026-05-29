@@ -17,9 +17,9 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
-    #[googletest::test]
+    #[test_that::test]
     fn just_fails() -> Result<()> {
         let argument = "An argument";
         fail!("Failure message with argument: {argument}").and_log_failure();

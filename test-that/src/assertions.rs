@@ -37,20 +37,20 @@
 ///
 /// Example:
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(42, eq(42))?; // This will pass.
 /// # Ok(())
 /// # }
 /// # should_pass().unwrap();
 /// # fn should_fail() -> Result<()> {
-/// # googletest::internal::test_outcome::TestOutcome::init_current_test_outcome();
+/// # test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
 /// verify_that!(42, eq(123)).and_log_failure();
 ///             // This will log a test failure and allow execution to continue.
 /// let _ = verify_that!(42, eq(123)); // This will do nothing.
 /// verify_that!(42, eq(123))?; // This will fail, returning immediately.
 /// verify_that!(42, eq(0))?; // This will not run.
-/// # googletest::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
+/// # test_that::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
 /// #     .unwrap_err();
 /// # Ok(())
 /// # }
@@ -70,7 +70,7 @@
 /// follows:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!((123, 456), (eq(123), eq(456)))?; // Passes
 /// #     Ok(())
@@ -86,7 +86,7 @@
 /// This also works with composed matchers:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!((123, 456), not((eq(456), eq(123))))?; // Passes
 /// #     Ok(())
@@ -98,7 +98,7 @@
 /// the test will fail to compile.
 ///
 /// ```compile_fail
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_not_compile() -> Result<()> {
 /// verify_that!((123, 456), (eq(123),))?; // Does not compile: wrong tuple size
 /// verify_that!((123, "A string"), (eq(123), eq(456)))?; // Does not compile: wrong type
@@ -111,7 +111,7 @@
 /// for the test.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// verify_that!((123, 456), (eq(123), anything()))
 /// #     .unwrap();
 /// ```
@@ -158,7 +158,7 @@ macro_rules! verify_that {
 /// example:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// fn equals_modulo(a: i32, b: i32, n: i32) -> bool { a % n == b % n }
 ///
 /// # /* The attribute macro would prevent the function from being compiled in a doctest.
@@ -311,7 +311,7 @@ macro_rules! fail {
 /// match.
 ///
 /// ```should_panic
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_fail() {
 /// let value = 2;
 /// assert_that!(value, eq(3));  // Fails and panics.
@@ -326,7 +326,7 @@ macro_rules! fail {
 /// failure message. For example:
 ///
 /// ```should_panic
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_fail() {
 /// let value = 2;
 /// let extra_information = "Some additional information";
@@ -406,7 +406,7 @@ macro_rules! assert_pred {
 /// execution in the event of assertion failure.
 ///
 /// This can only be invoked inside tests with the
-/// [`googletest::test`][crate::test] attribute. The assertion must
+/// [`test_that::test`][crate::test] attribute. The assertion must
 /// occur in the same thread as that running the test itself.
 ///
 /// Invoking this macro is equivalent to using
@@ -420,13 +420,13 @@ macro_rules! assert_pred {
 /// failure message. For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
-/// # fn should_fail() -> std::result::Result<(), googletest::internal::test_outcome::TestFailure> {
-/// # googletest::internal::test_outcome::TestOutcome::init_current_test_outcome();
+/// # use test_that::prelude::*;
+/// # fn should_fail() -> std::result::Result<(), test_that::internal::test_outcome::TestFailure> {
+/// # test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
 /// let value = 2;
 /// let extra_information = "Some additional information";
 /// expect_that!(value, eq(3), "Test failed. Extra information: {extra_information}.");
-/// # googletest::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
+/// # test_that::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
 /// # }
 /// # should_fail().unwrap_err();
 /// ```
@@ -462,7 +462,7 @@ macro_rules! expect_that {
 /// continues execution in the event of assertion failure.
 ///
 /// This can only be invoked inside tests with the
-/// [`googletest::test`][crate::test] attribute. The assertion must
+/// [`test_that::test`][crate::test] attribute. The assertion must
 /// occur in the same thread as that running the test itself.
 ///
 /// Invoking this macro is equivalent to using

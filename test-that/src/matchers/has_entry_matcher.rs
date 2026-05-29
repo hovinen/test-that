@@ -24,7 +24,7 @@ use std::marker::PhantomData;
 /// matcher `inner`.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
 /// # fn should_pass() -> Result<()> {
 /// let value = HashMap::from([(0, 1), (1, -1)]);
@@ -50,7 +50,7 @@ use std::marker::PhantomData;
 /// and using `contains`:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
 /// # fn should_pass() -> Result<()> {
 /// let value = HashMap::from([(0, 1), (1, -1)]);

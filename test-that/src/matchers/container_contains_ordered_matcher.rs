@@ -24,7 +24,7 @@
 /// corresponding element of the actual value.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// verify_that!(vec![1, 2, 3], contains_exactly![eq(1), anything(), gt(0).and(lt(123))].in_order())
 /// #    .unwrap();
 /// ```
@@ -34,7 +34,7 @@
 /// implement [`IntoIterator`].
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// let vector = vec![1, 2, 3];
 /// let slice = vector.as_slice();
 /// verify_that!(*slice, contains_exactly![eq(1), anything(), gt(0).and(lt(123))].in_order())
@@ -45,7 +45,7 @@
 /// brackets.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// verify_that!(vec![1, 2], [eq(1), eq(2)])
 /// #     .unwrap();
 /// ```
@@ -55,14 +55,14 @@
 /// [`elements_are!`][crate::matchers::elements_are] macro.
 ///
 /// ```compile_fail
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// verify_that!(vec![vec![1,2], vec![3]], [[eq(1), eq(2)], [eq(3)]])
 /// # .unwrap();
 /// ```
 ///
 /// Use this instead:
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// verify_that!(vec![vec![1,2], vec![3]], [contains_exactly![eq(1), eq(2)].in_order(), contains_exactly![eq(3)]])
 /// # .unwrap();
 /// ```

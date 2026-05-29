@@ -17,7 +17,7 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
     #[test]
     fn just_fails() -> Result<()> {

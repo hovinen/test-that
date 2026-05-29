@@ -110,7 +110,7 @@ pub trait MatcherExt: Sized {
     /// Constructs a matcher that matches both `self` and `right`.
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_pass() -> Result<()> {
     /// verify_that!("A string", starts_with("A").and(ends_with("string")))?; // Passes
     /// #     Ok(())
@@ -138,7 +138,7 @@ pub trait MatcherExt: Sized {
     /// matches the input.
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_pass() -> Result<()> {
     /// verify_that!(10, eq(2).or(ge(5)))?;  // Passes
     /// verify_that!(10, eq(2).or(eq(5)).or(ge(9)))?;  // Passes

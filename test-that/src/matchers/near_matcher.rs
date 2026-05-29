@@ -30,7 +30,7 @@ use std::fmt::Debug;
 /// otherwise.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass_1() -> Result<()> {
 /// verify_that!(1.0, near(1.0, 0.1))?; // Passes
 /// verify_that!(1.01, near(1.0, 0.1))?; // Passes
@@ -61,7 +61,7 @@ use std::fmt::Debug;
 /// floating point value:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_fail_1() -> Result<()> {
 /// verify_that!(f64::INFINITY, near(0.0, f64::MAX))?; // Fails
 /// #     Ok(())
@@ -82,7 +82,7 @@ use std::fmt::Debug;
 /// Similarly, by default, `NaN` is infinitely far away from any value:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_fail_1() -> Result<()> {
 /// verify_that!(f64::NAN, near(0.0, f64::MAX))?; // Fails
 /// #     Ok(())
@@ -104,7 +104,7 @@ use std::fmt::Debug;
 /// [`NearMatcher::nans_are_equal`].
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(f64::NAN, near(f64::NAN, f64::MAX).nans_are_equal())?; // Passes
 /// #     Ok(())

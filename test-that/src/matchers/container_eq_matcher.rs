@@ -41,7 +41,7 @@ use std::marker::PhantomData;
 /// the same element type. For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let vec = vec![1, 2, 3];
 /// verify_that!(vec, container_eq([1, 2, 3]))?;
@@ -54,7 +54,7 @@ use std::marker::PhantomData;
 /// may be a slice of `&str`:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let vec: Vec<String> = vec!["A string".into(), "Another string".into()];
 /// verify_that!(vec, container_eq(["A string", "Another string"]))?;
@@ -70,7 +70,7 @@ use std::marker::PhantomData;
 /// dereference the slice:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value = &[1, 2, 3];
 /// verify_that!(*value, container_eq([1, 2, 3]))?;

@@ -24,7 +24,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// includes `Vec`, arrays, and (dereferenced) slices.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
 /// # fn should_pass_1() -> Result<()> {
 /// let value = vec![1, 2, 3];
@@ -54,7 +54,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// One can also verify the contents of a slice by dereferencing it:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value = &[1, 2, 3];
 /// verify_that!(*value, each(gt(0)))?;

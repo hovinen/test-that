@@ -17,9 +17,9 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
-    #[googletest::test]
+    #[test_that::test]
     fn calls_verify_that_in_subroutine() -> Result<()> {
         verify_that_things_are_okay(2);
         Ok(())

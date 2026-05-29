@@ -18,11 +18,11 @@ fn main() {}
 #[deny(warnings)]
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
     use std::time::Duration;
     use tokio::time::sleep;
 
-    #[googletest::test]
+    #[test_that::test]
     #[tokio::test]
     async fn async_test_failure_with_non_fatal_assertion() -> Result<()> {
         sleep(Duration::from_millis(1)).await;
@@ -30,7 +30,7 @@ mod tests {
         Ok(())
     }
 
-    #[googletest::test]
+    #[test_that::test]
     #[tokio::test]
     async fn async_test_failure_with_fatal_assertion() -> Result<()> {
         sleep(Duration::from_millis(1)).await;

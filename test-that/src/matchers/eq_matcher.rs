@@ -26,7 +26,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// expected and actual values can be compared.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(123, eq(123))?; // Passes
 /// #     Ok(())
@@ -45,7 +45,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// types are comparable, for example `String` with `&str`.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(String::from("Some value"), eq("Some value"))?; // Passes
 /// #     Ok(())

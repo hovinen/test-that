@@ -29,7 +29,7 @@ fn returns_wrapping_anyhow_error() -> anyhow::Result<()> {
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
     use crate::returns_wrapping_anyhow_error;
 

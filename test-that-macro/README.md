@@ -1,5 +1,4 @@
-## Procedural macros for GoogleTest Rust
+## Procedural macros for test-that
 
-This crate is only useful as a dependency of
-[GoogleTest Rust](https://crates.io/crates/googletest). It cannot be used on its
-own.
+This crate is only useful as a dependency of [test-that](https://crates.io/crates/test-that). It
+cannot be used on its own.

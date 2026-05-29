@@ -27,7 +27,7 @@
 /// using arbitrary matchers:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct MyStruct {
 ///     a_field: String,
@@ -49,7 +49,7 @@
 /// fields have no effect on the output of the matcher.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # #[derive(Debug)]
 /// # struct MyStruct {
 /// #     a_field: String,
@@ -70,7 +70,7 @@
 /// One can use it recursively to match nested structures:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct MyStruct {
 ///     a_nested_struct: MyInnerStruct,
@@ -96,7 +96,7 @@
 /// verbose:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # #[derive(Debug)]
 /// # struct MyStruct {
 /// #     a_nested_struct: MyInnerStruct,
@@ -122,7 +122,7 @@
 /// ("properties"):
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct MyStruct {
 ///     a_field: String,
@@ -147,7 +147,7 @@
 /// These may also include extra parameters you pass in:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # #[derive(Debug)]
 /// # struct MyStruct {
 /// #     a_field: String,
@@ -167,7 +167,7 @@
 /// If the method returns a reference, precede it with a `*`:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # #[derive(Debug)]
 /// # struct MyStruct {
 /// #     a_field: String,
@@ -188,7 +188,7 @@
 /// fields must have matchers:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct MyTupleStruct(String, String);
 ///
@@ -203,7 +203,7 @@
 /// One can also match enum values:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// enum MyEnum {
 ///     A(u32),
@@ -231,7 +231,7 @@
 /// Methods returning string slices now work too:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # #[derive(Debug)]
 /// pub struct MyStruct {
 ///     a_string: String,

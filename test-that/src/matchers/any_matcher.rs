@@ -25,7 +25,7 @@
 /// For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!("A string", any!(starts_with("A"), ends_with("string")))?; // Passes
 /// verify_that!("A string", any!(starts_with("A"), starts_with("string")))?; // Passes
@@ -44,7 +44,7 @@
 /// [`or`][crate::matcher::MatcherExt::or] method:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(10, gt(9).or(lt(8)))?; // Also passes
 /// #     Ok(())

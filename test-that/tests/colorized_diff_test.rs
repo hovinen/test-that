@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use googletest::prelude::*;
+use test_that::prelude::*;
 use std::fmt::{Display, Write};
 
 // Make a long text with each element of the iterator on one line.

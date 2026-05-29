@@ -16,7 +16,7 @@
 [workspace]
 resolver = "2"
 members = [
-  "test_that_macro",
-  "test_that",
+  "test-that-macro",
+  "test-that",
   "integration_tests",
 ]

@@ -26,7 +26,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// `PartialOrd<ExpectedT>`.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// verify_that!(1, lt(2))?; // Passes
 /// #     Ok(())
@@ -44,7 +44,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// references:
 ///
 /// ```compile_fail
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_not_compile() -> Result<()> {
 /// verify_that!(123u32, lt(0u64))?; // Does not compile
 /// verify_that!(123u32 as u64, lt(100000000u64))?; // Passes
@@ -53,7 +53,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// ```
 ///
 /// ```compile_fail
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_not_compile() -> Result<()> {
 /// let actual: &u32 = &2;
 /// let expected: u32 = 70;
@@ -63,7 +63,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// ```
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let actual: &u32 = &2;
 /// let expected: u32 = 70;

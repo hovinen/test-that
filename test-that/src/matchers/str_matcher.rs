@@ -33,7 +33,7 @@ use std::ops::Deref;
 /// a string reference.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass_1() -> Result<()> {
 /// verify_that!("Some value", contains_substring("Some"))?;  // Passes
 /// #     Ok(())
@@ -74,7 +74,7 @@ pub fn contains_substring<A: ?Sized, T>(expected: T) -> StrMatcher<A, T> {
 /// a string reference.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass_1() -> Result<()> {
 /// verify_that!("Some value", starts_with("Some"))?;  // Passes
 /// #     Ok(())
@@ -114,7 +114,7 @@ pub fn starts_with<A: ?Sized, T>(expected: T) -> StrMatcher<A, T> {
 /// a string reference.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass_1() -> Result<()> {
 /// verify_that!("Some value", ends_with("value"))?;  // Passes
 /// #     Ok(())
@@ -160,7 +160,7 @@ pub trait StrMatcherConfigurator<ActualT: ?Sized, ExpectedT> {
     /// Whitespace is defined as in [`str::trim_start`].
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_pass() -> Result<()> {
     /// verify_that!("A string", eq("   A string").ignoring_leading_whitespace())?; // Passes
     /// verify_that!("   A string", eq("A string").ignoring_leading_whitespace())?; // Passes
@@ -180,7 +180,7 @@ pub trait StrMatcherConfigurator<ActualT: ?Sized, ExpectedT> {
     /// Whitespace is defined as in [`str::trim_end`].
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_pass() -> Result<()> {
     /// verify_that!("A string", eq("A string   ").ignoring_trailing_whitespace())?; // Passes
     /// verify_that!("A string   ", eq("A string").ignoring_trailing_whitespace())?; // Passes
@@ -200,7 +200,7 @@ pub trait StrMatcherConfigurator<ActualT: ?Sized, ExpectedT> {
     /// Whitespace is defined as in [`str::trim`].
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_pass() -> Result<()> {
     /// verify_that!("A string", eq("   A string   ").ignoring_outer_whitespace())?; // Passes
     /// verify_that!("   A string   ", eq("A string").ignoring_outer_whitespace())?; // Passes
@@ -223,7 +223,7 @@ pub trait StrMatcherConfigurator<ActualT: ?Sized, ExpectedT> {
     /// This uses the same rules for case as [`str::eq_ignore_ascii_case`].
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_pass() -> Result<()> {
     /// verify_that!("Some value", eq("SOME VALUE").ignoring_ascii_case())?;  // Passes
     /// #     Ok(())
@@ -244,7 +244,7 @@ pub trait StrMatcherConfigurator<ActualT: ?Sized, ExpectedT> {
     /// conditions a number times matched by the matcher `times`.
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_pass() -> Result<()> {
     /// verify_that!("Some value\nSome value", contains_substring("value").times(eq(2)))?; // Passes
     /// #     Ok(())
@@ -261,7 +261,7 @@ pub trait StrMatcherConfigurator<ActualT: ?Sized, ExpectedT> {
     /// For example:
     ///
     /// ```
-    /// # use googletest::prelude::*;
+    /// # use test_that::prelude::*;
     /// # fn should_fail() -> Result<()> {
     /// // Fails: substrings distinct but not disjoint!
     /// verify_that!("ababab", contains_substring("abab").times(eq(2)))?;

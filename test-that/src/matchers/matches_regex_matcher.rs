@@ -30,7 +30,7 @@ use std::ops::Deref;
 /// `String` or a string reference.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass_1() -> Result<()> {
 /// verify_that!("Some value", matches_regex("S.*e"))?;  // Passes
 /// #     Ok(())

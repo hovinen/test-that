@@ -27,7 +27,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// The input may be a slice `&[u8]` or a `Vec` of bytes.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let bytes: &[u8] = "A string".as_bytes();
 /// verify_that!(bytes, is_utf8_string(eq("A string")))?; // Passes

@@ -17,9 +17,9 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
-    #[googletest::test]
+    #[test_that::test]
     fn should_fail_but_not_abort() -> Result<()> {
         let value = 2;
         expect_that!(value, eq(3));

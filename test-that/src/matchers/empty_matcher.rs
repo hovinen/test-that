@@ -26,7 +26,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// [`HashSet`][std::collections::HashSet].
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
 /// # fn should_pass() -> Result<()> {
 /// let value: Vec<i32> = vec![];
@@ -41,7 +41,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// One can also check whether a slice is empty by dereferencing it:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
 /// # fn should_pass() -> Result<()> {
 /// let value: &[u32] = &[];

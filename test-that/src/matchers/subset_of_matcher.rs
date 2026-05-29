@@ -30,7 +30,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// `Vec` or arrays. They need not be the same container type.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
 /// # fn should_pass_1() -> Result<()> {
 /// let value = vec![1, 2, 3];
@@ -58,7 +58,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// Item multiplicity in both the actual and expected containers is ignored:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value: Vec<i32> = vec![0, 0, 1];
 /// verify_that!(value, subset_of([0, 1]))?;  // Passes
@@ -71,7 +71,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// One can also verify the contents of a slice by dereferencing it:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value = &[1, 2, 3];
 /// verify_that!(*value, subset_of([1, 2, 3]))?;

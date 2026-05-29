@@ -28,7 +28,7 @@
 /// For example:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct IntField {
 ///   int: i32
@@ -43,7 +43,7 @@
 /// Tuple structs are also supported via the index syntax:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct IntField(i32);
 /// # fn should_pass() -> Result<()> {
@@ -57,7 +57,7 @@
 /// matched:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// enum MyEnum {
 ///     A(i32),
@@ -78,7 +78,7 @@
 /// The structure or enum may also be referenced from a separate module:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// mod a_module {
 ///     #[derive(Debug)]
 ///     pub struct AStruct(pub i32);
@@ -93,7 +93,7 @@
 /// Nested structures are *not supported*, however:
 ///
 /// ```compile_fail
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct InnerStruct(i32);
 /// #[derive(Debug)]

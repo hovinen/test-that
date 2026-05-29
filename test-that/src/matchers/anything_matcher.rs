@@ -25,7 +25,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// `Some(...)`)  but without caring about the internal value.
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let option = Some("Some value");
 /// verify_that!(option, some(anything()))?;

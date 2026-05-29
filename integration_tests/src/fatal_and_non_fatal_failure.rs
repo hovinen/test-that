@@ -17,9 +17,9 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
-    #[googletest::test]
+    #[test_that::test]
     fn fatal_and_non_fatal_failure() -> Result<()> {
         let value = 2;
         verify_that!(value, eq(3)).and_log_failure();

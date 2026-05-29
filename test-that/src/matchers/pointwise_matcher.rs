@@ -25,7 +25,7 @@
 /// does not exceed the given upper bounds:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value = vec![1, 2, 3];
 /// verify_that!(value, pointwise!(le, [1, 3, 3]))?; // Passes
@@ -44,7 +44,7 @@
 /// One can also use a closure which returns a matcher:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value = vec![1.00001, 2.000001, 3.00001];
 /// verify_that!(value, pointwise!(|v| near(v, 0.001), [1.0, 2.0, 3.0]))?;
@@ -57,7 +57,7 @@
 /// creating the matcher:
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value = vec![1.00001, 2.000001, 3.00001];
 /// verify_that!(value, pointwise!(|v, t| near(v, t), [1.0, 2.0, 3.0], [0.001, 0.0001, 0.01]))?;
@@ -85,7 +85,7 @@
 /// implement [`IntoIterator`].
 ///
 /// ```
-/// # use googletest::prelude::*;
+/// # use test_that::prelude::*;
 /// # fn should_pass() -> Result<()> {
 /// let value = vec![1, 2, 3];
 /// verify_that!(*value.as_slice(), pointwise!(le, [1, 3, 3]))?; // Passes
@@ -114,7 +114,7 @@
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect
-/// [`Pointwise`]: https://google.github.io/googletest/reference/matchers.html#container-matchers
+/// [`Pointwise`]: https://google.github.io/test_that/reference/matchers.html#container-matchers
 /// [`Vec`]: std::vec::Vec
 #[macro_export]
 #[doc(hidden)]

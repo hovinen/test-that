@@ -71,26 +71,26 @@ mod tests {
         assert_that!(value, eq(2), "A custom error message",);
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn should_pass_with_expect_that() -> Result<()> {
         let value = 2;
         expect_that!(value, eq(2));
         Ok(())
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn should_pass_with_expect_that_returning_unit() {
         let value = 2;
         expect_that!(value, eq(2));
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn expect_that_supports_trailing_comma() {
         let value = 2;
         expect_that!(value, eq(2),);
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn expect_that_with_custom_failure_message_supports_trailing_comma() {
         let value = 2;
         expect_that!(value, eq(2), "A custom error message",);
@@ -187,7 +187,7 @@ mod tests {
         )
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn should_output_failure_message_with_simple_structured_value() -> Result<()> {
         let output = run_external_process_in_tests_directory(
             "assertion_failures_with_short_structured_actual_values",
@@ -371,7 +371,7 @@ mod tests {
         a == b
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn should_verify_predicate_with_success_using_expect_pred() -> Result<()> {
         expect_pred!(eq_predicate(1, 1));
         Ok(())
@@ -622,7 +622,7 @@ mod tests {
         )
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn test_with_google_test_and_rstest_runs_only_once() -> Result<()> {
         let output = run_external_process_in_tests_directory("google_test_with_rstest")?;
 
@@ -653,7 +653,7 @@ mod tests {
         )
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn async_test_with_google_test_runs_correctly() -> Result<()> {
         let output = run_external_process_in_tests_directory("async_test_with_expect_that")?;
 
@@ -690,30 +690,30 @@ mod tests {
         verify_that!(123, eq(123)).and_log_failure();
     }
 
-    #[googletest::test]
+    #[test_that::test]
     fn should_just_pass() -> Result<()> {
         Ok(())
     }
 
-    #[googletest::test]
+    #[test_that::test]
     #[should_panic]
     fn should_pass_with_should_panic() {
         expect_that!(2, eq(4));
     }
 
-    #[googletest::test]
+    #[test_that::test]
     #[should_panic(expected = "See failure output above")]
     fn should_pass_with_should_panic_with_expectation() {
         expect_that!(2, eq(4));
     }
 
     #[should_panic]
-    #[googletest::test]
+    #[test_that::test]
     fn should_pass_with_should_panic_in_first_position() {
         expect_that!(2, eq(4));
     }
 
-    #[googletest::test]
+    #[test_that::test]
     #[should_panic]
     fn should_pass_with_should_panic_and_verify_that() -> Result<()> {
         verify_that!(2, eq(4))?;
@@ -730,7 +730,7 @@ mod tests {
     #[::core::prelude::v1::test]
     #[should_panic]
     fn should_panic_when_expect_that_runs_without_attribute_macro_after_another_test() {
-        // The boilerplate in the attribute googletest::test should reset the test
+        // The boilerplate in the attribute test_that::test should reset the test
         // context when the test has finished running. If it fails to do so, then the
         // expect_that! call will see a test context and *not* panic, causing the test
         // to fail.

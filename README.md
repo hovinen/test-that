@@ -5,25 +5,25 @@
 [![Apache licensed][license-badge]][license-url]
 [![Build Status][actions-badge]][actions-url]
 
-[crates-badge]: https://img.shields.io/crates/v/googletest.svg
-[crates-url]: https://crates.io/crates/googletest
-[docs-badge]: https://img.shields.io/badge/docs.rs-googletest-66c2a5
-[docs-url]: https://docs.rs/googletest/*/googletest/
+[crates-badge]: https://img.shields.io/crates/v/test_that.svg
+[crates-url]: https://crates.io/crates/test_that
+[docs-badge]: https://img.shields.io/badge/docs.rs-test_that-66c2a5
+[docs-url]: https://docs.rs/test_that/*/test_that/
 [license-badge]: https://img.shields.io/badge/license-Apache-blue.svg
-[license-url]: https://github.com/google/googletest-rust/blob/main/LICENSE
-[actions-badge]: https://github.com/google/googletest-rust/workflows/CI/badge.svg
-[actions-url]: https://github.com/google/googletest-rust/actions?query=workflow%3ACI+branch%3Amain
+[license-url]: https://github.com/google/test_that-rust/blob/main/LICENSE
+[actions-badge]: https://github.com/google/test_that-rust/workflows/CI/badge.svg
+[actions-url]: https://github.com/google/test_that-rust/actions?query=workflow%3ACI+branch%3Amain
 
 This library brings the rich assertion types of Google's C++ testing library
-[GoogleTest](https://github.com/google/googletest) to Rust. It provides:
+[GoogleTest](https://github.com/google/test_that) to Rust. It provides:
 
  * A framework for writing matchers which can be combined to make a wide range
    of assertions on data,
  * A rich set of matchers providing similar functionality to those included in
-   [GoogleTest](https://google.github.io/googletest/reference/matchers.html),
+   [GoogleTest](https://google.github.io/test_that/reference/matchers.html),
    and
  * A new set of assertion macros offering similar functionality to those of
-   [GoogleTest](https://google.github.io/googletest/primer.html#assertions).
+   [GoogleTest](https://google.github.io/test_that/primer.html#assertions).
 
 **The minimum supported Rust version is 1.66**.
 
@@ -45,7 +45,7 @@ To make an assertion using a matcher, GoogleTest offers three macros:
  * [`assert_that!`] panics if the assertion fails, aborting the test.
  * [`expect_that!`] logs an assertion failure, marking the test as having
    failed, but allows the test to continue running (called a _non-fatal
-   assertion_). It requires the use of the [`googletest::test`] attribute macro
+   assertion_). It requires the use of the [`test_that::test`] attribute macro
    on the test itself.
  * [`verify_that!`] has no side effects and evaluates to a [`Result<()>`] whose
    `Err` variant describes the assertion failure, if there is one. In
@@ -57,7 +57,7 @@ To make an assertion using a matcher, GoogleTest offers three macros:
 For example:
 
 ```rust
-use googletest::prelude::*;
+use test_that::prelude::*;
 
 #[test]
 fn fails_and_panics() {
@@ -65,7 +65,7 @@ fn fails_and_panics() {
     assert_that!(value, eq(4));
 }
 
-#[googletest::test]
+#[test_that::test]
 fn two_logged_failures() {
     let value = 2;
     expect_that!(value, eq(4)); // Test now failed, but continues executing.
@@ -96,9 +96,9 @@ This library includes a rich set of matchers, covering:
 Matchers are composable:
 
 ```rust
-use googletest::prelude::*;
+use test_that::prelude::*;
 
-#[googletest::test]
+#[test_that::test]
 fn contains_at_least_one_item_at_least_3() {
     let value = vec![1, 2, 3];
     expect_that!(value, contains(ge(3)));
@@ -108,9 +108,9 @@ fn contains_at_least_one_item_at_least_3() {
 They can also be logically combined:
 
 ```rust
-use googletest::prelude::*;
+use test_that::prelude::*;
 
-#[googletest::test]
+#[test_that::test]
 fn strictly_between_9_and_11() {
     let value = 10;
     expect_that!(value, gt(9).and(not(ge(11))));
@@ -123,7 +123,7 @@ One can use the macro [`matches_pattern!`] to create a composite matcher for a
 struct or enum that matches fields with other matchers:
 
 ```rust
-use googletest::prelude::*;
+use test_that::prelude::*;
 
 struct AStruct {
     a_field: i32,
@@ -187,7 +187,7 @@ pub fn eq_my_way<T: PartialEq + Debug>(expected: T) -> impl Matcher<ActualT = T>
 The new matcher can then be used in the assertion macros:
 
 ```rust
-#[googletest::test]
+#[test_that::test]
 fn should_be_equal_by_my_definition() {
     expect_that!(10, eq_my_way(10));
 }
@@ -202,12 +202,12 @@ failed, but execution continues until the test completes or otherwise aborts.
 This is analogous to the `EXPECT_*` family of macros in GoogleTest.
 
 To make a non-fatal assertion, use the macro [`expect_that!`]. The test must
-also be marked with [`googletest::test`] instead of the Rust-standard `#[test]`.
+also be marked with [`test_that::test`] instead of the Rust-standard `#[test]`.
 
 ```rust
-use googletest::prelude::*;
+use test_that::prelude::*;
 
-#[googletest::test]
+#[test_that::test]
 fn three_non_fatal_assertions() {
     let value = 2;
     expect_that!(value, eq(2));  // Passes; test still considered passing.
@@ -220,9 +220,9 @@ This can be used in the same tests as `verify_that!`, in which case the test
 function must also return [`Result<()>`]:
 
 ```rust
-use googletest::prelude::*;
+use test_that::prelude::*;
 
-#[googletest::test]
+#[test_that::test]
 fn failing_non_fatal_assertion() -> Result<()> {
     let value = 2;
     expect_that!(value, eq(3));  // Just marks the test as having failed.
@@ -233,9 +233,9 @@ fn failing_non_fatal_assertion() -> Result<()> {
 ```
 
 ```rust
-use googletest::prelude::*;
+use test_that::prelude::*;
 
-#[googletest::test]
+#[test_that::test]
 fn failing_fatal_assertion_after_non_fatal_assertion() -> Result<()> {
     let value = 2;
     verify_that!(value, eq(3))?; // Fails and aborts the test.
@@ -246,12 +246,12 @@ fn failing_fatal_assertion_after_non_fatal_assertion() -> Result<()> {
 
 ### Interoperability
 
-You can use the `#[googletest::test]` macro together with many other libraries
+You can use the `#[test_that::test]` macro together with many other libraries
 such as [rstest](https://crates.io/crates/rstest). Just apply both attribute
 macros to the test:
 
 ```rust
-#[googletest::test]
+#[test_that::test]
 #[rstest]
 #[case(1)]
 #[case(2)]
@@ -261,7 +261,7 @@ fn rstest_works_with_google_test(#[case] value: u32) -> Result<()> {
 }
 ```
 
-Make sure to put `#[googletest::test]` *before* `#[rstest]`. Otherwise the
+Make sure to put `#[test_that::test]` *before* `#[rstest]`. Otherwise the
 annotated test will run twice, since both macros will attempt to register a test
 with the Rust test harness.
 
@@ -270,7 +270,7 @@ The macro also works together with
 the same way:
 
 ```rust
-#[googletest::test]
+#[test_that::test]
 #[tokio::test]
 async fn should_work_with_tokio() -> Result<()> {
     verify_that!(3, gt(0))
@@ -343,15 +343,15 @@ displayed, we recommend setting those variables in the personal
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute
 to this project.
 
-[`and_log_failure()`]: https://docs.rs/googletest/*/googletest/trait.GoogleTestSupport.html#tymethod.and_log_failure
-[`assert_that!`]: https://docs.rs/googletest/*/googletest/macro.assert_that.html
-[`expect_pred!`]: https://docs.rs/googletest/*/googletest/macro.expect_pred.html
-[`expect_that!`]: https://docs.rs/googletest/*/googletest/macro.expect_that.html
-[`fail!`]: https://docs.rs/googletest/*/googletest/macro.fail.html
-[`googletest::test`]: https://docs.rs/googletest/*/googletest/attr.test.html
-[`matches_pattern!`]: https://docs.rs/googletest/*/googletest/macro.matches_pattern.html
-[`verify_pred!`]: https://docs.rs/googletest/*/googletest/macro.verify_pred.html
-[`verify_that!`]: https://docs.rs/googletest/*/googletest/macro.verify_that.html
-[`Describe`]: https://docs.rs/googletest/*/googletest/matcher/trait.Describe.html
-[`Matcher`]: https://docs.rs/googletest/*/googletest/matcher/trait.Matcher.html
-[`Result<()>`]: https://docs.rs/googletest/*/googletest/type.Result.html
+[`and_log_failure()`]: https://docs.rs/test_that/*/test_that/trait.GoogleTestSupport.html#tymethod.and_log_failure
+[`assert_that!`]: https://docs.rs/test_that/*/test_that/macro.assert_that.html
+[`expect_pred!`]: https://docs.rs/test_that/*/test_that/macro.expect_pred.html
+[`expect_that!`]: https://docs.rs/test_that/*/test_that/macro.expect_that.html
+[`fail!`]: https://docs.rs/test_that/*/test_that/macro.fail.html
+[`test_that::test`]: https://docs.rs/test_that/*/test_that/attr.test.html
+[`matches_pattern!`]: https://docs.rs/test_that/*/test_that/macro.matches_pattern.html
+[`verify_pred!`]: https://docs.rs/test_that/*/test_that/macro.verify_pred.html
+[`verify_that!`]: https://docs.rs/test_that/*/test_that/macro.verify_that.html
+[`Describe`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describe.html
+[`Matcher`]: https://docs.rs/test_that/*/test_that/matcher/trait.Matcher.html
+[`Result<()>`]: https://docs.rs/test_that/*/test_that/type.Result.html

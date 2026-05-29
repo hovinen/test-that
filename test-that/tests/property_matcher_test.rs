@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use googletest::matcher::{Describable as _, Matcher, MatcherResult};
-use googletest::prelude::*;
+use test_that::matcher::{Describable as _, Matcher, MatcherResult};
+use test_that::prelude::*;
 
 #[derive(Debug)]
 struct SomeStruct {

@@ -17,9 +17,9 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
+    use test_that::prelude::*;
 
-    #[googletest::test]
+    #[test_that::test]
     #[should_panic]
     fn passes_but_fails_due_to_should_panic() {
         expect_that!(2, eq(2));
