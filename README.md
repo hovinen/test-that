@@ -9,8 +9,8 @@
 [docs-url]: https://docs.rs/test_that/*/test_that/
 [license-badge]: https://img.shields.io/badge/license-Apache-blue.svg
 [license-url]: https://github.com/google/test_that-rust/blob/main/LICENSE
-[actions-badge]: https://github.com/google/test_that-rust/workflows/CI/badge.svg
-[actions-url]: https://github.com/google/test_that-rust/actions?query=workflow%3ACI+branch%3Amain
+[actions-badge]: https://github.com/hovinen/test_that/workflows/CI/badge.svg
+[actions-url]: https://github.com/hovinen/test_that/actions?query=workflow%3ACI+branch%3Amain
 
 This library brings the rich assertion types of Google's C++ testing library
 [GoogleTest](https://github.com/google/googletest) to Rust. It provides:
