@@ -1,4 +1,5 @@
 # Copyright 2022 Google LLC
+# Copyright 2026 Bradford Hovinen <bradford@hovinen.me>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,22 +14,33 @@
 # limitations under the License.
 
 [package]
-name = "googletest_macro"
-version = "0.11.0"
+name = "test-that"
+version = "0.99.0"
 keywords = ["unit", "matcher", "testing", "assertions"]
 categories = ["development-tools", "development-tools::testing"]
-description = "Procedural macros for GoogleTest Rust"
-repository = "https://github.com/google/googletest-rust"
+description = "A rich assertion and matcher library based on GoogleTest"
+repository = "https://github.com/hovinen/test-that"
+readme = "../README.md"
 license = "Apache-2.0"
 edition = "2021"
+rust-version = "1.66.0"
 authors = [
-  "Bradford Hovinen <hovinen@google.com>",
+  "Bradford Hovinen <bradford@hovinen.me>",
+  "Bastien Jacot-Guillarmod <bjacotg@google.com>",
+  "Maciej Pietrzak <mpi@google.com>",
+  "Martin Geisler <mgeisler@google.com>",
 ]
 
 [dependencies]
-quote = "1.0.33"
-syn = {version = "2.0.39", features = ["full"]}
+test-that-macro = { path = "../test-that-macro", version = "0.99.0" }
+anyhow = { version = "1", optional = true }
+num-traits = "0.2.17"
+proptest = { version = "1.2.0", optional = true }
+regex = "1.7.3"
+rustversion = "1.0.14"
 
-[lib]
-name = "googletest_macro"
-proc-macro = true
+[dev-dependencies]
+indoc = "2"
+quickcheck = "1.0.3"
+serial_test = "2.0.0"
+temp-env = "0.3.6"
