@@ -1,4 +1,5 @@
 // Copyright 2022 Google LLC
+// Copyright 2026 Bradford Hovinen <bradford@hovinen.me>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +17,9 @@ fn main() {}
 
 #[cfg(test)]
 mod tests {
-    use googletest::prelude::*;
     use indoc::indoc;
     use std::process::Command;
+    use test_that::prelude::*;
 
     #[test]
     fn should_pass() -> Result<()> {
@@ -48,8 +49,7 @@ mod tests {
     }
 
     #[test]
-    fn verify_that_with_short_contains_exactly_syntax_supports_trailing_comma() -> Result<()>
-    {
+    fn verify_that_with_short_contains_exactly_syntax_supports_trailing_comma() -> Result<()> {
         verify_that!(vec![1, 2], {eq(2), eq(1),})
     }
 
