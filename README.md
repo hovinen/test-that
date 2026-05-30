@@ -12,6 +12,10 @@
 [actions-badge]: https://github.com/hovinen/test-that/workflows/CI/badge.svg
 [actions-url]: https://github.com/hovinen/test-that/actions?query=workflow%3ACI+branch%3Amain
 
+This is a fork of the crate [googletest](https://crates.io/crates/googletest)
+with the goal of providing a more ergonomic developer experience and removing
+some of the warts inherited from the C++ library on which that crate was based.
+
 This library brings the rich assertion types of Google's C++ testing library
 [GoogleTest](https://github.com/google/googletest) to Rust. It provides:
 
