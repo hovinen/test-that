@@ -16,6 +16,10 @@ This is a fork of the crate [googletest](https://crates.io/crates/googletest)
 with the goal of providing a more ergonomic developer experience and removing
 some of the warts inherited from the C++ library on which that crate was based.
 
+> [!NOTE]
+> This is not yet released on crates.io. There is still some work to be done on
+> it.
+
 This library brings the rich assertion types of Google's C++ testing library
 [GoogleTest](https://github.com/google/googletest) to Rust. It provides:
 
