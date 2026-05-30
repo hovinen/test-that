@@ -14,7 +14,7 @@
 # limitations under the License.
 
 [package]
-name = "integration_tests"
+name = "integration-tests"
 version = "0.99.0"
 description = "Integration tests for GoogleTest Rust"
 repository = "https://github.com/hovinen/test-that"
@@ -37,7 +37,7 @@ rustversion = "1.0.14"
 tokio = { version = "1.34", features = ["time", "macros", "rt"] }
 
 [[bin]]
-name = "integration_tests"
+name = "integration-tests"
 path = "src/integration_tests.rs"
 test = false
 

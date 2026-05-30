@@ -18,5 +18,5 @@ resolver = "2"
 members = [
   "test-that-macro",
   "test-that",
-  "integration_tests",
+  "integration-tests",
 ]

@@ -24,7 +24,7 @@
 set -e
 
 INTEGRATION_TEST_BINARIES=(
-  "integration_tests"
+  "integration-tests"
   "assert_predicate_with_failure"
   "assertion_failure_in_subroutine"
   "assertion_failures_with_short_structured_actual_values"
@@ -54,6 +54,6 @@ INTEGRATION_TEST_BINARIES=(
 
 cargo build
 for binary in ${INTEGRATION_TEST_BINARIES[@]}; do
-  cargo rustc -p integration_tests --bin $binary -- --test
+  cargo rustc -p integration-tests --bin $binary -- --test
 done
-./target/debug/integration_tests
+./target/debug/integration-tests

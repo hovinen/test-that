@@ -128,7 +128,7 @@ mod tests {
                 Expected: is equal to 3
                 Actual: 2,
                   which isn't equal to 3
-                  at .*integration_tests/src/simple_assertion_failure.rs:[0-9]+:9"})
+                  at .*integration-tests/src/simple_assertion_failure.rs:[0-9]+:9"})
         )
     }
 
@@ -144,7 +144,7 @@ mod tests {
                 Expected: is equal to 3
                 Actual: 2,
                   which isn't equal to 3
-                  at .*integration_tests/src/simple_assertion_failure_with_assert_that.rs:[0-9]+:9
+                  at .*integration-tests/src/simple_assertion_failure_with_assert_that.rs:[0-9]+:9
                 "})
         )
     }
@@ -160,7 +160,7 @@ mod tests {
                 Expected: is equal to 3
                 Actual: 2,
                   which isn't equal to 3
-                  at .*integration_tests/src/expect_that_failure.rs:[0-9]+:9
+                  at .*integration-tests/src/expect_that_failure.rs:[0-9]+:9
                 "})
         )
     }
@@ -176,13 +176,13 @@ mod tests {
                 Expected: is equal to 3
                 Actual: 2,
                   which isn't equal to 3
-                  at .*integration_tests/src/two_expect_that_failures.rs:[0-9]+:9
+                  at .*integration-tests/src/two_expect_that_failures.rs:[0-9]+:9
 
                 Value of: value
                 Expected: is equal to 4
                 Actual: 2,
                   which isn't equal to 4
-                  at .*integration_tests/src/two_expect_that_failures.rs:[0-9]+:9
+                  at .*integration-tests/src/two_expect_that_failures.rs:[0-9]+:9
                 "})
         )
     }
@@ -556,7 +556,7 @@ mod tests {
             output,
             contains_regex(indoc! {"
                 Expected test failure
-                  at .*integration_tests/src/failure_due_to_fail_macro.rs:[0-9]+:9
+                  at .*integration-tests/src/failure_due_to_fail_macro.rs:[0-9]+:9
                 "})
         )
     }
