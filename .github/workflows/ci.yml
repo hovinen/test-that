@@ -28,7 +28,7 @@ jobs:
       matrix:
         toolchain: [stable, beta]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
         uses: actions-rs/toolchain@v1
         with:
@@ -46,7 +46,7 @@ jobs:
       matrix:
         toolchain: [stable, nightly, beta]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
         uses: actions-rs/toolchain@v1
         with:
@@ -64,7 +64,7 @@ jobs:
       matrix:
         toolchain: [stable, 1.71]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
         uses: actions-rs/toolchain@v1
         with:
@@ -82,7 +82,7 @@ jobs:
       matrix:
         toolchain: [stable, 1.71.0, nightly, beta]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
         uses: actions-rs/toolchain@v1
         with:
@@ -97,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     name: doc / nightly
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Install nightly
