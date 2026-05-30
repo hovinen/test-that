@@ -13,8 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use test_that::prelude::*;
+use std::{convert::Infallible, ops::Deref};
+
 use indoc::indoc;
+use test_that::prelude::*;
 
 #[test]
 fn matches_struct_containing_single_field() -> Result<()> {
@@ -1604,6 +1606,132 @@ fn matches_struct_with_a_field_followed_by_a_method_with_params_trailing_comma_r
             another_field: eq(234),
             *get_field_ref(2, 3,): eq(123),
             a_third_field: eq(345),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_with_method_returning_option_of_reference() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_field: u32,
+    }
+
+    impl AStruct {
+        fn get_option_of_field(&self) -> Option<&u32> {
+            Some(&self.a_field)
+        }
+    }
+
+    let actual = AStruct { a_field: 123 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_option_of_field(): some(points_to(eq(123))),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_with_method_returning_result_of_reference() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_field: u32,
+    }
+
+    impl AStruct {
+        fn get_result_with_field(&self) -> std::result::Result<&u32, Infallible> {
+            Ok(&self.a_field)
+        }
+    }
+
+    let actual = AStruct { a_field: 123 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_result_with_field(): ok(points_to(eq(123))),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_with_method_returning_result_with_err_of_reference() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_field: u32,
+    }
+
+    impl AStruct {
+        fn get_result_with_field(&self) -> std::result::Result<(), &u32> {
+            Err(&self.a_field)
+        }
+    }
+
+    let actual = AStruct { a_field: 123 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_result_with_field(): err(points_to(eq(123))),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_containing_reference() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_field: &'a u32,
+    }
+
+    impl<'a> AStruct<'a> {
+        fn get_field(&self) -> &'a u32 {
+            self.a_field
+        }
+    }
+
+    let value = 123;
+    let actual = AStruct { a_field: &value };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            *get_field(): eq(123),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_with_method_returning_view_on_reference() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_field: &'a u32,
+    }
+    #[derive(Debug)]
+    struct View<'a>(&'a u32);
+    impl<'a> Deref for View<'a> {
+        type Target = u32;
+
+        fn deref(&self) -> &Self::Target {
+            self.0
+        }
+    }
+
+    impl<'a> AStruct<'a> {
+        fn get_field(&self) -> View<'a> {
+            View(self.a_field)
+        }
+    }
+
+    let value = 123;
+    let actual = AStruct { a_field: &value };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_field(): points_to(eq(123)),
         })
     )
 }

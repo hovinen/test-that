@@ -33,21 +33,20 @@ use std::ops::Deref;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn points_to<ExpectedT, MatcherT, ActualT>(expected: MatcherT) -> impl Matcher<ActualT>
+pub fn points_to<ExpectedT, MatcherT>(expected: MatcherT) -> PointsToMatcher<ExpectedT, MatcherT>
 where
     ExpectedT: Debug,
     MatcherT: Matcher<ExpectedT>,
-    ActualT: Deref<Target = ExpectedT> + Debug + ?Sized,
 {
-    PointsToMatcher { expected, phantom: Default::default() }
+    PointsToMatcher { expected, phantom: PhantomData }
 }
 
-struct PointsToMatcher<ActualT: ?Sized, MatcherT> {
+pub struct PointsToMatcher<ExpectedT, MatcherT> {
     expected: MatcherT,
-    phantom: PhantomData<ActualT>,
+    phantom: PhantomData<fn() -> ExpectedT>,
 }
 
-impl<ExpectedT, MatcherT, ActualT> Matcher<ActualT> for PointsToMatcher<ActualT, MatcherT>
+impl<ExpectedT, MatcherT, ActualT> Matcher<ActualT> for PointsToMatcher<ExpectedT, MatcherT>
 where
     ExpectedT: Debug,
     MatcherT: Matcher<ExpectedT>,
@@ -62,7 +61,7 @@ where
     }
 }
 
-impl<MatcherT: Describable, ActualT: ?Sized> Describable for PointsToMatcher<ActualT, MatcherT> {
+impl<ExpectedT, MatcherT: Describable> Describable for PointsToMatcher<ExpectedT, MatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         self.expected.describe(matcher_result)
     }
