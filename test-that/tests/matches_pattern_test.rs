@@ -1736,6 +1736,99 @@ fn matches_struct_with_method_returning_view_on_reference() -> Result<()> {
     )
 }
 
+#[test]
+fn matches_struct_with_method_returning_option_of_view_on_reference() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_field: &'a u32,
+    }
+    #[derive(Debug)]
+    struct View<'a>(&'a u32);
+    impl<'a> Deref for View<'a> {
+        type Target = u32;
+
+        fn deref(&self) -> &Self::Target {
+            self.0
+        }
+    }
+
+    impl<'a> AStruct<'a> {
+        fn get_field(&self) -> Option<View<'a>> {
+            Some(View(self.a_field))
+        }
+    }
+
+    let value = 123;
+    let actual = AStruct { a_field: &value };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_field(): some(points_to(eq(123))),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_with_method_returning_reference_to_nested_struct() -> Result<()> {
+    #[derive(Debug)]
+    struct ANestedStruct {
+        a_field: u32,
+    }
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_field: &'a ANestedStruct,
+    }
+
+    impl<'a> AStruct<'a> {
+        fn get_field(&self) -> &'a ANestedStruct {
+            self.a_field
+        }
+    }
+
+    let substruct = ANestedStruct { a_field: 123 };
+    let actual = AStruct { a_field: &substruct };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            *get_field(): matches_pattern!(ANestedStruct {
+                a_field: eq(123),
+            }),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_with_method_returning_option_of_reference_to_nested_struct() -> Result<()> {
+    #[derive(Debug)]
+    struct ANestedStruct {
+        a_field: u32,
+    }
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_field: &'a ANestedStruct,
+    }
+
+    impl<'a> AStruct<'a> {
+        fn get_field(&self) -> Option<&'a ANestedStruct> {
+            Some(self.a_field)
+        }
+    }
+
+    let substruct = ANestedStruct { a_field: 123 };
+    let actual = AStruct { a_field: &substruct };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_field(): some(points_to(matches_pattern!(ANestedStruct {
+                a_field: eq(123),
+            }))),
+        })
+    )
+}
+
 #[cfg(feature = "anyhow")]
 #[test]
 fn allows_asserting_on_error_source() -> Result<()> {
@@ -1754,5 +1847,51 @@ fn allows_asserting_on_error_source() -> Result<()> {
         err(matches_pattern!(anyhow::Error {
             source(): some(displays_as(eq("Anyhow error")))
         }))
+    )
+}
+
+#[test]
+fn matches_method_returning_string_slice() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_string: String,
+    }
+
+    impl AStruct {
+        fn get_string(&self) -> &str {
+            &self.a_string
+        }
+    }
+
+    let actual = AStruct { a_string: "Some string".into() };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_string(): eq("Some string"),
+        })
+    )
+}
+
+#[test]
+fn matches_method_returning_array_slice() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    impl AStruct {
+        fn get_slice(&self) -> &[u32] {
+            &self.a_vec
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            *get_slice(): contains_exactly![eq(1), eq(2), eq(3)].in_order(),
+        })
     )
 }
