@@ -1735,3 +1735,24 @@ fn matches_struct_with_method_returning_view_on_reference() -> Result<()> {
         })
     )
 }
+
+#[cfg(feature = "anyhow")]
+#[test]
+fn allows_asserting_on_error_source() -> Result<()> {
+    fn returns_anyhow_error() -> anyhow::Result<()> {
+        anyhow::bail!("Anyhow error")
+    }
+    fn returns_wrapping_anyhow_error() -> anyhow::Result<()> {
+        use anyhow::Context as _;
+        returns_anyhow_error().context("Wrapping context")?;
+        Ok(())
+    }
+    let result = returns_wrapping_anyhow_error();
+
+    verify_that!(
+        result,
+        err(matches_pattern!(anyhow::Error {
+            source(): some(displays_as(eq("Anyhow error")))
+        }))
+    )
+}
