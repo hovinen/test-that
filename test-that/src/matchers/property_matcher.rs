@@ -79,7 +79,7 @@
 /// #    .unwrap();
 /// ```
 ///
-/// This matcher also works with string slices. For those, one does _not_ use the `*` syntax:
+/// When using methods returning string slices, one does _not_ use the `*` syntax:
 ///
 /// ```
 /// # use test_that::prelude::*;
