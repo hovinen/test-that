@@ -79,10 +79,9 @@
 /// #    .unwrap();
 /// ```
 ///
-/// Unfortunately, this matcher does *not* work with methods returning string
-/// slices:
+/// This matcher also works with string slices. For those, one does _not_ use the `*` syntax:
 ///
-/// ```compile_fail
+/// ```
 /// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// pub struct MyStruct {
@@ -93,7 +92,7 @@
 /// }
 ///
 /// let value = MyStruct { a_string: "A string".into() };
-/// verify_that!(value, property!(*MyStruct.get_a_string(), eq("A string"))) // Does not compile
+/// verify_that!(value, property!(MyStruct.get_a_string(), eq("A string")))
 /// #    .unwrap();
 /// ```
 ///
