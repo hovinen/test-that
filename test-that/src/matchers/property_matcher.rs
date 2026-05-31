@@ -62,6 +62,40 @@
 /// #    .unwrap();
 /// ```
 ///
+/// The same holds if the method returns an array slice:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// pub struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+/// impl MyStruct {
+///     pub fn get_a_slice(&self) -> &[u32] { &self.a_vec }
+/// }
+///
+/// let value = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(value, property!(*MyStruct.get_a_slice(), contains(eq(1))))
+/// #    .unwrap();
+/// ```
+///
+/// *However*, when the method returns a _string slice_, one does _not_ add `*`:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// pub struct MyStruct {
+///     a_string: String,
+/// }
+/// impl MyStruct {
+///     pub fn get_a_string(&self) -> &str { &self.a_string }
+/// }
+///
+/// let value = MyStruct { a_string: "A string".into() };
+/// verify_that!(value, property!(MyStruct.get_a_string(), eq("A string")))
+/// #    .unwrap();
+/// ```
+///
 /// The method may also take additional arguments:
 ///
 /// ```
@@ -76,23 +110,6 @@
 ///
 /// # let value = vec![MyStruct { a_field: 100 }];
 /// verify_that!(value, contains(property!(MyStruct.add_to_a_field(50), eq(150))))
-/// #    .unwrap();
-/// ```
-///
-/// When using methods returning string slices, one does _not_ use the `*` syntax:
-///
-/// ```
-/// # use test_that::prelude::*;
-/// #[derive(Debug)]
-/// pub struct MyStruct {
-///     a_string: String,
-/// }
-/// impl MyStruct {
-///     pub fn get_a_string(&self) -> &str { &self.a_string }
-/// }
-///
-/// let value = MyStruct { a_string: "A string".into() };
-/// verify_that!(value, property!(MyStruct.get_a_string(), eq("A string")))
 /// #    .unwrap();
 /// ```
 ///
