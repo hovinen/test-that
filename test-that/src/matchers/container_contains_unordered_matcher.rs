@@ -405,40 +405,59 @@ pub mod internal {
         ) -> ContainerContainsOrderedMatcher<'matchers, ContainerT, T, ModeT, N> {
             ContainerContainsOrderedMatcher::new(self.elements)
         }
+
+        fn matches_with_iter<ItemT: Borrow<T>>(
+            &self,
+            n: usize,
+            actual: impl Iterator<Item = ItemT>,
+        ) -> MatcherResult {
+            let match_matrix = MatchMatrix::generate(actual, n, &self.elements);
+            match_matrix.is_match_for(self.requirements).into()
+        }
+
+        // This performs the checks in three different steps. This is useful for
+        // performance but also to produce an actionable error message.
+        // 1. Verifies that both collections have the same size (via size_mismatch param)
+        // 2. Verifies that each actual element matches at least one expected element and
+        //    vice versa.
+        // 3. Verifies that a perfect matching exists using Ford-Fulkerson.
+        fn explain_match_with_iters<ItemT1: Borrow<T>, ItemT2: Borrow<T>>(
+            &self,
+            size_mismatch: Option<Description>,
+            n: usize,
+            iter_for_generate: impl Iterator<Item = ItemT1>,
+            iter_for_explain: impl Iterator<Item = ItemT2>,
+        ) -> Description {
+            if let Some(explanation) = size_mismatch {
+                return explanation;
+            }
+            let match_matrix = MatchMatrix::generate(iter_for_generate, n, &self.elements);
+            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
+                return unmatchable;
+            }
+            let best_match = match_matrix.find_best_match();
+            best_match
+                .get_explanation(iter_for_explain, &self.elements, self.requirements)
+                .unwrap_or("whose elements all match".into())
+        }
     }
 
-    // This matcher performs the checks in three different steps in both `matches`
-    // and `explain_match`. This is useful for performance but also to produce
-    // an actionable error message.
-    // 1. `ContainerContainsUnorderedMatcher` verifies that both collections have the same size
-    // 2. `ContainerContainsUnorderedMatcher` verifies that each actual element matches at least
-    //    one expected element and vice versa.
-    // 3. `ContainerContainsUnorderedMatcher` verifies that a perfect matching exists using
-    //    Ford-Fulkerson.
     impl<'matchers, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
         for ContainerContainsUnorderedMatcher<'matchers, ContainerT, T, RefItems, N>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
-            match_matrix.is_match_for(self.requirements).into()
+            self.matches_with_iter(count_elements(actual), actual.into_iter())
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
-                return size_mismatch;
-            }
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
-            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
-                return unmatchable;
-            }
-            let best_match = match_matrix.find_best_match();
-            best_match
-                .get_explanation(actual.into_iter(), &self.elements, self.requirements)
-                .unwrap_or("whose elements all match".into())
+            self.explain_match_with_iters(
+                self.requirements.explain_size_mismatch(actual, N),
+                count_elements(actual),
+                actual.into_iter(),
+                actual.into_iter(),
+            )
         }
     }
 
@@ -448,24 +467,16 @@ pub mod internal {
         for<'b> &'b ContainerT: IntoIterator<Item = T>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
-            match_matrix.is_match_for(self.requirements).into()
+            self.matches_with_iter(count_elements(actual), actual.into_iter())
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
-                return size_mismatch;
-            }
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate(actual.into_iter(), n, &self.elements);
-            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
-                return unmatchable;
-            }
-            let best_match = match_matrix.find_best_match();
-            best_match
-                .get_explanation(actual.into_iter(), &self.elements, self.requirements)
-                .unwrap_or("whose elements all match".into())
+            self.explain_match_with_iters(
+                self.requirements.explain_size_mismatch(actual, N),
+                count_elements(actual),
+                actual.into_iter(),
+                actual.into_iter(),
+            )
         }
     }
 
@@ -506,7 +517,7 @@ pub mod internal {
         phantom: PhantomData<(ModeT, ContainerT)>,
     }
 
-    impl<'matchers, ContainerT, KeyT: Debug, ValueT: Debug, ModeT, const N: usize>
+    impl<'matchers, ContainerT: ?Sized, KeyT: Debug, ValueT: Debug, ModeT, const N: usize>
         MapContainsMatcher<'matchers, ContainerT, KeyT, ValueT, ModeT, N>
     {
         pub fn new(
@@ -514,6 +525,38 @@ pub mod internal {
             requirements: Requirements,
         ) -> Self {
             Self { elements, requirements, phantom: PhantomData }
+        }
+
+        fn matches_with_iter<ItemT: PairBorrow<KeyT, ValueT>>(
+            &self,
+            n: usize,
+            actual: impl Iterator<Item = ItemT>,
+        ) -> MatcherResult {
+            let match_matrix = MatchMatrix::generate_for_map(actual, n, &self.elements);
+            match_matrix.is_match_for(self.requirements).into()
+        }
+
+        fn explain_match_with_iters<
+            ItemT1: PairBorrow<KeyT, ValueT>,
+            ItemT2: PairBorrow<KeyT, ValueT>,
+        >(
+            &self,
+            size_mismatch: Option<Description>,
+            n: usize,
+            iter_for_generate: impl Iterator<Item = ItemT1>,
+            iter_for_explain: impl Iterator<Item = ItemT2>,
+        ) -> Description {
+            if let Some(explanation) = size_mismatch {
+                return explanation;
+            }
+            let match_matrix = MatchMatrix::generate_for_map(iter_for_generate, n, &self.elements);
+            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
+                return unmatchable;
+            }
+            let best_match = match_matrix.find_best_match();
+            best_match
+                .get_explanation_for_map(iter_for_explain, &self.elements, self.requirements)
+                .unwrap_or("whose elements all match".into())
         }
     }
 
@@ -523,24 +566,16 @@ pub mod internal {
         for<'b> &'b ContainerT: IntoIterator<Item = (&'b KeyT, &'b ValueT)>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
-            match_matrix.is_match_for(self.requirements).into()
+            self.matches_with_iter(count_elements(actual), actual.into_iter())
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
-                return size_mismatch;
-            }
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
-            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
-                return unmatchable;
-            }
-            let best_match = match_matrix.find_best_match();
-            best_match
-                .get_explanation_for_map(actual.into_iter(), &self.elements, self.requirements)
-                .unwrap_or("whose elements all match".into())
+            self.explain_match_with_iters(
+                self.requirements.explain_size_mismatch(actual, N),
+                count_elements(actual),
+                actual.into_iter(),
+                actual.into_iter(),
+            )
         }
     }
 
@@ -551,24 +586,16 @@ pub mod internal {
         for<'b> &'b ContainerT: IntoIterator<Item = (KeyT, ValueT)>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
-            match_matrix.is_match_for(self.requirements).into()
+            self.matches_with_iter(count_elements(actual), actual.into_iter())
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            if let Some(size_mismatch) = self.requirements.explain_size_mismatch(actual, N) {
-                return size_mismatch;
-            }
-            let n = count_elements(actual);
-            let match_matrix = MatchMatrix::generate_for_map(actual.into_iter(), n, &self.elements);
-            if let Some(unmatchable) = match_matrix.explain_unmatchable(self.requirements) {
-                return unmatchable;
-            }
-            let best_match = match_matrix.find_best_match();
-            best_match
-                .get_explanation_for_map(actual.into_iter(), &self.elements, self.requirements)
-                .unwrap_or("whose elements all match".into())
+            self.explain_match_with_iters(
+                self.requirements.explain_size_mismatch(actual, N),
+                count_elements(actual),
+                actual.into_iter(),
+                actual.into_iter(),
+            )
         }
     }
 
