@@ -45,6 +45,14 @@
 /// failure, it will be invoked a second time, with the assertion failure output
 /// reflecting the *second* invocation.
 ///
+/// This macro is analogous to [`field`][crate::matchers::field], except that it
+/// extracts the datum to be matched from the given object by invoking a method
+/// rather than accessing a field.
+///
+/// The list of arguments may optionally have a trailing comma.
+///
+/// ## Methods returning references
+///
 /// If the method returns a *reference*, then it must be preceded by a `*`:
 ///
 /// ```
@@ -60,6 +68,15 @@
 /// # let value = vec![MyStruct { a_field: 100 }];
 /// verify_that!(value, contains(property!(*MyStruct.get_a_field(), eq(100))))
 /// #    .unwrap();
+/// ```
+///
+/// This is due to the parallel structure between the matcher and the data being
+/// matched. The following, after all, does not compile:
+///
+/// ```compile_fail
+/// let value1 = 123;
+/// let value2 = 234;
+/// assert!(value1 == &value2);  // Comparing i32 with &i32
 /// ```
 ///
 /// The same holds if the method returns an array slice:
@@ -79,7 +96,27 @@
 /// #    .unwrap();
 /// ```
 ///
-/// *However*, when the method returns a _string slice_, one does _not_ add `*`:
+/// Again, when iterating over an array slice `&[T]`, one gets `&T`, not `T`. So
+/// one must "dereference" the slice to an array to match the elements.
+///
+/// Alternatively (though more verbosely), one can use the [`points_to`] matcher:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// pub struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+/// impl MyStruct {
+///     pub fn get_a_slice(&self) -> &[u32] { &self.a_vec }
+/// }
+///
+/// let value = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(value, property!(MyStruct.get_a_slice(), contains(points_to(eq(1)))))
+/// #    .unwrap();
+/// ```
+///
+/// When the method returns a _string slice_, one does _not_ add `*`:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -95,6 +132,11 @@
 /// verify_that!(value, property!(MyStruct.get_a_string(), eq("A string")))
 /// #    .unwrap();
 /// ```
+///
+/// This is because the value against which one is matching is _already_ a `&str`,
+/// so the types match.
+///
+/// ## Methods taking additional arguments
 ///
 /// The method may also take additional arguments:
 ///
@@ -112,12 +154,6 @@
 /// verify_that!(value, contains(property!(MyStruct.add_to_a_field(50), eq(150))))
 /// #    .unwrap();
 /// ```
-///
-/// This macro is analogous to [`field`][crate::matchers::field], except that it
-/// extracts the datum to be matched from the given object by invoking a method
-/// rather than accessing a field.
-///
-/// The list of arguments may optionally have a trailing comma.
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __property {
