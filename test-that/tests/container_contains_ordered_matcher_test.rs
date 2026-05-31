@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use indoc::indoc;
 use test_that::matcher::Matcher;
 use test_that::prelude::*;
-use indoc::indoc;
 
 #[test]
 fn contains_exactly_in_order_matches_vector() -> Result<()> {
@@ -28,6 +28,13 @@ fn contains_exactly_in_order_matches_slice() -> Result<()> {
     let value = vec![1, 2, 3];
     let slice = value.as_slice();
     verify_that!(*slice, contains_exactly![eq(1), eq(2), eq(3)].in_order())
+}
+
+#[test]
+fn contains_exactly_in_order_with_points_to_matches_slice() -> Result<()> {
+    let value = vec![1, 2, 3];
+    let slice = value.as_slice();
+    verify_that!(slice, points_to(contains_exactly![eq(1), eq(2), eq(3)].in_order()))
 }
 
 #[test]
