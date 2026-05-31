@@ -99,23 +99,6 @@
 /// Again, when iterating over an array slice `&[T]`, one gets `&T`, not `T`. So
 /// one must "dereference" the slice to an array to match the elements.
 ///
-/// Alternatively (though more verbosely), one can use the [`points_to`] matcher:
-///
-/// ```
-/// # use test_that::prelude::*;
-/// #[derive(Debug)]
-/// pub struct MyStruct {
-///     a_vec: Vec<u32>,
-/// }
-/// impl MyStruct {
-///     pub fn get_a_slice(&self) -> &[u32] { &self.a_vec }
-/// }
-///
-/// let value = MyStruct { a_vec: vec![1, 2, 3] };
-/// verify_that!(value, property!(MyStruct.get_a_slice(), contains(points_to(eq(1)))))
-/// #    .unwrap();
-/// ```
-///
 /// When the method returns a _string slice_, one does _not_ add `*`:
 ///
 /// ```
