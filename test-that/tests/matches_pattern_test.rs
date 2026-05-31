@@ -1770,6 +1770,72 @@ fn matches_struct_with_method_returning_option_of_view_on_reference() -> Result<
 }
 
 #[test]
+fn matches_struct_with_method_returning_view_on_reference_with_smaller_lifetime() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_field: &'a u32,
+    }
+    #[derive(Debug)]
+    struct View<'a>(&'a u32);
+    impl<'a> Deref for View<'a> {
+        type Target = u32;
+
+        fn deref(&self) -> &Self::Target {
+            self.0
+        }
+    }
+
+    impl<'a> AStruct<'a> {
+        fn get_field<'b>(&'b self) -> View<'b> {
+            View(self.a_field)
+        }
+    }
+
+    let value = 123;
+    let actual = AStruct { a_field: &value };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_field(): points_to(eq(123)),
+        })
+    )
+}
+
+#[test]
+fn matches_struct_with_method_returning_view_on_reference_using_deref_syntax() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_field: &'a u32,
+    }
+    #[derive(Debug)]
+    struct View<'a>(&'a u32);
+    impl<'a> Deref for View<'a> {
+        type Target = u32;
+
+        fn deref(&self) -> &Self::Target {
+            self.0
+        }
+    }
+
+    impl<'a> AStruct<'a> {
+        fn get_field(&self) -> View<'a> {
+            View(self.a_field)
+        }
+    }
+
+    let value = 123;
+    let actual = AStruct { a_field: &value };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            *get_field(): eq(123),
+        })
+    )
+}
+
+#[test]
 fn matches_struct_with_method_returning_reference_to_nested_struct() -> Result<()> {
     #[derive(Debug)]
     struct ANestedStruct {
@@ -1892,6 +1958,29 @@ fn matches_method_returning_array_slice() -> Result<()> {
         actual,
         matches_pattern!(AStruct {
             *get_slice(): contains_exactly![eq(1), eq(2), eq(3)].in_order(),
+        })
+    )
+}
+
+#[test]
+fn matches_method_returning_array_slice_with_points_to() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    impl AStruct {
+        fn get_slice(&self) -> &[u32] {
+            &self.a_vec
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_slice(): points_to(contains_exactly![eq(1), eq(2), eq(3)].in_order()),
         })
     )
 }

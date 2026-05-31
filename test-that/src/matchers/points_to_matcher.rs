@@ -35,20 +35,20 @@ use std::ops::Deref;
 /// ```
 pub fn points_to<ExpectedT, MatcherT>(expected: MatcherT) -> PointsToMatcher<ExpectedT, MatcherT>
 where
-    ExpectedT: Debug,
+    ExpectedT: Debug + ?Sized,
     MatcherT: Matcher<ExpectedT>,
 {
     PointsToMatcher { expected, phantom: PhantomData }
 }
 
-pub struct PointsToMatcher<ExpectedT, MatcherT> {
+pub struct PointsToMatcher<ExpectedT: ?Sized, MatcherT> {
     expected: MatcherT,
     phantom: PhantomData<fn() -> ExpectedT>,
 }
 
 impl<ExpectedT, MatcherT, ActualT> Matcher<ActualT> for PointsToMatcher<ExpectedT, MatcherT>
 where
-    ExpectedT: Debug,
+    ExpectedT: Debug + ?Sized,
     MatcherT: Matcher<ExpectedT>,
     ActualT: Deref<Target = ExpectedT> + Debug + ?Sized,
 {
@@ -61,7 +61,9 @@ where
     }
 }
 
-impl<ExpectedT, MatcherT: Describable> Describable for PointsToMatcher<ExpectedT, MatcherT> {
+impl<ExpectedT: ?Sized, MatcherT: Describable> Describable
+    for PointsToMatcher<ExpectedT, MatcherT>
+{
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         self.expected.describe(matcher_result)
     }

@@ -133,11 +133,23 @@ macro_rules! property_internal {
     }};
 
     (* $($t:ident)::+.$method:tt($($argument:tt),* $(,)?), $m:expr) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::property_ref_matcher;
-        property_ref_matcher(
-            |o: &$($t)::+| o.$method($($argument),*),
-            &stringify!($method($($argument),*)),
-            $m)
+        use $crate::matchers::__internal_unstable_do_not_depend_on_these::property_matcher;
+        let inner = $crate::matchers::points_to($m);
+        property_matcher::<$($t)::+, _, _, _, _>(
+            stringify!($method($($argument),*)),
+            inner,
+            |o: &$($t)::+, inner| inner.matches(&o.$method($($argument),*)),
+            |inner, r| $crate::matcher::Describable::describe(inner, r),
+            |o: &$($t)::+, inner| {
+                let actual_inner = o.$method($($argument),*);
+                ::std::convert::Into::into(format!(
+                    "whose property `{}` is `{:#?}`, {}",
+                    stringify!($method($($argument),*)),
+                    actual_inner,
+                    inner.explain_match(&actual_inner)
+                ))
+            },
+        )
     }};
 }
 
@@ -221,59 +233,6 @@ pub mod internal {
                 "has property `{}`, which {}",
                 self.property_desc,
                 (self.describe)(&self.inner, matcher_result)
-            )
-            .into()
-        }
-    }
-
-    /// **For internal use only. API stablility is not guaranteed!**
-    #[doc(hidden)]
-    pub fn property_ref_matcher<OuterT, InnerT, MatcherT>(
-        extractor: fn(&OuterT) -> &InnerT,
-        property_desc: &'static str,
-        inner: MatcherT,
-    ) -> impl Matcher<OuterT>
-    where
-        OuterT: Debug,
-        InnerT: Debug + ?Sized,
-        MatcherT: Matcher<InnerT>,
-    {
-        PropertyRefMatcher { extractor, property_desc, inner }
-    }
-
-    struct PropertyRefMatcher<InnerT: ?Sized, OuterT, MatcherT> {
-        extractor: fn(&OuterT) -> &InnerT,
-        property_desc: &'static str,
-        inner: MatcherT,
-    }
-
-    impl<InnerT: Debug + ?Sized, OuterT: Debug, MatcherT: Matcher<InnerT>> Matcher<OuterT>
-        for PropertyRefMatcher<InnerT, OuterT, MatcherT>
-    {
-        fn matches(&self, actual: &OuterT) -> MatcherResult {
-            self.inner.matches((self.extractor)(actual))
-        }
-
-        fn explain_match(&self, actual: &OuterT) -> Description {
-            let actual_inner = (self.extractor)(actual);
-            format!(
-                "whose property `{}` is `{:#?}`, {}",
-                self.property_desc,
-                actual_inner,
-                self.inner.explain_match(actual_inner)
-            )
-            .into()
-        }
-    }
-
-    impl<InnerT: ?Sized, OuterT, MatcherT: Describable> Describable
-        for PropertyRefMatcher<InnerT, OuterT, MatcherT>
-    {
-        fn describe(&self, matcher_result: MatcherResult) -> Description {
-            format!(
-                "has property `{}`, which {}",
-                self.property_desc,
-                self.inner.describe(matcher_result)
             )
             .into()
         }
