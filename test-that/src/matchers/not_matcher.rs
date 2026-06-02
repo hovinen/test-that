@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches the actual value exactly when the inner matcher does _not_ match.
 ///
@@ -34,16 +34,15 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_pass().unwrap();
 /// # should_fail().unwrap_err();
 /// ```
-pub fn not<T: Debug, InnerMatcherT: Matcher<T>>(inner: InnerMatcherT) -> impl Matcher<T> {
-    NotMatcher::<T, _> { inner, phantom: Default::default() }
+pub fn not<InnerMatcherT>(inner: InnerMatcherT) -> NotMatcher<InnerMatcherT> {
+    NotMatcher { inner }
 }
 
-struct NotMatcher<T, InnerMatcherT> {
+pub struct NotMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
-    phantom: PhantomData<T>,
 }
 
-impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<T, InnerMatcherT> {
+impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<InnerMatcherT> {
     fn matches(&self, actual: &T) -> MatcherResult {
         match self.inner.matches(actual) {
             MatcherResult::Match => MatcherResult::NoMatch,
@@ -56,7 +55,7 @@ impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<T, InnerMatc
     }
 }
 
-impl<T, InnerMatcherT: Describable> Describable for NotMatcher<T, InnerMatcherT> {
+impl<InnerMatcherT: Describable> Describable for NotMatcher<InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         self.inner.describe(if matcher_result.into() {
             MatcherResult::NoMatch

@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches an empty container.
 ///
@@ -51,18 +51,13 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_pass().unwrap();
 /// ```
 
-pub fn empty<T: Debug + ?Sized>() -> impl Matcher<T>
-where
-    for<'a> &'a T: IntoIterator,
-{
-    EmptyMatcher { phantom: Default::default() }
+pub fn empty() -> EmptyMatcher {
+    EmptyMatcher
 }
 
-struct EmptyMatcher<T: ?Sized> {
-    phantom: PhantomData<T>,
-}
+pub struct EmptyMatcher;
 
-impl<T: Debug + ?Sized> Matcher<T> for EmptyMatcher<T>
+impl<T: Debug + ?Sized> Matcher<T> for EmptyMatcher
 where
     for<'a> &'a T: IntoIterator,
 {
@@ -71,7 +66,7 @@ where
     }
 }
 
-impl<T: Debug + ?Sized> Describable for EmptyMatcher<T> {
+impl Describable for EmptyMatcher {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         if matcher_result.into() { "is empty" } else { "isn't empty" }.into()
     }
