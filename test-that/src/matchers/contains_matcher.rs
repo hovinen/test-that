@@ -16,6 +16,7 @@
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
+    matchers::container_contains::RefItems,
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -44,21 +45,21 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn contains<T: ?Sized, InnerMatcherT>(
+pub fn contains<T: ?Sized, InnerMatcherT, ModeT>(
     inner: InnerMatcherT,
-) -> ContainsMatcher<T, InnerMatcherT> {
+) -> ContainsMatcher<T, InnerMatcherT, ModeT> {
     ContainsMatcher { inner, count: None, phantom: Default::default() }
 }
 
 /// A matcher which matches a container containing one or more elements a given
 /// inner [`Matcher`] matches.
-pub struct ContainsMatcher<T: ?Sized, InnerMatcherT> {
+pub struct ContainsMatcher<T: ?Sized, InnerMatcherT, ModeT> {
     inner: InnerMatcherT,
     count: Option<Box<dyn Matcher<usize>>>,
-    phantom: PhantomData<T>,
+    phantom: PhantomData<(ModeT, T)>,
 }
 
-impl<T: ?Sized, InnerMatcherT> ContainsMatcher<T, InnerMatcherT> {
+impl<T: ?Sized, InnerMatcherT, ModeT> ContainsMatcher<T, InnerMatcherT, ModeT> {
     /// Configures this instance to match containers which contain a number of
     /// matching items matched by `count`.
     ///
@@ -88,13 +89,13 @@ impl<T: ?Sized, InnerMatcherT> ContainsMatcher<T, InnerMatcherT> {
 //  the argument to matches outlive the matcher. It works fine if one defines
 //  val before matcher.
 impl<T: Debug, InnerMatcherT: Matcher<T>, ContainerT: Debug + ?Sized> Matcher<ContainerT>
-    for ContainsMatcher<ContainerT, InnerMatcherT>
+    for ContainsMatcher<ContainerT, InnerMatcherT, RefItems>
 where
     for<'a> &'a ContainerT: IntoIterator<Item = &'a T>,
 {
     fn matches(&self, actual: &ContainerT) -> MatcherResult {
         if let Some(count) = &self.count {
-            count.matches(&self.count_matches(actual))
+            count.matches(&self.count_matches_ref(actual))
         } else {
             for v in actual.into_iter() {
                 if self.inner.matches(v).into() {
@@ -106,7 +107,7 @@ where
     }
 
     fn explain_match(&self, actual: &ContainerT) -> Description {
-        let count = self.count_matches(actual);
+        let count = self.count_matches_ref(actual);
         match (count, &self.count) {
             (_, Some(_)) => format!("which contains {} matching elements", count).into(),
             (0, None) => "which does not contain a matching element".into(),
@@ -115,8 +116,40 @@ where
     }
 }
 
-impl<InnerMatcherT: Describable, ContainerT: Debug + ?Sized> Describable
-    for ContainsMatcher<ContainerT, InnerMatcherT>
+// Allows matching `&ContainerT` (e.g., `&[u32]`) by iterating via `&ContainerT` and
+// calling the inner matcher with each `&T` element. This handles the case where
+// a method returns `&[T]` and the property macro adds an extra `&`, giving `&&[T]`.
+impl<T: Debug, InnerMatcherT, ContainerT: Debug + ?Sized> Matcher<&ContainerT>
+    for ContainsMatcher<ContainerT, InnerMatcherT, RefItems>
+where
+    for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
+    for<'b> InnerMatcherT: Matcher<&'b T>,
+{
+    fn matches(&self, actual: &&ContainerT) -> MatcherResult {
+        if let Some(count) = &self.count {
+            count.matches(&self.count_matches_ref_deref(*actual))
+        } else {
+            for v in (*actual).into_iter() {
+                if self.inner.matches(&v).into() {
+                    return MatcherResult::Match;
+                }
+            }
+            MatcherResult::NoMatch
+        }
+    }
+
+    fn explain_match(&self, actual: &&ContainerT) -> Description {
+        let count = self.count_matches_ref_deref(*actual);
+        match (count, &self.count) {
+            (_, Some(_)) => format!("which contains {} matching elements", count).into(),
+            (0, None) => "which does not contain a matching element".into(),
+            (_, None) => "which contains a matching element".into(),
+        }
+    }
+}
+
+impl<InnerMatcherT: Describable, ContainerT: Debug + ?Sized, ModeT> Describable
+    for ContainsMatcher<ContainerT, InnerMatcherT, ModeT>
 {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match (matcher_result, &self.count) {
@@ -145,8 +178,8 @@ impl<InnerMatcherT: Describable, ContainerT: Debug + ?Sized> Describable
     }
 }
 
-impl<ActualT: ?Sized, InnerMatcherT> ContainsMatcher<ActualT, InnerMatcherT> {
-    fn count_matches<T: Debug, ContainerT: ?Sized>(&self, actual: &ContainerT) -> usize
+impl<ActualT: ?Sized, InnerMatcherT, ModeT> ContainsMatcher<ActualT, InnerMatcherT, ModeT> {
+    fn count_matches_ref<T: Debug, ContainerT: ?Sized>(&self, actual: &ContainerT) -> usize
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
         InnerMatcherT: Matcher<T>,
@@ -159,12 +192,27 @@ impl<ActualT: ?Sized, InnerMatcherT> ContainsMatcher<ActualT, InnerMatcherT> {
         }
         count
     }
+
+    fn count_matches_ref_deref<T: Debug, ContainerT: ?Sized>(&self, actual: &ContainerT) -> usize
+    where
+        for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
+        for<'b> InnerMatcherT: Matcher<&'b T>,
+    {
+        let mut count = 0;
+        for v in actual.into_iter() {
+            if self.inner.matches(&v).into() {
+                count += 1;
+            }
+        }
+        count
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::{ContainsMatcher, contains};
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
+    use crate::matchers::container_contains::RefItems;
     use crate::prelude::*;
 
     #[test]
@@ -205,7 +253,7 @@ mod tests {
 
     #[test]
     fn contains_does_not_match_empty_slice() -> Result<()> {
-        let matcher = contains(eq::<i32, _>(1));
+        let matcher: ContainsMatcher<_, EqMatcher<i32, i32>, RefItems> = contains(eq::<i32, _>(1));
 
         let result = matcher.matches(&[]);
 
@@ -241,7 +289,7 @@ mod tests {
 
     #[test]
     fn contains_formats_without_multiplicity_by_default() -> Result<()> {
-        let matcher: ContainsMatcher<Vec<i32>, _> = contains(eq::<i32, _>(1));
+        let matcher: ContainsMatcher<Vec<i32>, _, RefItems> = contains(eq::<i32, _>(1));
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -251,7 +299,8 @@ mod tests {
 
     #[test]
     fn contains_formats_with_multiplicity_when_specified() -> Result<()> {
-        let matcher: ContainsMatcher<Vec<i32>, _> = contains(eq::<i32, _>(1)).times(eq(2));
+        let matcher: ContainsMatcher<Vec<i32>, _, RefItems> =
+            contains(eq::<i32, _>(1)).times(eq(2));
 
         verify_that!(
             matcher.describe(MatcherResult::Match),

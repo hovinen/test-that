@@ -1984,3 +1984,26 @@ fn matches_method_returning_array_slice_with_points_to() -> Result<()> {
         })
     )
 }
+
+#[test]
+fn matches_method_returning_array_slice_with_points_to_for_single_element() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    impl AStruct {
+        fn get_slice(&self) -> &[u32] {
+            &self.a_vec
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            get_slice(): contains(points_to(eq(1)))
+        })
+    )
+}
