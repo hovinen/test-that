@@ -79,26 +79,79 @@ mod tests {
     use std::collections::HashSet;
 
     #[test]
-    fn empty_matcher_match_empty_vec() -> Result<()> {
+    fn empty_matcher_matches_empty_vec() -> Result<()> {
         let value: Vec<i32> = vec![];
         verify_that!(value, empty())
     }
 
     #[test]
-    fn empty_matcher_does_not_match_empty_vec() -> Result<()> {
-        let value = vec![1, 2, 3];
-        verify_that!(value, not(empty()))
+    fn empty_matcher_matches_empty_array() -> Result<()> {
+        verify_that!([] as [u32; 0], empty())
     }
 
     #[test]
-    fn empty_matcher_matches_empty_slice() -> Result<()> {
-        let value: &[i32] = &[];
-        verify_that!(*value, empty())
+    fn empty_matcher_matches_empty_ref_to_array_with_points_to() -> Result<()> {
+        verify_that!(&([] as [u32; 0]), points_to(empty()))
+    }
+
+    #[test]
+    fn empty_matcher_matches_empty_ref_to_array_with_deref_notation() -> Result<()> {
+        let value: [u32; 0] = [];
+        let reference = &value;
+        verify_that!(*reference, empty())
+    }
+
+    #[test]
+    fn empty_matcher_matches_empty_slice_with_points_to() -> Result<()> {
+        let value: Vec<u32> = vec![];
+        let slice = value.as_slice();
+        verify_that!(slice, points_to(empty()))
+    }
+
+    #[test]
+    fn empty_matcher_matches_empty_slice_with_deref_notation() -> Result<()> {
+        let value: Vec<u32> = vec![];
+        let slice = value.as_slice();
+        verify_that!(*slice, empty())
+    }
+
+    #[test]
+    fn empty_matcher_does_not_match_non_empty_vec() -> Result<()> {
+        verify_that!(vec![1, 2, 3], not(empty()))
+    }
+
+    #[test]
+    fn empty_matcher_does_not_match_non_empty_array() -> Result<()> {
+        verify_that!([1, 2, 3], not(empty()))
+    }
+
+    #[test]
+    fn empty_matcher_does_not_match_non_empty_slice() -> Result<()> {
+        let value: Vec<u32> = vec![1, 2, 3];
+        let slice = value.as_slice();
+        verify_that!(*slice, not(empty()))
     }
 
     #[test]
     fn empty_matcher_matches_empty_hash_set() -> Result<()> {
         let value: HashSet<i32> = HashSet::new();
         verify_that!(value, empty())
+    }
+
+    #[derive(Debug)]
+    struct OwnedItemContainer(Vec<i32>);
+
+    impl<'a> IntoIterator for &'a OwnedItemContainer {
+        type Item = i32;
+        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().copied()
+        }
+    }
+
+    #[test]
+    fn empty_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+    -> Result<()> {
+        verify_that!(OwnedItemContainer(vec![]), empty())
     }
 }
