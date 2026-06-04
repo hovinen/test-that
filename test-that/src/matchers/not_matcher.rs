@@ -42,7 +42,7 @@ pub struct NotMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
 }
 
-impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<InnerMatcherT> {
+impl<T: Debug + ?Sized, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<InnerMatcherT> {
     fn matches(&self, actual: &T) -> MatcherResult {
         match self.inner.matches(actual) {
             MatcherResult::Match => MatcherResult::NoMatch,
