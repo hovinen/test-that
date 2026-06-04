@@ -53,7 +53,19 @@ use std::marker::PhantomData;
 /// # should_pass_2().unwrap();
 /// ```
 ///
-/// One can also verify the contents of a slice by dereferencing it:
+/// One can also verify the contents of a slice using [points_to][crate::matchers::points_to]:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> Result<()> {
+/// let value = &[1, 2, 3];
+/// verify_that!(value, points_to(each(gt(0))))?;
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// ```
+///
+/// One can also use the dereference shorthand:
 ///
 /// ```
 /// # use test_that::prelude::*;
