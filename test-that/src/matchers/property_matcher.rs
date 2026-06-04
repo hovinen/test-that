@@ -99,7 +99,8 @@
 /// Again, when iterating over an array slice `&[T]`, one gets `&T`, not `T`. So
 /// one must "dereference" the slice to an array to match the elements.
 ///
-/// Alternatively (though more verbosely), one can use the [`points_to`] matcher:
+/// Alternatively (though more verbosely), one can use the [`points_to`][crate::matchers::points_to]
+/// matcher:
 ///
 /// ```
 /// # use test_that::prelude::*;
