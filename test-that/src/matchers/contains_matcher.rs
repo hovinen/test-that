@@ -16,7 +16,7 @@
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
-    matchers::container_contains::RefItems,
+    matchers::container_contains::{OwnedItems, RefItems},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -75,6 +75,37 @@ impl<T: ?Sized, InnerMatcherT, ModeT> ContainsMatcher<T, InnerMatcherT, ModeT> {
     pub fn times(mut self, count: impl Matcher<usize> + 'static) -> Self {
         self.count = Some(Box::new(count));
         self
+    }
+}
+
+// Case 4: `&Container: IntoIterator<Item = T>` (owned items from a borrowed container).
+// Used when the container yields owned T (not &T) when iterated via reference, e.g. a custom
+// container that copies or clones its elements on iteration.
+impl<T: Debug, InnerMatcherT: Matcher<T>, ContainerT: Debug + ?Sized> Matcher<ContainerT>
+    for ContainsMatcher<ContainerT, InnerMatcherT, OwnedItems>
+where
+    for<'a> &'a ContainerT: IntoIterator<Item = T>,
+{
+    fn matches(&self, actual: &ContainerT) -> MatcherResult {
+        if let Some(count) = &self.count {
+            count.matches(&self.count_matches_owned(actual))
+        } else {
+            for v in actual.into_iter() {
+                if self.inner.matches(&v).into() {
+                    return MatcherResult::Match;
+                }
+            }
+            MatcherResult::NoMatch
+        }
+    }
+
+    fn explain_match(&self, actual: &ContainerT) -> Description {
+        let count = self.count_matches_owned(actual);
+        match (count, &self.count) {
+            (_, Some(_)) => format!("which contains {} matching elements", count).into(),
+            (0, None) => "which does not contain a matching element".into(),
+            (_, None) => "which contains a matching element".into(),
+        }
     }
 }
 
@@ -206,6 +237,20 @@ impl<ActualT: ?Sized, InnerMatcherT, ModeT> ContainsMatcher<ActualT, InnerMatche
         }
         count
     }
+
+    fn count_matches_owned<T: Debug, ContainerT: ?Sized>(&self, actual: &ContainerT) -> usize
+    where
+        for<'b> &'b ContainerT: IntoIterator<Item = T>,
+        InnerMatcherT: Matcher<T>,
+    {
+        let mut count = 0;
+        for v in actual.into_iter() {
+            if self.inner.matches(&v).into() {
+                count += 1;
+            }
+        }
+        count
+    }
 }
 
 #[cfg(test)]
@@ -285,6 +330,49 @@ mod tests {
         let result = matcher.matches(&[1, 1]);
 
         verify_that!(result, eq(MatcherResult::NoMatch))
+    }
+
+    #[test]
+    fn contains_matches_on_vec_of_values() -> Result<()> {
+        verify_that!(vec![1, 2, 3], contains(eq(1)))
+    }
+
+    #[test]
+    fn contains_matches_on_array_of_values() -> Result<()> {
+        verify_that!([1, 2, 3], contains(eq(1)))
+    }
+
+    #[test]
+    fn contains_matches_on_slice_of_values_with_points_to_element() -> Result<()> {
+        verify_that!(&[1, 2, 3], contains(points_to(eq(1))))
+    }
+
+    #[test]
+    fn contains_matches_on_slice_of_values_with_points_to_slice() -> Result<()> {
+        verify_that!(&[1, 2, 3], points_to(contains(eq(1))))
+    }
+
+    #[test]
+    fn contains_matches_on_slice_of_values_with_deref_notation_on_macro() -> Result<()> {
+        let slice = &[1, 2, 3];
+        verify_that!(*slice, contains(eq(1)))
+    }
+
+    #[derive(Debug)]
+    struct OwnedItemContainer(Vec<i32>);
+
+    impl<'a> IntoIterator for &'a OwnedItemContainer {
+        type Item = i32;
+        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().copied()
+        }
+    }
+
+    #[test]
+    fn contains_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+    -> Result<()> {
+        verify_that!(OwnedItemContainer(vec![1, 2, 3]), contains(eq(1)))
     }
 
     #[test]
