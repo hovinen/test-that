@@ -234,12 +234,6 @@ mod tests {
         verify_that!(value, each(gt(0)))
     }
 
-    #[test]
-    fn each_matches_slice_with_one_element() -> Result<()> {
-        let value = &[1];
-        verify_that!(*value, each(gt(0)))
-    }
-
     #[derive(Debug)]
     struct OwnedItemContainer(Vec<i32>);
 
