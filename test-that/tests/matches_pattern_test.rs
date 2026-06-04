@@ -2003,7 +2003,7 @@ fn matches_method_returning_array_slice_with_points_to_for_single_element() -> R
     verify_that!(
         actual,
         matches_pattern!(AStruct {
-            get_slice(): contains(points_to(eq(1)))
+            get_slice(): points_to(contains(eq(1)))
         })
     )
 }

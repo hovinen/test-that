@@ -79,7 +79,7 @@
 /// assert!(value1 == &value2);  // Comparing i32 with &i32
 /// ```
 ///
-/// The same holds if the method returns an array slice:
+/// The same holds if the method returns a slice:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -112,7 +112,7 @@
 /// }
 ///
 /// let value = MyStruct { a_vec: vec![1, 2, 3] };
-/// verify_that!(value, property!(MyStruct.get_a_slice(), contains(points_to(eq(1)))))
+/// verify_that!(value, property!(MyStruct.get_a_slice(), points_to(contains(eq(1)))))
 /// #    .unwrap();
 /// ```
 ///
