@@ -1,4 +1,4 @@
-# test-that
+# Test that!
 
 [![Apache licensed][license-badge]][license-url]
 [![Build Status][actions-badge]][actions-url]
