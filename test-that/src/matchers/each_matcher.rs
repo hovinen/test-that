@@ -15,7 +15,9 @@
 
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
-use std::{fmt::Debug, marker::PhantomData};
+use crate::matchers::container_contains::{OwnedItems, RefItems};
+use std::fmt::Debug;
+use std::marker::PhantomData;
 
 /// Matches a container all of whose elements are matched by the matcher
 /// `inner`.
@@ -62,26 +64,19 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn each<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT>(
-    inner: MatcherT,
-) -> impl Matcher<ActualT>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-    MatcherT: Matcher<ElementT>,
-{
-    EachMatcher { inner, phantom: Default::default() }
+pub fn each<MatcherT, Mode>(inner: MatcherT) -> EachMatcher<MatcherT, Mode> {
+    EachMatcher { inner, phantom: PhantomData }
 }
 
-struct EachMatcher<ActualT: ?Sized, MatcherT> {
+pub struct EachMatcher<MatcherT, Mode> {
     inner: MatcherT,
-    phantom: PhantomData<ActualT>,
+    phantom: PhantomData<Mode>,
 }
 
-impl<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT> Matcher<ActualT>
-    for EachMatcher<ActualT, MatcherT>
+impl<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT: Matcher<ElementT>> Matcher<ActualT>
+    for EachMatcher<MatcherT, RefItems>
 where
     for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-    MatcherT: Matcher<ElementT>,
 {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         for element in actual {
@@ -122,7 +117,52 @@ where
     }
 }
 
-impl<ActualT: ?Sized, MatcherT: Describable> Describable for EachMatcher<ActualT, MatcherT> {
+impl<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT: Matcher<ElementT>> Matcher<ActualT>
+    for EachMatcher<MatcherT, OwnedItems>
+where
+    for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+{
+    fn matches(&self, actual: &ActualT) -> MatcherResult {
+        for element in actual {
+            if self.inner.matches(&element).is_no_match() {
+                return MatcherResult::NoMatch;
+            }
+        }
+        MatcherResult::Match
+    }
+
+    fn explain_match(&self, actual: &ActualT) -> Description {
+        let mut non_matching_elements = Vec::new();
+        for (index, element) in actual.into_iter().enumerate() {
+            if self.inner.matches(&element).is_no_match() {
+                let explanation = self.inner.explain_match(&element);
+                non_matching_elements.push((index, element, explanation));
+            }
+        }
+        if non_matching_elements.is_empty() {
+            return format!("whose each element {}", self.inner.describe(MatcherResult::Match))
+                .into();
+        }
+        if non_matching_elements.len() == 1 {
+            let (idx, element, explanation) = non_matching_elements.remove(0);
+            return format!("whose element #{idx} is {element:?}, {explanation}").into();
+        }
+
+        let failed_indexes = non_matching_elements
+            .iter()
+            .map(|&(idx, _, _)| format!("#{idx}"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        let element_explanations = non_matching_elements
+            .iter()
+            .map(|&(_, ref element, ref explanation)| format!("{element:?}, {explanation}"))
+            .collect::<Description>()
+            .indent();
+        format!("whose elements {failed_indexes} don't match\n{element_explanations}").into()
+    }
+}
+
+impl<MatcherT: Describable, Mode> Describable for EachMatcher<MatcherT, Mode> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -152,8 +192,40 @@ mod tests {
 
     #[test]
     fn each_matches_vec_with_one_element() -> Result<()> {
+        verify_that!(vec![1], each(gt(0)))
+    }
+
+    #[test]
+    fn each_matches_array_with_one_element() -> Result<()> {
+        verify_that!([1], each(gt(0)))
+    }
+
+    #[test]
+    fn each_matches_ref_to_array_using_deref_notation() -> Result<()> {
+        let value = [1];
+        let reference = &value;
+        verify_that!(*reference, each(gt(0)))
+    }
+
+    #[test]
+    fn each_matches_ref_to_array_using_points_to() -> Result<()> {
+        let value = [1];
+        let reference = &value;
+        verify_that!(reference, points_to(each(gt(0))))
+    }
+
+    #[test]
+    fn each_matches_slice_using_deref_notation() -> Result<()> {
         let value = vec![1];
-        verify_that!(value, each(gt(0)))
+        let slice = value.as_slice();
+        verify_that!(*slice, each(gt(0)))
+    }
+
+    #[test]
+    fn each_matches_slice_using_points_to() -> Result<()> {
+        let value = vec![1];
+        let slice = value.as_slice();
+        verify_that!(slice, points_to(each(gt(0))))
     }
 
     #[test]
@@ -166,6 +238,23 @@ mod tests {
     fn each_matches_slice_with_one_element() -> Result<()> {
         let value = &[1];
         verify_that!(*value, each(gt(0)))
+    }
+
+    #[derive(Debug)]
+    struct OwnedItemContainer(Vec<i32>);
+
+    impl<'a> IntoIterator for &'a OwnedItemContainer {
+        type Item = i32;
+        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().copied()
+        }
+    }
+
+    #[test]
+    fn each_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+    -> Result<()> {
+        verify_that!(OwnedItemContainer(vec![1]), each(eq(1)))
     }
 
     #[test]
