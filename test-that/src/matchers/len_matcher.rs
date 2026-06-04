@@ -105,76 +105,96 @@ mod tests {
     use std::marker::PhantomData;
 
     #[test]
-    fn len_matcher_match_vec() -> Result<()> {
-        let value = vec![1, 2, 3];
-        verify_that!(value, len(eq(3)))
+    fn len_matcher_matches_vec() -> Result<()> {
+        verify_that!(vec![1, 2, 3], len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_array_reference() -> Result<()> {
+    fn len_matcher_matches_array_reference_with_deref_notation() -> Result<()> {
         let value = &[1, 2, 3];
         verify_that!(*value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_slice_of_array() -> Result<()> {
+    fn len_matcher_matches_array_reference_points_to() -> Result<()> {
+        verify_that!(&[1, 2, 3], points_to(len(eq(3))))
+    }
+
+    #[test]
+    fn len_matcher_matches_slice_of_array() -> Result<()> {
         let value = &[1, 2, 3];
         verify_that!(value[0..1], len(eq(1)))
     }
 
     #[test]
-    fn len_matcher_match_slice_of_vec() -> Result<()> {
+    fn len_matcher_matches_slice_of_vec() -> Result<()> {
         let value = vec![1, 2, 3];
         let slice = value.as_slice();
         verify_that!(*slice, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_sized_slice() -> Result<()> {
-        let value = [1, 2, 3];
-        verify_that!(value, len(eq(3)))
+    fn len_matcher_matches_array() -> Result<()> {
+        verify_that!([1, 2, 3], len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_btreemap() -> Result<()> {
+    fn len_matcher_matches_btreemap() -> Result<()> {
         let value = BTreeMap::from([(1, 2), (2, 3), (3, 4)]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_btreeset() -> Result<()> {
+    fn len_matcher_matches_btreeset() -> Result<()> {
         let value = BTreeSet::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_binaryheap() -> Result<()> {
+    fn len_matcher_matches_binaryheap() -> Result<()> {
         let value = BinaryHeap::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_hashmap() -> Result<()> {
+    fn len_matcher_matches_hashmap() -> Result<()> {
         let value = HashMap::from([(1, 2), (2, 3), (3, 4)]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_hashset() -> Result<()> {
+    fn len_matcher_matches_hashset() -> Result<()> {
         let value = HashSet::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_linkedlist() -> Result<()> {
+    fn len_matcher_matches_linkedlist() -> Result<()> {
         let value = LinkedList::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_match_vecdeque() -> Result<()> {
+    fn len_matcher_matches_vecdeque() -> Result<()> {
         let value = VecDeque::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
+    }
+
+    #[derive(Debug)]
+    struct OwnedItemContainer(Vec<i32>);
+
+    impl<'a> IntoIterator for &'a OwnedItemContainer {
+        type Item = i32;
+        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().copied()
+        }
+    }
+
+    #[test]
+    fn len_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+    -> Result<()> {
+        verify_that!(OwnedItemContainer(vec![1, 2, 3]), len(eq(3)))
     }
 
     #[test]
