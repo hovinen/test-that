@@ -224,6 +224,7 @@ pub mod internal {
         }
     }
 
+    // TODO: Try to reduce the code duplication here.
     impl<T: Debug, MatcherT: Matcher<T>, ContainerT: ?Sized + Debug> Matcher<ContainerT>
         for PointwiseMatcher<MatcherT, OwnedItems>
     where
