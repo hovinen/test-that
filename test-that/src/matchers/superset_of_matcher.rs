@@ -16,6 +16,7 @@
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
+    matchers::container_contains::{OwnedItems, RefItems},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -85,30 +86,26 @@ use std::{fmt::Debug, marker::PhantomData};
 /// runtime proportional to the *product* of the sizes of the actual and
 /// expected containers as well as the time to check equality of each pair of
 /// items. It should not be used on especially large containers.
-pub fn superset_of<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug>(
+pub fn superset_of<ExpectedT: Debug, Mode>(
     subset: ExpectedT,
-) -> impl Matcher<ActualT>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
-{
-    SupersetOfMatcher::<ActualT, _> { subset, phantom: Default::default() }
+) -> SupersetOfMatcher<ExpectedT, Mode> {
+    SupersetOfMatcher { subset, phantom: Default::default() }
 }
 
-struct SupersetOfMatcher<ActualT: ?Sized, ExpectedT> {
+pub struct SupersetOfMatcher<ExpectedT, Mode> {
     subset: ExpectedT,
-    phantom: PhantomData<ActualT>,
+    phantom: PhantomData<Mode>,
 }
 
 impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
-    for SupersetOfMatcher<ActualT, ExpectedT>
+    for SupersetOfMatcher<ExpectedT, RefItems>
 where
     for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
     for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
 {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         for expected_item in &self.subset {
-            if actual_is_missing(actual, expected_item) {
+            if Self::actual_is_missing(actual, expected_item) {
                 return MatcherResult::NoMatch;
             }
         }
@@ -119,7 +116,7 @@ where
         let missing_items: Vec<_> = self
             .subset
             .into_iter()
-            .filter(|expected_item| actual_is_missing(actual, expected_item))
+            .filter(|expected_item| Self::actual_is_missing(actual, expected_item))
             .map(|expected_item| format!("{expected_item:#?}"))
             .collect();
         match missing_items.len() {
@@ -130,23 +127,67 @@ where
     }
 }
 
-impl<ActualT: ?Sized, ExpectedT: Debug> Describable for SupersetOfMatcher<ActualT, ExpectedT> {
+impl<ExpectedT: Debug> SupersetOfMatcher<ExpectedT, RefItems> {
+    fn actual_is_missing<ElementT: PartialEq, ActualT: ?Sized>(
+        actual: &ActualT,
+        needle: &ElementT,
+    ) -> bool
+    where
+        for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
+    {
+        !actual.into_iter().any(|item| *item == *needle)
+    }
+}
+
+impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
+    for SupersetOfMatcher<ExpectedT, OwnedItems>
+where
+    for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
+{
+    fn matches(&self, actual: &ActualT) -> MatcherResult {
+        for expected_item in &self.subset {
+            if Self::actual_is_missing(actual, expected_item) {
+                return MatcherResult::NoMatch;
+            }
+        }
+        MatcherResult::Match
+    }
+
+    fn explain_match(&self, actual: &ActualT) -> Description {
+        let missing_items: Vec<_> = self
+            .subset
+            .into_iter()
+            .filter(|expected_item| Self::actual_is_missing(actual, expected_item))
+            .map(|expected_item| format!("{expected_item:#?}"))
+            .collect();
+        match missing_items.len() {
+            0 => "whose no element is missing".into(),
+            1 => format!("whose element {} is missing", &missing_items[0]).into(),
+            _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
+        }
+    }
+}
+
+impl<ExpectedT: Debug> SupersetOfMatcher<ExpectedT, OwnedItems> {
+    fn actual_is_missing<ElementT: PartialEq, ActualT: ?Sized>(
+        actual: &ActualT,
+        needle: &ElementT,
+    ) -> bool
+    where
+        for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+    {
+        !actual.into_iter().any(|item| item == *needle)
+    }
+}
+
+impl<ExpectedT: Debug, Mode> Describable for SupersetOfMatcher<ExpectedT, Mode> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is a superset of {:#?}", self.subset).into(),
             MatcherResult::NoMatch => format!("isn't a superset of {:#?}", self.subset).into(),
         }
     }
-}
-
-fn actual_is_missing<ElementT: PartialEq, ActualT: ?Sized>(
-    actual: &ActualT,
-    needle: &ElementT,
-) -> bool
-where
-    for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-{
-    !actual.into_iter().any(|item| *item == *needle)
 }
 
 #[cfg(test)]
@@ -163,51 +204,91 @@ mod tests {
     }
 
     #[test]
-    fn superset_of_matches_vec_with_one_element() -> Result<()> {
-        let value = vec![1];
-        verify_that!(value, superset_of([1]))
+    fn superset_of_matches_vec_with_one_element_with_array() -> Result<()> {
+        verify_that!(vec![1], superset_of([1]))
     }
 
     #[test]
-    fn superset_of_matches_vec_with_two_items() -> Result<()> {
-        let value = vec![1, 2];
-        verify_that!(value, superset_of([1, 2]))
+    fn superset_of_matches_vec_with_one_element_with_vec() -> Result<()> {
+        verify_that!(vec![1], superset_of(vec![1]))
+    }
+
+    #[test]
+    fn superset_of_matches_array_of_one_element_with_array() -> Result<()> {
+        verify_that!([1], superset_of([1]))
+    }
+
+    #[test]
+    fn superset_of_matches_vec_with_two_elements() -> Result<()> {
+        verify_that!(vec![1, 2], superset_of([1, 2]))
     }
 
     #[test]
     fn superset_of_matches_vec_when_actual_has_excess_element() -> Result<()> {
-        let value = vec![1, 2, 3];
-        verify_that!(value, superset_of([1, 2]))
+        verify_that!(vec![1, 2, 3], superset_of([1, 2]))
     }
 
     #[test]
     fn superset_of_matches_vec_when_actual_has_excess_element_first() -> Result<()> {
-        let value = vec![3, 1, 2];
-        verify_that!(value, superset_of([1, 2]))
+        verify_that!(vec![3, 1, 2], superset_of([1, 2]))
     }
 
     #[test]
-    fn superset_of_matches_slice_with_one_element() -> Result<()> {
+    fn superset_of_matches_array_ref_with_one_element_using_points_to() -> Result<()> {
+        let value = &[1];
+        verify_that!(value, points_to(superset_of([1])))
+    }
+
+    #[test]
+    fn superset_of_matches_array_ref_with_one_element_using_deref_notation() -> Result<()> {
         let value = &[1];
         verify_that!(*value, superset_of([1]))
     }
 
     #[test]
+    fn superset_of_matches_slice_with_one_element_using_points_to() -> Result<()> {
+        let value = vec![1];
+        let slice = value.as_slice();
+        verify_that!(slice, points_to(superset_of([1])))
+    }
+
+    #[test]
+    fn superset_of_matches_slice_with_one_element_using_deref_notation() -> Result<()> {
+        let value = vec![1];
+        let slice = value.as_slice();
+        verify_that!(*slice, superset_of([1]))
+    }
+
+    #[derive(Debug, PartialEq)]
+    struct OwnedItemContainer(Vec<i32>);
+
+    impl<'a> IntoIterator for &'a OwnedItemContainer {
+        type Item = i32;
+        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().copied()
+        }
+    }
+
+    #[test]
+    fn superset_of_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+    -> Result<()> {
+        verify_that!(OwnedItemContainer(vec![1]), superset_of([1]))
+    }
+
+    #[test]
     fn superset_of_matches_hash_set_with_one_element() -> Result<()> {
-        let value: HashSet<i32> = [1].into();
-        verify_that!(value, superset_of([1]))
+        verify_that!(HashSet::from([1]), superset_of([1]))
     }
 
     #[test]
     fn superset_of_does_not_match_when_first_element_does_not_match() -> Result<()> {
-        let value = vec![0];
-        verify_that!(value, not(superset_of([1])))
+        verify_that!(vec![0], not(superset_of([1])))
     }
 
     #[test]
     fn superset_of_does_not_match_when_second_element_does_not_match() -> Result<()> {
-        let value = vec![2];
-        verify_that!(value, not(superset_of([2, 0])))
+        verify_that!(vec![2], not(superset_of([2, 0])))
     }
 
     #[test]
