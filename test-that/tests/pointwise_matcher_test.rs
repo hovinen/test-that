@@ -12,32 +12,74 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use test_that::prelude::*;
 use indoc::indoc;
+use test_that::prelude::*;
 
 #[test]
-fn pointwise_matches_single_element() -> Result<()> {
-    let value = vec![1];
-    verify_that!(value, pointwise!(lt, vec![2]))
+fn pointwise_matches_array_with_single_element() -> Result<()> {
+    verify_that!([1], pointwise!(lt, vec![2]))
 }
 
 #[test]
-fn pointwise_matches_two_elements() -> Result<()> {
+fn pointwise_matches_array_with_two_elements() -> Result<()> {
+    verify_that!([1, 2], pointwise!(lt, vec![2, 3]))
+}
+
+#[test]
+fn pointwise_matches_vec_with_single_element() -> Result<()> {
+    verify_that!(vec![1], pointwise!(lt, vec![2]))
+}
+
+#[test]
+fn pointwise_matches_vec_with_two_elements() -> Result<()> {
+    verify_that!(vec![1, 2], pointwise!(lt, vec![2, 3]))
+}
+
+#[test]
+fn pointwise_matches_vec_with_two_elements_with_array() -> Result<()> {
+    verify_that!(vec![1, 2], pointwise!(lt, [2, 3]))
+}
+
+#[test]
+fn pointwise_matches_two_element_slice_using_points_to() -> Result<()> {
     let value = vec![1, 2];
-    verify_that!(value, pointwise!(lt, vec![2, 3]))
+    let slice = value.as_slice();
+    verify_that!(slice, points_to(pointwise!(lt, [2, 3])))
 }
 
 #[test]
-fn pointwise_matches_two_elements_with_array() -> Result<()> {
-    let value = vec![1, 2];
-    verify_that!(value, pointwise!(lt, [2, 3]))
-}
-
-#[test]
-fn pointwise_matches_two_element_slice() -> Result<()> {
+fn pointwise_matches_two_element_slice_using_deref_notation() -> Result<()> {
     let value = vec![1, 2];
     let slice = value.as_slice();
     verify_that!(*slice, pointwise!(lt, [2, 3]))
+}
+
+#[test]
+fn pointwise_matches_ref_of_array_with_using_points_to() -> Result<()> {
+    verify_that!(&[1, 2], points_to(pointwise!(lt, vec![2, 3])))
+}
+
+#[test]
+fn pointwise_matches_ref_of_array_with_using_deref_notation() -> Result<()> {
+    let value = &[1, 2];
+    verify_that!(*value, pointwise!(lt, vec![2, 3]))
+}
+
+#[derive(Debug)]
+struct OwnedItemContainer(Vec<i32>);
+
+impl<'a> IntoIterator for &'a OwnedItemContainer {
+    type Item = i32;
+    type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter().copied()
+    }
+}
+
+#[test]
+fn pointswise_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+-> Result<()> {
+    verify_that!(OwnedItemContainer(vec![1]), pointwise!(eq, [1]))
 }
 
 #[test]

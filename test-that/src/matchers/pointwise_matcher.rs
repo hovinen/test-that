@@ -155,25 +155,26 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
+    use crate::matchers::container_contains::{OwnedItems, RefItems};
     use std::{fmt::Debug, marker::PhantomData};
 
     /// This struct is meant to be used only through the `pointwise` macro.
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub struct PointwiseMatcher<ContainerT: ?Sized, MatcherT> {
+    pub struct PointwiseMatcher<MatcherT, Mode> {
         matchers: Vec<MatcherT>,
-        phantom: PhantomData<ContainerT>,
+        phantom: PhantomData<Mode>,
     }
 
-    impl<ContainerT: ?Sized, MatcherT> PointwiseMatcher<ContainerT, MatcherT> {
+    impl<MatcherT, Mode> PointwiseMatcher<MatcherT, Mode> {
         pub fn new(matchers: Vec<MatcherT>) -> Self {
             Self { matchers, phantom: Default::default() }
         }
     }
 
     impl<T: Debug, MatcherT: Matcher<T>, ContainerT: ?Sized + Debug> Matcher<ContainerT>
-        for PointwiseMatcher<ContainerT, MatcherT>
+        for PointwiseMatcher<MatcherT, RefItems>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
@@ -223,9 +224,58 @@ pub mod internal {
         }
     }
 
-    impl<MatcherT: Describable, ContainerT: ?Sized> Describable
-        for PointwiseMatcher<ContainerT, MatcherT>
+    impl<T: Debug, MatcherT: Matcher<T>, ContainerT: ?Sized + Debug> Matcher<ContainerT>
+        for PointwiseMatcher<MatcherT, OwnedItems>
+    where
+        for<'b> &'b ContainerT: IntoIterator<Item = T>,
     {
+        fn matches(&self, actual: &ContainerT) -> MatcherResult {
+            let mut zipped_iterator = zip(actual.into_iter(), self.matchers.iter());
+            for (element, matcher) in zipped_iterator.by_ref() {
+                if matcher.matches(&element).is_no_match() {
+                    return MatcherResult::NoMatch;
+                }
+            }
+            if zipped_iterator.has_size_mismatch() {
+                MatcherResult::NoMatch
+            } else {
+                MatcherResult::Match
+            }
+        }
+
+        fn explain_match(&self, actual: &ContainerT) -> Description {
+            // TODO(b/260819741) This code duplicates elements_are_matcher.rs. Consider
+            // extract as a separate library. (or implement pointwise! with
+            // elements_are)
+            let actual_iterator = actual.into_iter();
+            let mut zipped_iterator = zip(actual_iterator, self.matchers.iter());
+            let mut mismatches = Vec::new();
+            for (idx, (a, e)) in zipped_iterator.by_ref().enumerate() {
+                if e.matches(&a).is_no_match() {
+                    mismatches.push(format!("element #{idx} is {a:?}, {}", e.explain_match(&a)));
+                }
+            }
+            if mismatches.is_empty() {
+                if !zipped_iterator.has_size_mismatch() {
+                    "which matches all elements".into()
+                } else {
+                    format!(
+                        "which has size {} (expected {})",
+                        zipped_iterator.left_size(),
+                        self.matchers.len()
+                    )
+                    .into()
+                }
+            } else if mismatches.len() == 1 {
+                format!("where {}", mismatches[0]).into()
+            } else {
+                let mismatches = mismatches.into_iter().collect::<Description>();
+                format!("where:\n{}", mismatches.bullet_list().indent()).into()
+            }
+        }
+    }
+
+    impl<MatcherT: Describable, Mode> Describable for PointwiseMatcher<MatcherT, Mode> {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
                 "{} elements satisfying respectively:\n{}",
