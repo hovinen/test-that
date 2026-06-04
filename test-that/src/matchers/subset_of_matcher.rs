@@ -16,6 +16,7 @@
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
+    matchers::container_contains::{OwnedItems, RefItems},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -84,23 +85,17 @@ use std::{fmt::Debug, marker::PhantomData};
 /// runtime proportional to the *product* of the sizes of the actual and
 /// expected containers as well as the time to check equality of each pair of
 /// items. It should not be used on especially large containers.
-pub fn subset_of<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug>(
-    superset: ExpectedT,
-) -> impl Matcher<ActualT>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
-{
-    SubsetOfMatcher::<ActualT, _> { superset, phantom: Default::default() }
+pub fn subset_of<ExpectedT: Debug, Mode>(superset: ExpectedT) -> SubsetOfMatcher<ExpectedT, Mode> {
+    SubsetOfMatcher { superset, phantom: Default::default() }
 }
 
-struct SubsetOfMatcher<ActualT: ?Sized, ExpectedT> {
+pub struct SubsetOfMatcher<ExpectedT, Mode> {
     superset: ExpectedT,
-    phantom: PhantomData<ActualT>,
+    phantom: PhantomData<Mode>,
 }
 
 impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
-    for SubsetOfMatcher<ActualT, ExpectedT>
+    for SubsetOfMatcher<ExpectedT, RefItems>
 where
     for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
     for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
@@ -130,21 +125,52 @@ where
     }
 }
 
-impl<ActualT: ?Sized, ExpectedT: Debug> Describable for SubsetOfMatcher<ActualT, ExpectedT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is a subset of {:#?}", self.superset).into(),
-            MatcherResult::NoMatch => format!("isn't a subset of {:#?}", self.superset).into(),
+impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
+    for SubsetOfMatcher<ExpectedT, OwnedItems>
+where
+    for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
+{
+    fn matches(&self, actual: &ActualT) -> MatcherResult {
+        for actual_item in actual {
+            if self.expected_is_missing(&actual_item) {
+                return MatcherResult::NoMatch;
+            }
+        }
+        MatcherResult::Match
+    }
+
+    fn explain_match(&self, actual: &ActualT) -> Description {
+        let unexpected_elements = actual
+            .into_iter()
+            .enumerate()
+            .filter(|&(_, ref actual_item)| self.expected_is_missing(actual_item))
+            .map(|(idx, actual_item)| format!("{actual_item:#?} at #{idx}"))
+            .collect::<Vec<_>>();
+
+        match unexpected_elements.len() {
+            0 => "which no element is unexpected".into(),
+            1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
+            _ => format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into(),
         }
     }
 }
 
-impl<ActualT: ?Sized, ElementT: PartialEq, ExpectedT> SubsetOfMatcher<ActualT, ExpectedT>
+impl<ElementT: PartialEq, ExpectedT, Mode> SubsetOfMatcher<ExpectedT, Mode>
 where
     for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
 {
     fn expected_is_missing(&self, needle: &ElementT) -> bool {
         !self.superset.into_iter().any(|item| *item == *needle)
+    }
+}
+
+impl<ExpectedT: Debug, Mode> Describable for SubsetOfMatcher<ExpectedT, Mode> {
+    fn describe(&self, matcher_result: MatcherResult) -> Description {
+        match matcher_result {
+            MatcherResult::Match => format!("is a subset of {:#?}", self.superset).into(),
+            MatcherResult::NoMatch => format!("isn't a subset of {:#?}", self.superset).into(),
+        }
     }
 }
 
@@ -162,51 +188,91 @@ mod tests {
     }
 
     #[test]
-    fn subset_of_matches_vec_with_one_element() -> Result<()> {
-        let value = vec![1];
-        verify_that!(value, subset_of([1]))
+    fn subset_of_matches_vec_with_one_element_with_array() -> Result<()> {
+        verify_that!(vec![1], subset_of([1]))
+    }
+
+    #[test]
+    fn subset_of_matches_vec_with_one_element_with_vec() -> Result<()> {
+        verify_that!(vec![1], subset_of(vec![1]))
+    }
+
+    #[test]
+    fn subset_of_matches_array_of_one_element_with_array() -> Result<()> {
+        verify_that!([1], subset_of([1]))
     }
 
     #[test]
     fn subset_of_matches_vec_with_two_elements() -> Result<()> {
-        let value = vec![1, 2];
-        verify_that!(value, subset_of([1, 2]))
+        verify_that!(vec![1, 2], subset_of([1, 2]))
     }
 
     #[test]
     fn subset_of_matches_vec_when_expected_has_excess_element() -> Result<()> {
-        let value = vec![1, 2];
-        verify_that!(value, subset_of([1, 2, 3]))
+        verify_that!(vec![1, 2], subset_of([1, 2, 3]))
     }
 
     #[test]
     fn subset_of_matches_vec_when_expected_has_excess_element_first() -> Result<()> {
-        let value = vec![1, 2];
-        verify_that!(value, subset_of([3, 1, 2]))
+        verify_that!(vec![1, 2], subset_of([3, 1, 2]))
     }
 
     #[test]
-    fn subset_of_matches_slice_with_one_element() -> Result<()> {
+    fn subset_of_matches_array_ref_with_one_element_using_points_to() -> Result<()> {
+        let value = &[1];
+        verify_that!(value, points_to(subset_of([1])))
+    }
+
+    #[test]
+    fn subset_of_matches_array_ref_with_one_element_using_deref_notation() -> Result<()> {
         let value = &[1];
         verify_that!(*value, subset_of([1]))
     }
 
     #[test]
+    fn subset_of_matches_slice_with_one_element_using_points_to() -> Result<()> {
+        let value = vec![1];
+        let slice = value.as_slice();
+        verify_that!(slice, points_to(subset_of([1])))
+    }
+
+    #[test]
+    fn subset_of_matches_slice_with_one_element_using_deref_notation() -> Result<()> {
+        let value = vec![1];
+        let slice = value.as_slice();
+        verify_that!(*slice, subset_of([1]))
+    }
+
+    #[derive(Debug, PartialEq)]
+    struct OwnedItemContainer(Vec<i32>);
+
+    impl<'a> IntoIterator for &'a OwnedItemContainer {
+        type Item = i32;
+        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().copied()
+        }
+    }
+
+    #[test]
+    fn subset_of_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+    -> Result<()> {
+        verify_that!(OwnedItemContainer(vec![1]), subset_of([1]))
+    }
+
+    #[test]
     fn subset_of_matches_hash_set_with_one_element() -> Result<()> {
-        let value: HashSet<i32> = [1].into();
-        verify_that!(value, subset_of([1]))
+        verify_that!(HashSet::from([1]), subset_of([1]))
     }
 
     #[test]
     fn subset_of_does_not_match_when_first_element_does_not_match() -> Result<()> {
-        let value = vec![0];
-        verify_that!(value, not(subset_of([1])))
+        verify_that!(vec![0], not(subset_of([1])))
     }
 
     #[test]
     fn subset_of_does_not_match_when_second_element_does_not_match() -> Result<()> {
-        let value = vec![2, 0];
-        verify_that!(value, not(subset_of([2])))
+        verify_that!(vec![2, 0], not(subset_of([2])))
     }
 
     #[test]
