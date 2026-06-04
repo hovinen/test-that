@@ -15,6 +15,7 @@
 
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
+use crate::matchers::container_contains::{OwnedItems, RefItems};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
@@ -90,23 +91,22 @@ use std::marker::PhantomData;
 // ContainerEqMatcher has some specialisations for slice types (see
 // documentation above). Returning impl Matcher would hide those from the
 // compiler.
-pub fn container_eq<ActualContainerT, ExpectedContainerT>(
+pub fn container_eq<ExpectedContainerT, Mode>(
     expected: ExpectedContainerT,
-) -> ContainerEqMatcher<ActualContainerT, ExpectedContainerT>
+) -> ContainerEqMatcher<ExpectedContainerT, Mode>
 where
-    ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
     ExpectedContainerT: Debug,
 {
     ContainerEqMatcher { expected, phantom: Default::default() }
 }
 
-pub struct ContainerEqMatcher<ActualContainerT: ?Sized, ExpectedContainerT> {
+pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {
     expected: ExpectedContainerT,
-    phantom: PhantomData<ActualContainerT>,
+    phantom: PhantomData<Mode>,
 }
 
 impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
-    Matcher<ActualContainerT> for ContainerEqMatcher<ActualContainerT, ExpectedContainerT>
+    Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, RefItems>
 where
     ActualElementT: PartialEq<ExpectedElementT> + Debug + ?Sized,
     ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
@@ -124,31 +124,89 @@ where
     }
 }
 
-impl<ActualContainerT: ?Sized, ExpectedContainerT: Debug> Describable
-    for ContainerEqMatcher<ActualContainerT, ExpectedContainerT>
+impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, RefItems>
+where
+    for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
 {
+    fn get_missing_items<ActualElementT, ActualContainerT>(
+        &self,
+        actual: &ActualContainerT,
+    ) -> Vec<&ExpectedElementT>
+    where
+        ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
+    {
+        self.expected.into_iter().filter(|&i| !actual.into_iter().any(|j| j == i)).collect()
+    }
+
+    fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
+        &self,
+        actual: &'a ActualContainerT,
+    ) -> Vec<&'a ActualElementT>
+    where
+        ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        for<'b> &'b ActualContainerT: IntoIterator<Item = &'b ActualElementT>,
+    {
+        actual.into_iter().filter(|&i| !self.expected.into_iter().any(|j| i == j)).collect()
+    }
+}
+
+impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
+    Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, OwnedItems>
+where
+    ActualElementT: PartialEq<ExpectedElementT> + Debug,
+    ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
+    ExpectedElementT: Debug,
+    ExpectedContainerT: Debug,
+    for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
+    for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
+{
+    fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
+        (*actual == self.expected).into()
+    }
+
+    fn explain_match(&self, actual: &ActualContainerT) -> Description {
+        build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual)).into()
+    }
+}
+
+impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, OwnedItems>
+where
+    for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
+{
+    fn get_missing_items<ActualElementT, ActualContainerT>(
+        &self,
+        actual: &ActualContainerT,
+    ) -> Vec<ExpectedElementT>
+    where
+        ActualElementT: PartialEq<ExpectedElementT>,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
+    {
+        self.expected.into_iter().filter(|i| !actual.into_iter().any(|j| j == *i)).collect()
+    }
+
+    fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
+        &self,
+        actual: &'a ActualContainerT,
+    ) -> Vec<ActualElementT>
+    where
+        ActualElementT: PartialEq<ExpectedElementT>,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        for<'b> &'b ActualContainerT: IntoIterator<Item = ActualElementT>,
+    {
+        actual.into_iter().filter(|i| !self.expected.into_iter().any(|j| *i == j)).collect()
+    }
+}
+
+impl<ExpectedContainerT: Debug, Mode> Describable for ContainerEqMatcher<ExpectedContainerT, Mode> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
             MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
         }
-    }
-}
-
-impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
-    ContainerEqMatcher<ActualContainerT, ExpectedContainerT>
-where
-    ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
-    ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
-    for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
-    for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
-{
-    fn get_missing_items(&self, actual: &ActualContainerT) -> Vec<&ExpectedElementT> {
-        self.expected.into_iter().filter(|&i| !actual.into_iter().any(|j| j == i)).collect()
-    }
-
-    fn get_unexpected_items<'a>(&self, actual: &'a ActualContainerT) -> Vec<&'a ActualElementT> {
-        actual.into_iter().filter(|&i| !self.expected.into_iter().any(|j| i == j)).collect()
     }
 }
 
@@ -188,8 +246,6 @@ fn build_explanation<T: Debug, U: Debug>(missing: Vec<T>, unexpected: Vec<U>) ->
 
 #[cfg(test)]
 mod tests {
-    use super::container_eq;
-    use crate::matcher::{Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
     use std::collections::HashSet;
@@ -200,19 +256,88 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_matches_array_with_slice() -> Result<()> {
+    fn container_eq_matches_array_with_array() -> Result<()> {
+        verify_that!([1, 2, 3], container_eq([1, 2, 3]))
+    }
+
+    #[test]
+    fn container_eq_matches_vec_with_array() -> Result<()> {
+        verify_that!(vec![1, 2, 3], container_eq([1, 2, 3]))
+    }
+
+    #[test]
+    fn container_eq_matches_slice_using_points_to() -> Result<()> {
+        let value = vec![1, 2, 3];
+        let slice = value.as_slice();
+        verify_that!(slice, points_to(container_eq([1, 2, 3])))
+    }
+
+    #[test]
+    fn container_eq_matches_slice_using_deref_notation() -> Result<()> {
+        let value = vec![1, 2, 3];
+        let slice = value.as_slice();
+        verify_that!(*slice, container_eq([1, 2, 3]))
+    }
+
+    #[test]
+    fn container_eq_matches_ref_to_array_using_points_to() -> Result<()> {
+        verify_that!(&[1, 2, 3], points_to(container_eq([1, 2, 3])))
+    }
+
+    #[test]
+    fn container_eq_matches_ref_to_array_using_deref_notation() -> Result<()> {
         let value = &[1, 2, 3];
         verify_that!(*value, container_eq([1, 2, 3]))
     }
 
     #[test]
-    fn container_eq_matches_hash_set() -> Result<()> {
-        let value: HashSet<i32> = [1, 2, 3].into();
-        verify_that!(value, container_eq([1, 2, 3].into()))
+    fn container_eq_matches_owned_vec_of_owned_strings_with_array_of_string_slices() -> Result<()> {
+        verify_that!(
+            vec!["A string".to_string(), "Another string".to_string()],
+            container_eq(["A string", "Another string"])
+        )
     }
 
     #[test]
-    fn container_eq_full_error_message() -> Result<()> {
+    fn container_eq_does_not_match_vec_of_owned_strings_with_shorter_array_of_string_slices()
+    -> Result<()> {
+        verify_that!(
+            vec!["A string".to_string(), "Another string".to_string()],
+            not(container_eq(["A string"]))
+        )
+    }
+
+    #[test]
+    fn container_eq_matches_vec_of_string_slices_with_array_of_string_slices() -> Result<()> {
+        verify_that!(
+            vec!["A string", "Another string"],
+            container_eq(["A string", "Another string"])
+        )
+    }
+
+    #[test]
+    fn container_eq_matches_array_of_string_slices_with_array_of_string_slices() -> Result<()> {
+        verify_that!(["A string", "Another string"], container_eq(["A string", "Another string"]))
+    }
+
+    #[test]
+    fn container_eq_matches_array_of_string_slices_with_non_static_lifetime_with_array_of_string_slices()
+    -> Result<()> {
+        let string_1 = String::from("A string");
+        let string_2 = String::from("Another string");
+        verify_that!(
+            [string_1.as_str(), string_2.as_str()],
+            container_eq(["A string", "Another string"])
+        )
+    }
+
+    #[test]
+    fn container_eq_matches_hash_set_with_array() -> Result<()> {
+        verify_that!(HashSet::from([1, 2, 3]), container_eq([1, 2, 3].into()))
+    }
+
+    #[test]
+    fn container_eq_produces_correct_failure_message() -> Result<()> {
         let result = verify_that!(vec![1, 3, 2], container_eq(vec![1, 2, 3]));
         verify_that!(
             result,
@@ -229,93 +354,91 @@ mod tests {
 
     #[test]
     fn container_eq_returns_mismatch_when_elements_out_of_order() -> Result<()> {
+        let result = verify_that!(vec![1, 3, 2], container_eq(vec![1, 2, 3]));
         verify_that!(
-            container_eq(vec![1, 2, 3]).explain_match(&vec![1, 3, 2]),
-            displays_as(eq("which contains all the elements"))
+            result,
+            err(displays_as(contains_substring("which contains all the elements")))
         )
     }
 
     #[test]
     fn container_eq_mismatch_shows_missing_elements_in_container() -> Result<()> {
-        verify_that!(
-            container_eq(vec![1, 2, 3]).explain_match(&vec![1, 2]),
-            displays_as(eq("which is missing the element 3"))
-        )
+        let result = verify_that!(vec![1, 2], container_eq(vec![1, 2, 3]));
+        verify_that!(result, err(displays_as(contains_substring("which is missing the element 3"))))
+    }
+
+    #[test]
+    fn container_eq_mismatch_shows_missing_elements_in_container_when_matching_vec_with_array()
+    -> Result<()> {
+        let result = verify_that!(vec![1, 2], container_eq([1, 2, 3]));
+        verify_that!(result, err(displays_as(contains_substring("which is missing the element 3"))))
     }
 
     #[test]
     fn container_eq_mismatch_shows_surplus_elements_in_container() -> Result<()> {
+        let result = verify_that!(vec![1, 2, 3], container_eq(vec![1, 2]));
         verify_that!(
-            container_eq(vec![1, 2]).explain_match(&vec![1, 2, 3]),
-            displays_as(eq("which contains the unexpected element 3"))
+            result,
+            err(displays_as(contains_substring("which contains the unexpected element 3")))
         )
     }
 
     #[test]
     fn container_eq_mismatch_shows_missing_and_surplus_elements_in_container() -> Result<()> {
+        let result = verify_that!(vec![1, 2, 4], container_eq(vec![1, 2, 3]));
         verify_that!(
-            container_eq(vec![1, 2, 3]).explain_match(&vec![1, 2, 4]),
-            displays_as(eq("which is missing the element 3 and contains the unexpected element 4"))
+            result,
+            err(displays_as(contains_substring(
+                "which is missing the element 3 and contains the unexpected element 4"
+            )))
         )
     }
 
     #[test]
     fn container_eq_mismatch_does_not_show_duplicated_element() -> Result<()> {
+        let result = verify_that!(vec![1, 2, 3, 3], container_eq(vec![1, 2, 3]));
         verify_that!(
-            container_eq(vec![1, 2, 3]).explain_match(&vec![1, 2, 3, 3]),
-            displays_as(eq("which contains all the elements"))
-        )
-    }
-
-    #[test]
-    fn container_eq_matches_owned_vec_with_array() -> Result<()> {
-        let vector = vec![123, 234];
-        verify_that!(vector, container_eq([123, 234]))
-    }
-
-    #[test]
-    fn container_eq_matches_owned_vec_of_owned_strings_with_slice_of_string_references()
-    -> Result<()> {
-        let vector = vec!["A string".to_string(), "Another string".to_string()];
-        verify_that!(vector, container_eq(["A string", "Another string"]))
-    }
-
-    #[test]
-    fn container_eq_matches_owned_vec_of_owned_strings_with_shorter_slice_of_string_references()
-    -> Result<()> {
-        let actual = vec!["A string".to_string(), "Another string".to_string()];
-        let matcher = container_eq(["A string"]);
-
-        let result = matcher.matches(&actual);
-
-        verify_that!(result, eq(MatcherResult::NoMatch))
-    }
-
-    #[test]
-    fn container_eq_mismatch_with_slice_shows_missing_elements_in_container() -> Result<()> {
-        verify_that!(
-            container_eq([1, 2, 3]).explain_match(&vec![1, 2]),
-            displays_as(eq("which is missing the element 3"))
+            result,
+            err(displays_as(contains_substring("which contains all the elements")))
         )
     }
 
     #[test]
     fn container_eq_mismatch_with_str_slice_shows_missing_elements_in_container() -> Result<()> {
+        let result =
+            verify_that!(vec!["A".to_string(), "B".to_string()], container_eq(["A", "B", "C"]));
         verify_that!(
-            container_eq(["A", "B", "C"]).explain_match(&vec!["A".to_string(), "B".to_string()]),
-            displays_as(eq("which is missing the element \"C\""))
+            result,
+            err(displays_as(contains_substring(r#"which is missing the element "C""#)))
         )
     }
 
     #[test]
     fn container_eq_mismatch_with_str_slice_shows_surplus_elements_in_container() -> Result<()> {
+        let result = verify_that!(
+            vec!["A".to_string(), "B".to_string(), "C".to_string()],
+            container_eq(["A", "B"])
+        );
         verify_that!(
-            container_eq(["A", "B"]).explain_match(&vec![
-                "A".to_string(),
-                "B".to_string(),
-                "C".to_string()
-            ]),
-            displays_as(eq("which contains the unexpected element \"C\""))
+            result,
+            err(displays_as(contains_substring(r#"which contains the unexpected element "C""#)))
         )
+    }
+
+    #[derive(Debug, PartialEq)]
+    struct OwnedItemContainer(Vec<i32>);
+
+    impl<'a> IntoIterator for &'a OwnedItemContainer {
+        type Item = i32;
+        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        fn into_iter(self) -> Self::IntoIter {
+            self.0.iter().copied()
+        }
+    }
+
+    #[test]
+    fn container_eq_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
+    -> Result<()> {
+        verify_that!(OwnedItemContainer(vec![1]), container_eq(OwnedItemContainer(vec![1])))
     }
 }
