@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a `Result` containing `Ok` with a value matched by `inner`.
 ///
@@ -39,18 +39,17 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn ok<E: Debug, InnerMatcherT>(inner: InnerMatcherT) -> OkMatcher<E, InnerMatcherT> {
-    OkMatcher { inner, phantom_e: PhantomData }
+pub fn ok<InnerMatcherT>(inner: InnerMatcherT) -> OkMatcher<InnerMatcherT> {
+    OkMatcher { inner }
 }
 
 #[doc(hidden)]
-pub struct OkMatcher<E, InnerMatcherT> {
+pub struct OkMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
-    phantom_e: PhantomData<E>,
 }
 
 impl<T: Debug, E: Debug, InnerMatcherT: Matcher<T>> Matcher<std::result::Result<T, E>>
-    for OkMatcher<E, InnerMatcherT>
+    for OkMatcher<InnerMatcherT>
 {
     fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
         actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
@@ -66,7 +65,7 @@ impl<T: Debug, E: Debug, InnerMatcherT: Matcher<T>> Matcher<std::result::Result<
     }
 }
 
-impl<E: Debug, InnerMatcherT: Describable> Describable for OkMatcher<E, InnerMatcherT> {
+impl<InnerMatcherT: Describable> Describable for OkMatcher<InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(
@@ -140,10 +139,12 @@ mod tests {
 
     #[test]
     fn ok_describe_matches() -> Result<()> {
-        let matcher: Box<dyn Matcher<std::result::Result<i32, i32>>> = Box::new(ok(eq(1)));
+        let result = verify_that!(Ok::<i32, i32>(2), ok(eq(1)));
         verify_that!(
-            matcher.describe(MatcherResult::Match),
-            displays_as(eq("is a success containing a value, which is equal to 1"))
+            result,
+            err(displays_as(contains_substring(
+                "is a success containing a value, which is equal to 1"
+            )))
         )
     }
 }

@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a `Result` containing `Err` with a value matched by `inner`.
 ///
@@ -39,18 +39,17 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn err<T: Debug, InnerMatcherT>(inner: InnerMatcherT) -> ErrMatcher<T, InnerMatcherT> {
-    ErrMatcher { inner, phantom_t: PhantomData }
+pub fn err<InnerMatcherT>(inner: InnerMatcherT) -> ErrMatcher<InnerMatcherT> {
+    ErrMatcher { inner }
 }
 
 #[doc(hidden)]
-pub struct ErrMatcher<T, InnerMatcherT> {
+pub struct ErrMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
-    phantom_t: PhantomData<T>,
 }
 
 impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<std::result::Result<T, E>>
-    for ErrMatcher<T, InnerMatcherT>
+    for ErrMatcher<InnerMatcherT>
 {
     fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
         actual.as_ref().err().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
@@ -66,7 +65,7 @@ impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<std::result::Result<
     }
 }
 
-impl<T, InnerMatcherT: Describable> Describable for ErrMatcher<T, InnerMatcherT> {
+impl<InnerMatcherT: Describable> Describable for ErrMatcher<InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -138,10 +137,10 @@ mod tests {
 
     #[test]
     fn err_describe_matches() -> Result<()> {
-        let matcher: Box<dyn Matcher<std::result::Result<i32, i32>>> = Box::new(err(eq(1)));
+        let result = verify_that!(Err::<i32, i32>(2), err(eq(1)));
         verify_that!(
-            matcher.describe(MatcherResult::Match),
-            displays_as(eq("is an error which is equal to 1"))
+            result,
+            err(displays_as(contains_substring("is an error which is equal to 1")))
         )
     }
 }
