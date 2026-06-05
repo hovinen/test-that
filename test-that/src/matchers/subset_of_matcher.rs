@@ -261,6 +261,40 @@ mod tests {
     }
 
     #[test]
+    fn subset_of_matches_vec_of_string_slices() -> Result<()> {
+        verify_that!(
+            vec!["String 1", "String 2", "String 3"],
+            subset_of(["String 1", "String 2", "String 3"])
+        )
+    }
+
+    #[test]
+    fn subset_of_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+        let string_1 = String::from("String 1");
+        let string_2 = String::from("String 2");
+        let string_3 = String::from("String 3");
+        verify_that!(
+            vec![string_1.as_str(), string_2.as_str(), string_3.as_str()],
+            subset_of(["String 1", "String 2", "String 3"])
+        )
+    }
+
+    #[test]
+    fn subset_of_matches_slice_of_string_slices() -> Result<()> {
+        let value = vec!["String 1", "String 2", "String 3"];
+        verify_that!(value.as_slice(), points_to(subset_of(["String 1", "String 2", "String 3"])))
+    }
+
+    #[test]
+    fn subset_of_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()> {
+        let string_1 = String::from("String 1");
+        let string_2 = String::from("String 2");
+        let string_3 = String::from("String 3");
+        let value = vec![string_1.as_str(), string_2.as_str(), string_3.as_str()];
+        verify_that!(value.as_slice(), points_to(subset_of(["String 1", "String 2", "String 3"])))
+    }
+
+    #[test]
     fn subset_of_matches_hash_set_with_one_element() -> Result<()> {
         verify_that!(HashSet::from([1]), subset_of([1]))
     }

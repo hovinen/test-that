@@ -323,6 +323,37 @@ mod tests {
     }
 
     #[test]
+    fn contains_matches_vec_of_string_slices() -> Result<()> {
+        verify_that!(vec!["String 1", "String 2", "String 3"], contains(contains_substring("1")))
+    }
+
+    #[test]
+    fn contains_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+        let string_1 = String::from("String 1");
+        let string_2 = String::from("String 2");
+        let string_3 = String::from("String 3");
+        verify_that!(
+            vec![string_1.as_str(), string_2.as_str(), string_3.as_str()],
+            contains(contains_substring("1"))
+        )
+    }
+
+    #[test]
+    fn contains_matches_slice_of_string_slices() -> Result<()> {
+        let value = vec!["String 1", "String 2", "String 3"];
+        verify_that!(value.as_slice(), points_to(contains(contains_substring("1"))))
+    }
+
+    #[test]
+    fn contains_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()> {
+        let string_1 = String::from("String 1");
+        let string_2 = String::from("String 2");
+        let string_3 = String::from("String 3");
+        let value = vec![string_1.as_str(), string_2.as_str(), string_3.as_str()];
+        verify_that!(value.as_slice(), points_to(contains(contains_substring("1"))))
+    }
+
+    #[test]
     fn contains_formats_without_multiplicity_by_default() -> Result<()> {
         let matcher: ContainsMatcher<_, RefItems> = contains(eq::<i32, _>(1));
 

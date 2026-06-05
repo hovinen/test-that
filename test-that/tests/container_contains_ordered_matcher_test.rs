@@ -79,6 +79,71 @@ fn contains_exactly_in_order_matches_slice_with_deref_notation() -> Result<()> {
 }
 
 #[test]
+fn contains_exactly_in_order_matches_vec_of_string_slices() -> Result<()> {
+    verify_that!(
+        vec!["String 1", "String 2", "String 3"],
+        contains_exactly![
+            contains_substring("1"),
+            contains_substring("2"),
+            contains_substring("3")
+        ]
+        .in_order()
+    )
+}
+
+#[test]
+fn contains_exactly_in_order_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+    let string_1 = String::from("String 1");
+    let string_2 = String::from("String 2");
+    let string_3 = String::from("String 3");
+    verify_that!(
+        vec![string_1.as_str(), string_2.as_str(), string_3.as_str()],
+        contains_exactly![
+            contains_substring("1"),
+            contains_substring("2"),
+            contains_substring("3")
+        ]
+        .in_order()
+    )
+}
+
+#[test]
+fn contains_exactly_in_order_matches_slice_of_string_slices() -> Result<()> {
+    let value = vec!["String 1", "String 2", "String 3"];
+    verify_that!(
+        value.as_slice(),
+        points_to(
+            contains_exactly![
+                contains_substring("1"),
+                contains_substring("2"),
+                contains_substring("3")
+            ]
+            .in_order()
+        )
+    )
+}
+
+#[test]
+fn contains_exactly_in_order_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()>
+{
+    let string_1 = String::from("String 1");
+    let string_2 = String::from("String 2");
+    let string_3 = String::from("String 3");
+    let value = vec![string_1.as_str(), string_2.as_str(), string_3.as_str()];
+    verify_that!(
+        value.as_slice(),
+        points_to(
+            contains_exactly![
+                contains_substring("1"),
+                contains_substring("2"),
+                contains_substring("3")
+            ]
+            .in_order()
+        )
+    )
+}
+
+#[test]
 fn matches_with_square_bracket_notation() -> Result<()> {
     verify_that!(vec![1, 2, 3], [eq(1), eq(2), eq(3)])
 }
