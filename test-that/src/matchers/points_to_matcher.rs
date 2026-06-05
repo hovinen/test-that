@@ -16,7 +16,6 @@
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::fmt::Debug;
-use std::marker::PhantomData;
 use std::ops::Deref;
 
 /// Matches a (smart) pointer pointing to a value matched by the [`Matcher`]
@@ -33,20 +32,15 @@ use std::ops::Deref;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn points_to<ExpectedT, MatcherT>(expected: MatcherT) -> PointsToMatcher<ExpectedT, MatcherT>
-where
-    ExpectedT: Debug + ?Sized,
-    MatcherT: Matcher<ExpectedT>,
-{
-    PointsToMatcher { expected, phantom: PhantomData }
+pub fn points_to<MatcherT>(expected: MatcherT) -> PointsToMatcher<MatcherT> {
+    PointsToMatcher { expected }
 }
 
-pub struct PointsToMatcher<ExpectedT: ?Sized, MatcherT> {
+pub struct PointsToMatcher<MatcherT> {
     expected: MatcherT,
-    phantom: PhantomData<fn() -> ExpectedT>,
 }
 
-impl<ExpectedT, MatcherT, ActualT> Matcher<ActualT> for PointsToMatcher<ExpectedT, MatcherT>
+impl<ExpectedT, MatcherT, ActualT> Matcher<ActualT> for PointsToMatcher<MatcherT>
 where
     ExpectedT: Debug + ?Sized,
     MatcherT: Matcher<ExpectedT>,
@@ -61,9 +55,7 @@ where
     }
 }
 
-impl<ExpectedT: ?Sized, MatcherT: Describable> Describable
-    for PointsToMatcher<ExpectedT, MatcherT>
-{
+impl<MatcherT: Describable> Describable for PointsToMatcher<MatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         self.expected.describe(matcher_result)
     }
