@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a string whose number of Unicode scalars matches `expected`.
 ///
@@ -57,18 +57,15 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn char_count<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>>(
-    expected: E,
-) -> impl Matcher<T> {
-    CharLenMatcher { expected, phantom: Default::default() }
+pub fn char_count<E: Matcher<usize>>(expected: E) -> CharLenMatcher<E> {
+    CharLenMatcher { expected }
 }
 
-struct CharLenMatcher<T: ?Sized, E> {
+pub struct CharLenMatcher<E> {
     expected: E,
-    phantom: PhantomData<T>,
 }
 
-impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMatcher<T, E> {
+impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMatcher<E> {
     fn matches(&self, actual: &T) -> MatcherResult {
         self.expected.matches(&actual.as_ref().chars().count())
     }
@@ -84,7 +81,7 @@ impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMa
     }
 }
 
-impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Describable for CharLenMatcher<T, E> {
+impl<E: Matcher<usize>> Describable for CharLenMatcher<E> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(

@@ -23,9 +23,7 @@ use std::fmt::{Debug, Display};
 /// let result: impl Display = ...;
 /// verify_that!(result, displays_as(eq(format!("{}", result))))?;
 /// ```
-pub fn displays_as<InnerMatcher: Matcher<String>>(
-    inner: InnerMatcher,
-) -> DisplayMatcher<InnerMatcher> {
+pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> DisplayMatcher<InnerMatcher> {
     DisplayMatcher { inner }
 }
 

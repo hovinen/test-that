@@ -18,7 +18,6 @@ use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::collections::HashMap;
 use std::fmt::Debug;
 use std::hash::Hash;
-use std::marker::PhantomData;
 
 /// Matches a HashMap containing the given `key` whose value is matched by the
 /// matcher `inner`.
@@ -63,21 +62,17 @@ use std::marker::PhantomData;
 /// However, `has_entry` will offer somewhat better diagnostic messages in the
 /// case of assertion failure. And it avoid the extra allocation hidden in the
 /// code above.
-pub fn has_entry<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>(
-    key: KeyT,
-    inner: MatcherT,
-) -> impl Matcher<HashMap<KeyT, ValueT>> {
-    HasEntryMatcher { key, inner, phantom: Default::default() }
+pub fn has_entry<KeyT, MatcherT>(key: KeyT, inner: MatcherT) -> HasEntryMatcher<KeyT, MatcherT> {
+    HasEntryMatcher { key, inner }
 }
 
-struct HasEntryMatcher<KeyT, ValueT, MatcherT> {
+pub struct HasEntryMatcher<KeyT, MatcherT> {
     key: KeyT,
     inner: MatcherT,
-    phantom: PhantomData<ValueT>,
 }
 
 impl<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>
-    Matcher<HashMap<KeyT, ValueT>> for HasEntryMatcher<KeyT, ValueT, MatcherT>
+    Matcher<HashMap<KeyT, ValueT>> for HasEntryMatcher<KeyT, MatcherT>
 {
     fn matches(&self, actual: &HashMap<KeyT, ValueT>) -> MatcherResult {
         if let Some(value) = actual.get(&self.key) {
@@ -102,9 +97,7 @@ impl<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>
     }
 }
 
-impl<KeyT: Debug, ValueT, MatcherT: Describable> Describable
-    for HasEntryMatcher<KeyT, ValueT, MatcherT>
-{
+impl<KeyT: Debug, MatcherT: Describable> Describable for HasEntryMatcher<KeyT, MatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(

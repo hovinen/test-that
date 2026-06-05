@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a byte sequence which is a UTF-8 encoded string matched by `inner`.
 ///
@@ -49,24 +49,19 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn is_utf8_string<'a, ActualT: AsRef<[u8]> + Debug + 'a, InnerMatcherT>(
-    inner: InnerMatcherT,
-) -> impl Matcher<ActualT>
+pub fn is_utf8_string<InnerMatcherT>(inner: InnerMatcherT) -> IsEncodedStringMatcher<InnerMatcherT>
 where
     InnerMatcherT: Matcher<String>,
 {
-    IsEncodedStringMatcher { inner, phantom: Default::default() }
+    IsEncodedStringMatcher { inner }
 }
 
-struct IsEncodedStringMatcher<ActualT, InnerMatcherT> {
+pub struct IsEncodedStringMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
-    phantom: PhantomData<ActualT>,
 }
 
-impl<'a, ActualT: AsRef<[u8]> + Debug + 'a, InnerMatcherT> Matcher<ActualT>
-    for IsEncodedStringMatcher<ActualT, InnerMatcherT>
-where
-    InnerMatcherT: Matcher<String>,
+impl<'a, ActualT: AsRef<[u8]> + Debug + 'a, InnerMatcherT: Matcher<String>> Matcher<ActualT>
+    for IsEncodedStringMatcher<InnerMatcherT>
 {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         String::from_utf8(actual.as_ref().to_vec())
@@ -84,9 +79,7 @@ where
     }
 }
 
-impl<ActualT, InnerMatcherT: Describable> Describable
-    for IsEncodedStringMatcher<ActualT, InnerMatcherT>
-{
+impl<InnerMatcherT: Describable> Describable for IsEncodedStringMatcher<InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(
@@ -135,7 +128,7 @@ mod tests {
 
     #[test]
     fn has_correct_description_in_matched_case() -> Result<()> {
-        let matcher = is_utf8_string::<&[u8], _>(eq("A string"));
+        let matcher = is_utf8_string(eq("A string"));
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -145,7 +138,7 @@ mod tests {
 
     #[test]
     fn has_correct_description_in_not_matched_case() -> Result<()> {
-        let matcher = is_utf8_string::<&[u8], _>(eq("A string"));
+        let matcher = is_utf8_string(eq("A string"));
 
         verify_that!(
             matcher.describe(MatcherResult::NoMatch),

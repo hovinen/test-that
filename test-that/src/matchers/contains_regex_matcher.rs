@@ -17,7 +17,6 @@ use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use regex::Regex;
 use std::fmt::Debug;
-use std::marker::PhantomData;
 use std::ops::Deref;
 
 /// Matches a string containing a substring which matches the given regular
@@ -53,13 +52,8 @@ use std::ops::Deref;
 // compiler treats it as a Matcher<str> only and the code
 //   verify_that!("Some value".to_string(), contains_regex(".*value"))?;
 // doesn't compile.
-pub fn contains_regex<ActualT: ?Sized, PatternT: Deref<Target = str>>(
-    pattern: PatternT,
-) -> ContainsRegexMatcher<ActualT> {
-    ContainsRegexMatcher {
-        regex: Regex::new(pattern.deref()).unwrap(),
-        phantom: Default::default(),
-    }
+pub fn contains_regex<PatternT: Deref<Target = str>>(pattern: PatternT) -> ContainsRegexMatcher {
+    ContainsRegexMatcher { regex: Regex::new(pattern.deref()).unwrap() }
 }
 
 /// A matcher matching a string-like type containing a substring matching a
@@ -67,18 +61,17 @@ pub fn contains_regex<ActualT: ?Sized, PatternT: Deref<Target = str>>(
 ///
 /// Intended only to be used from the function [`contains_regex`] only.
 /// Should not be referenced by code outside this library.
-pub struct ContainsRegexMatcher<ActualT: ?Sized> {
+pub struct ContainsRegexMatcher {
     regex: Regex,
-    phantom: PhantomData<ActualT>,
 }
 
-impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher<ActualT> for ContainsRegexMatcher<ActualT> {
+impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher<ActualT> for ContainsRegexMatcher {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         self.regex.is_match(actual.as_ref()).into()
     }
 }
 
-impl<ActualT: ?Sized> Describable for ContainsRegexMatcher<ActualT> {
+impl Describable for ContainsRegexMatcher {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
@@ -93,7 +86,7 @@ impl<ActualT: ?Sized> Describable for ContainsRegexMatcher<ActualT> {
 
 #[cfg(test)]
 mod tests {
-    use super::{ContainsRegexMatcher, contains_regex};
+    use super::contains_regex;
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
 
@@ -140,7 +133,7 @@ mod tests {
 
     #[test]
     fn contains_regex_displays_quoted_debug_of_pattern() -> Result<()> {
-        let matcher: ContainsRegexMatcher<&str> = contains_regex("\n");
+        let matcher = contains_regex("\n");
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
