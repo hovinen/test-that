@@ -1092,7 +1092,7 @@ pub mod internal {
 #[cfg(test)]
 mod tests {
     use super::internal::MapContainsMatcher;
-    use crate::matcher::{Describable as _, Matcher, MatcherResult};
+    use crate::matcher::Matcher;
     use crate::matchers::container_contains::RefItems;
     use crate::prelude::*;
     use indoc::indoc;
@@ -1105,22 +1105,24 @@ mod tests {
         // compiler takes care of that, but when the matcher is created separately,
         // we must create the constitute matchers separately so that they
         // aren't dropped too early.
-        let matchers =
-            ((eq::<i32, _>(2), eq::<&str, _>("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
-        let matcher: MapContainsMatcher<HashMap<i32, &str>, _, _, RefItems, 3> = contains_exactly![
-            (matchers.0.0 => matchers.0.1),
-            (matchers.1.0 => matchers.1.1),
-            (matchers.2.0 => matchers.2.1)
-        ];
+        let matchers = ((eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
+        let result = verify_that!(
+            HashMap::from([(1, "one")]),
+            contains_exactly![
+                (matchers.0.0 => matchers.0.1),
+                (matchers.1.0 => matchers.1.1),
+                (matchers.2.0 => matchers.2.1)
+            ]
+        );
         verify_that!(
-            matcher.describe(MatcherResult::Match),
-            displays_as(eq(indoc!(
+            result,
+            err(displays_as(contains_substring(indoc!(
                 "
                 contains elements matching in any order:
                   is equal to 2 => is equal to \"Two\"
                   is equal to 1 => is equal to \"One\"
                   is equal to 3 => is equal to \"Three\""
-            )))
+            ))))
         )
     }
 

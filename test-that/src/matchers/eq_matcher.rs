@@ -17,8 +17,7 @@ use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use crate::matcher_support::edit_distance;
 use crate::matcher_support::summarize_diff::create_diff;
-
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a value equal (in the sense of `==`) to `expected`.
 ///
@@ -72,19 +71,18 @@ use std::{fmt::Debug, marker::PhantomData};
 /// options on how equality is checked through the
 /// [`StrMatcherConfigurator`][crate::matchers::str_matcher::StrMatcherConfigurator]
 /// extension trait, which is implemented for this matcher.
-pub fn eq<A: ?Sized, T>(expected: T) -> EqMatcher<A, T> {
-    EqMatcher { expected, phantom: Default::default() }
+pub fn eq<T>(expected: T) -> EqMatcher<T> {
+    EqMatcher { expected }
 }
 
 /// A matcher which matches a value equal to `expected`.
 ///
 /// See [`eq`].
-pub struct EqMatcher<A: ?Sized, T> {
+pub struct EqMatcher<T> {
     pub(crate) expected: T,
-    phantom: PhantomData<A>,
 }
 
-impl<T: Debug, A: Debug + ?Sized + PartialEq<T>> Matcher<A> for EqMatcher<A, T> {
+impl<T: Debug, A: Debug + ?Sized + PartialEq<T>> Matcher<A> for EqMatcher<T> {
     fn matches(&self, actual: &A) -> MatcherResult {
         (*actual == self.expected).into()
     }
@@ -114,7 +112,7 @@ impl<T: Debug, A: Debug + ?Sized + PartialEq<T>> Matcher<A> for EqMatcher<A, T> 
     }
 }
 
-impl<T: Debug, A: ?Sized> Describable for EqMatcher<A, T> {
+impl<T: Debug> Describable for EqMatcher<T> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),

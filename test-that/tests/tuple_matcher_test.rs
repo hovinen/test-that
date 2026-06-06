@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use indoc::indoc;
 use test_that::matcher::{Describable as _, Matcher, MatcherResult};
 use test_that::prelude::*;
-use indoc::indoc;
 
 #[test]
 fn empty_matcher_matches_empty_tuple() -> Result<()> {
@@ -177,7 +177,7 @@ fn tuple_matcher_with_trailing_comma_matches_matching_12_tuple() -> Result<()> {
 #[test]
 fn tuple_matcher_1_has_correct_description_for_match() -> Result<()> {
     verify_that!(
-        (eq::<i32, _>(1),).describe(MatcherResult::Match),
+        (eq(1),).describe(MatcherResult::Match),
         displays_as(eq(indoc!(
             "
             is a tuple whose values respectively match:
@@ -189,7 +189,7 @@ fn tuple_matcher_1_has_correct_description_for_match() -> Result<()> {
 #[test]
 fn tuple_matcher_1_has_correct_description_for_mismatch() -> Result<()> {
     verify_that!(
-        (eq::<i32, _>(1),).describe(MatcherResult::NoMatch),
+        (eq(1),).describe(MatcherResult::NoMatch),
         displays_as(eq(indoc!(
             "
             is a tuple whose values do not respectively match:
@@ -201,7 +201,7 @@ fn tuple_matcher_1_has_correct_description_for_mismatch() -> Result<()> {
 #[test]
 fn tuple_matcher_2_has_correct_description_for_match() -> Result<()> {
     verify_that!(
-        (eq::<i32, _>(1), eq::<i32, _>(2)).describe(MatcherResult::Match),
+        (eq(1), eq(2)).describe(MatcherResult::Match),
         displays_as(eq(indoc!(
             "
             is a tuple whose values respectively match:
@@ -214,7 +214,7 @@ fn tuple_matcher_2_has_correct_description_for_match() -> Result<()> {
 #[test]
 fn tuple_matcher_2_has_correct_description_for_mismatch() -> Result<()> {
     verify_that!(
-        (eq::<i32, _>(1), eq::<i32, _>(2)).describe(MatcherResult::NoMatch),
+        (eq(1), eq(2)).describe(MatcherResult::NoMatch),
         displays_as(eq(indoc!(
             "
             is a tuple whose values do not respectively match:

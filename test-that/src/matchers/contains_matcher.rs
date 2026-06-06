@@ -250,11 +250,8 @@ mod tests {
 
     #[test]
     fn contains_does_not_match_empty_slice() -> Result<()> {
-        let matcher: ContainsMatcher<EqMatcher<i32, i32>, RefItems> = contains(eq::<i32, _>(1));
-
-        let result = matcher.matches(&[]);
-
-        verify_that!(result, eq(MatcherResult::NoMatch))
+        let value = Vec::<i32>::new();
+        verify_that!(value.as_slice(), not(points_to(contains(eq(1)))))
     }
 
     #[test]
@@ -355,7 +352,7 @@ mod tests {
 
     #[test]
     fn contains_formats_without_multiplicity_by_default() -> Result<()> {
-        let matcher: ContainsMatcher<_, RefItems> = contains(eq::<i32, _>(1));
+        let matcher: ContainsMatcher<_, RefItems> = contains(eq(1));
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -365,7 +362,7 @@ mod tests {
 
     #[test]
     fn contains_formats_with_multiplicity_when_specified() -> Result<()> {
-        let matcher: ContainsMatcher<_, RefItems> = contains(eq::<i32, _>(1)).times(eq(2));
+        let matcher: ContainsMatcher<_, RefItems> = contains(eq(1)).times(eq(2));
 
         verify_that!(
             matcher.describe(MatcherResult::Match),

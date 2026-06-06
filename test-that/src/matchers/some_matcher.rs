@@ -104,11 +104,7 @@ mod tests {
 
     #[test]
     fn some_does_not_match_option_with_none() -> Result<()> {
-        let matcher = some(eq::<i32, _>(1));
-
-        let result = matcher.matches(&None);
-
-        verify_that!(result, eq(MatcherResult::NoMatch))
+        verify_that!(None::<i32>, not(some(eq(1))))
     }
 
     #[test]
@@ -131,7 +127,7 @@ mod tests {
     #[test]
     fn some_describe_matches() -> Result<()> {
         verify_that!(
-            some(eq::<i32, _>(1)).describe(MatcherResult::Match),
+            some(eq(1)).describe(MatcherResult::Match),
             displays_as(eq("has a value which is equal to 1"))
         )
     }
@@ -139,14 +135,15 @@ mod tests {
     #[test]
     fn some_describe_does_not_match() -> Result<()> {
         verify_that!(
-            some(eq::<i32, _>(1)).describe(MatcherResult::NoMatch),
+            some(eq(1)).describe(MatcherResult::NoMatch),
             displays_as(eq("is None or has a value which isn't equal to 1"))
         )
     }
 
     #[test]
     fn some_explain_match_with_none() -> Result<()> {
-        verify_that!(some(eq::<i32, _>(1)).explain_match(&None), displays_as(eq("which is None")))
+        let result = verify_that!(None::<i32>, some(eq(1)));
+        verify_that!(result, err(displays_as(contains_substring("which is None"))))
     }
 
     #[test]
