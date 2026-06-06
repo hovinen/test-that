@@ -106,8 +106,8 @@
 /// # }
 /// ```
 ///
-/// See also the macro [`property`][crate::matchers::property] for an analogous
-/// mechanism to extract a datum by invoking a method.
+/// See also the macro [`result_of`][crate::matchers::result_of] for a matcher which
+/// works for arbitrary closures.
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __field {
