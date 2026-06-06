@@ -159,7 +159,7 @@ fn describes_itself_in_matching_case() -> Result<()> {
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "after running `| s : &SomeStruct | s.get_property()` results in `1`, which is equal to 1"
+            "after applying `|s: &SomeStruct| s.get_property()` results in `1`, which is equal to 1"
         )))
     )
 }
@@ -171,7 +171,7 @@ fn describes_itself_in_not_matching_case() -> Result<()> {
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "after running `| s : &SomeStruct | s.get_property()` results in `2`, which isn't equal to 1"
+            "after applying `|s: &SomeStruct| s.get_property()` results in `2`, which isn't equal to 1"
         )))
     )
 }
@@ -192,7 +192,7 @@ fn explains_mismatch_referencing_explanation_of_inner_matcher() -> Result<()> {
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "after running `| s : &SomeStruct | s.get_a_collection()` results in `[]`, which is missing the element 1"
+            "after applying `|s: &SomeStruct| s.get_a_collection()` results in `[]`, which is missing the element 1"
         )))
     )
 }
@@ -205,7 +205,7 @@ fn describes_itself_in_matching_case_for_ref() -> Result<()> {
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "after running `| s : &SomeStruct | s.get_property_ref()` results in `2`, which isn't equal to 1"
+            "after applying `|s: &SomeStruct| s.get_property_ref()` results in `2`, which isn't equal to 1"
         )))
     )
 }
@@ -220,7 +220,7 @@ fn describes_itself_in_not_matching_case_for_ref() -> Result<()> {
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "after running `| s : &SomeStruct | s.get_property_ref()` results in `1`, which is equal to 1"
+            "after applying `|s: &SomeStruct| s.get_property_ref()` results in `1`, which is equal to 1"
         )))
     )
 }
@@ -244,7 +244,7 @@ fn explains_mismatch_referencing_explanation_of_inner_matcher_for_ref() -> Resul
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "after running `| s : &SomeStruct | s.get_a_collection_ref()` results in `[]`, which is missing the element 1"
+            "after applying `|s: &SomeStruct| s.get_a_collection_ref()` results in `[]`, which is missing the element 1"
         )))
     )
 }

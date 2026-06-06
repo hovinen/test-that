@@ -174,8 +174,15 @@ macro_rules! result_of_internal {
             |result, matcher| $crate::matcher::Describable::describe(matcher, result),
             |$param: $type, matcher| {
                 ::std::convert::Into::into(format!(
-                    "which after running `{}` results in `{:#?}`, {}",
-                    stringify!(|$param: $type| $body),
+                    concat!(
+                        "which after applying `|",
+                        stringify!($param),
+                        ": ",
+                        stringify!($type),
+                        "| ",
+                        stringify!($body),
+                        "` results in `{:#?}`, {}"
+                    ),
                     &$body,
                     $crate::matcher::Matcher::explain_match(matcher, &$body)
                 ))
