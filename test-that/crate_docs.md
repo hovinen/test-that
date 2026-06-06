@@ -9,11 +9,11 @@ This library provides:
 
 ## Assertions and matchers
 
-The core of GoogleTest is its *matchers*. Matchers indicate what aspect of an
+The core of Test That! is its *matchers*. Matchers indicate what aspect of an
 actual value one is asserting: (in-)equality, containment, regular expression
 matching, and so on.
 
-To make an assertion using a matcher, GoogleTest offers three macros:
+To make an assertion using a matcher, Test That! offers three macros:
 
  * [`assert_that!`] panics if the assertion fails, aborting the test.
  * [`expect_that!`] logs an assertion failure, marking the test as having
@@ -106,7 +106,7 @@ fn strictly_between_9_and_11() {
 
 ## Available matchers
 
-The following matchers are provided in GoogleTest Rust:
+The following matchers are provided in Test That!:
 
 | Matcher              | What it matches                                                          |
 |----------------------|--------------------------------------------------------------------------|
@@ -436,14 +436,14 @@ fn always_fails() -> TestResult<()> {
 
 ## Integrations with other crates
 
-GoogleTest Rust includes integrations with the
+Test That! includes integrations with the
 [Anyhow](https://crates.io/crates/anyhow) and
 [Proptest](https://crates.io/crates/proptest) crates to simplify turning
 errors from those crates into test failures.
 
 To use this, activate the `anyhow`, respectively `proptest` feature in
-GoogleTest Rust and invoke the extension method [`or_fail()`] on a
-`Result` value in your test. For example:
+Test That! and invoke the extension method [`or_fail()`] on a `Result` value in
+your test. For example:
 
 ```
 # use test_that::prelude::*;
@@ -465,7 +465,7 @@ fn just_return_error() -> anyhow::Result<()> {
 # has_anyhow_failure().unwrap_err();
 ```
 
-One can convert Proptest test failures into GoogleTest test failures when the
+One can convert Proptest test failures into Test That! test failures when the
 test is invoked with
 [`TestRunner::run`](https://docs.rs/proptest/latest/proptest/test_runner/struct.TestRunner.html#method.run):
 
@@ -485,7 +485,7 @@ fn numbers_are_greater_than_zero() -> TestResult<()> {
 # numbers_are_greater_than_zero().unwrap();
 ```
 
-Similarly, when the `proptest` feature is enabled, GoogleTest assertion failures
+Similarly, when the `proptest` feature is enabled, Test That! assertion failures
 can automatically be converted into Proptest
 [`TestCaseError`](https://docs.rs/proptest/latest/proptest/test_runner/enum.TestCaseError.html)
 through the `?` operator as the example above shows.

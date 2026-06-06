@@ -42,11 +42,11 @@ This library brings the rich assertion types of Google's C++ testing library
 
 ## Assertions and matchers
 
-The core of GoogleTest is its *matchers*. Matchers indicate what aspect of an
+The core of Test That! is its *matchers*. Matchers indicate what aspect of an
 actual value one is asserting: (in-)equality, containment, regular expression
 matching, and so on.
 
-To make an assertion using a matcher, GoogleTest offers three macros:
+To make an assertion using a matcher, Test That! offers three macros:
 
  * [`assert_that!`] panics if the assertion fails, aborting the test.
  * [`expect_that!`] logs an assertion failure, marking the test as having
@@ -349,7 +349,7 @@ displayed, we recommend setting those variables in the personal
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to contribute
 to this project.
 
-[`and_log_failure()`]: https://docs.rs/test_that/*/test_that/trait.GoogleTestSupport.html#tymethod.and_log_failure
+[`and_log_failure()`]: https://docs.rs/test_that/*/test_that/trait.TestResultExt.html#tymethod.and_log_failure
 [`assert_that!`]: https://docs.rs/test_that/*/test_that/macro.assert_that.html
 [`expect_pred!`]: https://docs.rs/test_that/*/test_that/macro.expect_pred.html
 [`expect_that!`]: https://docs.rs/test_that/*/test_that/macro.expect_that.html

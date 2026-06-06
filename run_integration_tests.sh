@@ -18,7 +18,7 @@
 # Shell script to build and run the library integration tests. These will not be
 # run with "cargo test" due to limitations in Cargo.
 #
-# To use this, just run the script in the root directory of GoogleTest Rust. You
+# To use this, just run the script in the root directory of Test That!. You
 # must have the Rust toolchain available.
 
 set -e

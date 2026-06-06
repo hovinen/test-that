@@ -73,7 +73,7 @@ impl TestOutcome {
                 },
                 Some(TestOutcome::Failure) => Err(TestFailure),
                 None => {
-                    panic!("No test context found. This indicates a bug in GoogleTest.")
+                    panic!("No test context found. This indicates a bug in Test That!.")
                 }
             };
             if let Err(fatal_assertion_failure) = inner_result {
@@ -90,7 +90,7 @@ impl TestOutcome {
         TestOutcome::with_current_test_outcome(|mut outcome| {
             let outcome = outcome
                 .as_mut()
-                .expect("No test context found. This indicates a bug in GoogleTest.");
+                .expect("No test context found. This indicates a bug in Test That!.");
             match outcome {
                 TestOutcome::Success => Ok(()),
                 TestOutcome::Failure => Err(TestAssertionFailure::create("Test failed".into())),
@@ -103,7 +103,7 @@ impl TestOutcome {
         TestOutcome::with_current_test_outcome(|mut outcome| {
             let outcome = outcome
                 .as_mut()
-                .expect("No test context found. This indicates a bug in GoogleTest.");
+                .expect("No test context found. This indicates a bug in Test That!.");
             *outcome = TestOutcome::Failure;
         })
     }
