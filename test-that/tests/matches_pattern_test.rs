@@ -182,10 +182,10 @@ fn has_correct_assertion_failure_message_for_field_and_property() -> Result<()> 
             "
             Value of: actual
             Expected: is AStruct which has all the following properties:
-              * has property `get_field ()`, which is equal to 234
+              * result of applying `|s: & AStruct| s.get_field ()` is equal to 234
               * has field `another_field`, which is equal to 123
             Actual: AStruct { a_field: 123, another_field: 234 },
-              * whose property `get_field ()` is `123`, which isn't equal to 234
+              * which after applying `|s: & AStruct| s.get_field ()` results in `123`, which isn't equal to 234
               * which has field `another_field`, which isn't equal to 123"
         ))))
     )
@@ -587,7 +587,7 @@ fn includes_struct_name_in_description_with_property() -> Result<()> {
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "Expected: is AStruct which has property `get_field ()`"
+            "which after applying `|s: & AStruct| s.get_field ()` results in"
         )))
     )
 }
@@ -610,7 +610,7 @@ fn includes_struct_name_in_description_with_ref_property() -> Result<()> {
     verify_that!(
         result,
         err(displays_as(contains_substring(
-            "Expected: is AStruct which has property `get_field ()`"
+            "which after applying `|s: & AStruct| s.get_field ()` results in"
         )))
     )
 }

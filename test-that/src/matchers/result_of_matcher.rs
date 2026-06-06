@@ -187,7 +187,7 @@ macro_rules! __result_of {
 macro_rules! result_of_internal {
     (|$param:ident: $type:ty| $body:expr, $matcher:expr) => {{
         $crate::matchers::__internal_unstable_do_not_depend_on_these::result_of(
-            stringify!($closure),
+            concat!("|", stringify!($param), ": ", stringify!($type), "| ", stringify!($body)),
             $matcher,
             |$param: $type, matcher| $crate::matcher::Matcher::matches(matcher, &$body),
             |result, matcher| $crate::matcher::Describable::describe(matcher, result),
@@ -277,7 +277,7 @@ pub mod internal {
     {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
-                "result of `{}`, which {}",
+                "result of applying `{}` {}",
                 self.definition,
                 (self.describe)(matcher_result, &self.matcher)
             )
