@@ -150,6 +150,27 @@
 ///
 /// This is because the closure is rewritten by the macro so that it no longer moves
 /// data.
+///
+/// Any methods the closure invokes must, however, still take a shared reference as
+/// their `self` parameter. So the following does not compile:
+///
+/// ```compile_fail
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// pub struct MyStruct {
+///     a_string: String,
+/// }
+///
+/// impl MyStruct {
+///     fn get_a_string(self) -> String {
+///         self.a_string
+///     }
+/// }
+///
+/// let value = MyStruct { a_string: "A string".into() };
+/// verify_that!(value, result_of!(|s: &MyStruct| s.get_a_string(), eq("A string")))
+/// #    .unwrap();
+/// ```
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __result_of {
