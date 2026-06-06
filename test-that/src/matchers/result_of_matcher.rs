@@ -35,6 +35,9 @@
 /// #    .unwrap();
 /// ```
 ///
+/// Closures taking exclusive references to or ownership of the item are
+/// not permitted.
+///
 /// The closure may also invoke methods on the item. For example:
 ///
 /// ```
