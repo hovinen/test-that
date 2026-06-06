@@ -185,7 +185,7 @@ macro_rules! __result_of {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! result_of_internal {
-    (|$param:ident: $type:ty| $body:expr, $matcher:expr) => {{
+    (|$param:ident: $type:ty| $body:expr, $matcher:expr $(,)?) => {{
         $crate::matchers::__internal_unstable_do_not_depend_on_these::result_of(
             concat!("|", stringify!($param), ": ", stringify!($type), "| ", stringify!($body)),
             $matcher,
