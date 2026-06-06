@@ -164,7 +164,7 @@
 /// #     .unwrap();
 /// ```
 ///
-/// If the method returns a reference, precede it with a `*`:
+/// If the method returns a reference, you must "dereference" it. Either preceed it with `*`:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -180,6 +180,65 @@
 /// # let my_struct = MyStruct { a_field: "Something to believe in".into() };
 /// verify_that!(my_struct, matches_pattern!(MyStruct {
 ///     *get_a_field_ref(): starts_with("Something"),
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// Or use [`points_to`](crate::matchers::points_to):
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # #[derive(Debug)]
+/// # struct MyStruct {
+/// #     a_field: String,
+/// # }
+/// #
+/// impl MyStruct {
+///     fn get_a_field_ref(&self) -> &String { &self.a_field }
+/// }
+///
+/// # let my_struct = MyStruct { a_field: "Something to believe in".into() };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     get_a_field_ref(): points_to(starts_with("Something")),
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// This is also the case if the method returns an array slice:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # #[derive(Debug)]
+/// # struct MyStruct {
+/// #     a_vec: Vec<u32>,
+/// # }
+/// #
+/// impl MyStruct {
+///     fn get_a_slice(&self) -> &[u32] { &self.a_vec }
+/// }
+///
+/// # let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     *get_a_slice(): contains(eq(1)),
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// No preceding `*` should be used when the method returns a _string_ slice:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # #[derive(Debug)]
+/// pub struct MyStruct {
+///     a_string: String,
+/// }
+/// impl MyStruct {
+///     pub fn get_a_string(&self) -> &str { &self.a_string }
+/// }
+///
+/// let value = MyStruct { a_string: "A string".into() };
+/// verify_that!(value, matches_pattern!( MyStruct {
+///     get_a_string(): eq("A string"),
 /// }))
 /// #    .unwrap();
 /// ```
@@ -200,7 +259,7 @@
 /// #    .unwrap();
 /// ```
 ///
-/// One can also match enum values:
+/// One can also match enum values, including specific variants and fields:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -227,25 +286,6 @@
 ///
 /// Trailing commas are allowed (but not required) in both ordinary and tuple
 /// structs.
-///
-/// Methods returning string slices now work too:
-///
-/// ```
-/// # use test_that::prelude::*;
-/// # #[derive(Debug)]
-/// pub struct MyStruct {
-///     a_string: String,
-/// }
-/// impl MyStruct {
-///     pub fn get_a_string(&self) -> &str { &self.a_string }
-/// }
-///
-/// let value = MyStruct { a_string: "A string".into() };
-/// verify_that!(value, matches_pattern!( MyStruct {
-///     get_a_string(): eq("A string"),
-/// }))
-/// #    .unwrap();
-/// ```
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __matches_pattern {
