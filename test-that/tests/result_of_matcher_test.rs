@@ -39,6 +39,34 @@ impl SomeStruct {
 }
 
 #[test]
+fn matches_struct_with_matching_field_value() -> Result<()> {
+    let value = SomeStruct { a_property: 10 };
+    verify_that!(value, result_of!(|s: &SomeStruct| s.a_property, eq(10)))
+}
+
+#[test]
+fn does_not_match_struct_with_non_matching_field_value() -> Result<()> {
+    let value = SomeStruct { a_property: 20 };
+    verify_that!(value, not(result_of!(|s: &SomeStruct| s.a_property, eq(10))))
+}
+
+#[test]
+fn matches_when_closure_returns_reference_with_self_lifetime() -> Result<()> {
+    let value = SomeStruct { a_property: 10 };
+    verify_that!(value, result_of!(|s: &SomeStruct| &s.a_property, points_to(eq(10))))
+}
+
+#[test]
+fn matches_when_closure_returns_non_copy_struct() -> Result<()> {
+    #[derive(PartialEq, Debug)]
+    struct NonCopyStruct(u32);
+    #[derive(Debug)]
+    struct AStruct(NonCopyStruct);
+    let value = AStruct(NonCopyStruct(10));
+    verify_that!(value, result_of!(|s: &AStruct| s.0, eq(NonCopyStruct(10))))
+}
+
+#[test]
 fn matches_struct_with_matching_property() -> Result<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &SomeStruct| s.get_property(), eq(10)))

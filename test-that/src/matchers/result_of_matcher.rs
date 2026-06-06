@@ -170,18 +170,14 @@ macro_rules! result_of_internal {
         $crate::matchers::__internal_unstable_do_not_depend_on_these::result_of(
             stringify!($closure),
             $matcher,
-            |$param: $type, matcher| {
-                let actual_inner = { $body };
-                $crate::matcher::Matcher::matches(matcher, &actual_inner)
-            },
+            |$param: $type, matcher| $crate::matcher::Matcher::matches(matcher, &$body),
             |result, matcher| $crate::matcher::Describable::describe(matcher, result),
             |$param: $type, matcher| {
-                let actual_inner = { $body };
                 ::std::convert::Into::into(format!(
                     "which after running `{}` results in `{:#?}`, {}",
                     stringify!(|$param: $type| $body),
-                    actual_inner,
-                    $crate::matcher::Matcher::explain_match(matcher, &actual_inner)
+                    &$body,
+                    $crate::matcher::Matcher::explain_match(matcher, &$body)
                 ))
             },
         )
