@@ -34,7 +34,7 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 ///
 /// ```ignore
 /// #[test_that::test]
-/// fn should_work() -> test_that::Result<()> {
+/// fn should_work() -> TestResult<()> {
 ///     let value = 2;
 ///     expect_that!(value, gt(0));
 ///     verify_that!(value, eq(2))
@@ -119,10 +119,9 @@ pub fn test(
             #(#attrs)*
             #sig -> #outer_return_type {
                 #maybe_closure
-                use test_that::internal::test_outcome::TestOutcome;
-                TestOutcome::init_current_test_outcome();
+                test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
                 let result: #output_type = #invocation;
-                TestOutcome::close_current_test_outcome(result)
+                test_that::internal::test_outcome::TestOutcome::close_current_test_outcome(result)
                 #trailer
             }
         }
@@ -131,10 +130,9 @@ pub fn test(
             #(#attrs)*
             #sig -> #outer_return_type {
                 #maybe_closure
-                use test_that::internal::test_outcome::TestOutcome;
-                TestOutcome::init_current_test_outcome();
+                test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
                 #invocation;
-                TestOutcome::close_current_test_outcome(test_that::Result::Ok(()))
+                test_that::internal::test_outcome::TestOutcome::close_current_test_outcome(test_that::TestResult::Ok(()))
                 #trailer
             }
         }
