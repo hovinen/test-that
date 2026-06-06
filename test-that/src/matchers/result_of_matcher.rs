@@ -17,12 +17,25 @@
 // macro is documented in the matcher module.
 #![doc(hidden)]
 
-/// Matches an object which, upon calling the given method on it with the given
-/// arguments, produces a value matched by the given inner matcher.
+/// Matches an item which, upon applying the given closure to it, produces a
+/// value matched by the given inner matcher.
 ///
-/// This is particularly useful as a nested matcher when the desired
-/// property cannot be accessed through a field and must instead be
-/// extracted through a method call. For example:
+/// The closure must accept a single parameter: a shared reference to the
+/// item. The type must be explicitly stated in the closure. For example:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// pub struct MyStruct {
+///     a_field: u32,
+/// }
+///
+/// let value = MyStruct { a_field: 100 };
+/// verify_that!(value, result_of!(|s: &MyStruct| s.a_field, eq(100)))
+/// #    .unwrap();
+/// ```
+///
+/// The closure may also invoke methods on the item. For example:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -32,90 +45,62 @@
 /// }
 ///
 /// impl MyStruct {
-///     pub fn get_a_field(&self) -> u32 { self.a_field }
+///     fn get_a_field(&self) -> u32 {
+///         self.a_field
+///     }
 /// }
 ///
-/// let value = vec![MyStruct { a_field: 100 }];
-/// verify_that!(value, contains(property!(MyStruct.get_a_field(), eq(100))))
+/// let value = MyStruct { a_field: 100 };
+/// verify_that!(value, result_of!(|s: &MyStruct| s.get_a_field(), eq(100)))
 /// #    .unwrap();
 /// ```
 ///
-/// **Important**: The method should be pure function with a deterministic
+/// **Important**: The closure should be pure function with a deterministic
 /// output and no side effects. In particular, in the event of an assertion
 /// failure, it will be invoked a second time, with the assertion failure output
 /// reflecting the *second* invocation.
 ///
-/// This macro is analogous to [`field`][crate::matchers::field], except that it
-/// extracts the datum to be matched from the given object by invoking a method
-/// rather than accessing a field.
+/// ## Closures returning references
 ///
-/// The list of arguments may optionally have a trailing comma.
-///
-/// ## Methods returning references
-///
-/// If the method returns a *reference*, then it must be preceded by a `*`:
-///
-/// ```
-/// # use test_that::prelude::*;
-/// # #[derive(Debug)]
-/// # pub struct MyStruct {
-/// #     a_field: u32,
-/// # }
-/// impl MyStruct {
-///     pub fn get_a_field(&self) -> &u32 { &self.a_field }
-/// }
-///
-/// # let value = vec![MyStruct { a_field: 100 }];
-/// verify_that!(value, contains(property!(*MyStruct.get_a_field(), eq(100))))
-/// #    .unwrap();
-/// ```
-///
-/// This is due to the parallel structure between the matcher and the data being
-/// matched. The following, after all, does not compile:
-///
-/// ```compile_fail
-/// let value1 = 123;
-/// let value2 = 234;
-/// assert!(value1 == &value2);  // Comparing i32 with &i32
-/// ```
-///
-/// The same holds if the method returns a slice:
+/// The closure may also return a reference whose lifetime is bound by the
+/// self parameter. For example:
 ///
 /// ```
 /// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// pub struct MyStruct {
-///     a_vec: Vec<u32>,
-/// }
-/// impl MyStruct {
-///     pub fn get_a_slice(&self) -> &[u32] { &self.a_vec }
+///     a_field: u32,
 /// }
 ///
-/// let value = MyStruct { a_vec: vec![1, 2, 3] };
-/// verify_that!(value, property!(*MyStruct.get_a_slice(), contains(eq(1))))
+/// impl MyStruct {
+///     fn get_ref_to_a_field(&self) -> &u32 {
+///         &self.a_field
+///     }
+/// }
+///
+/// let value = MyStruct { a_field: 100 };
+/// verify_that!(value, result_of!(|s: &MyStruct| s.get_ref_to_a_field(), points_to(eq(100))))
 /// #    .unwrap();
 /// ```
 ///
-/// Again, when iterating over an array slice `&[T]`, one gets `&T`, not `T`. So
-/// one must "dereference" the slice to an array to match the elements.
-///
-/// Alternatively (though more verbosely), one can use the [`points_to`][crate::matchers::points_to]
-/// matcher:
+/// The closure may also return a reference whose lifetime is given by the
+/// type itself. For example:
 ///
 /// ```
 /// # use test_that::prelude::*;
 /// #[derive(Debug)]
-/// pub struct MyStruct {
-///     a_vec: Vec<u32>,
-/// }
-/// impl MyStruct {
-///     pub fn get_a_slice(&self) -> &[u32] { &self.a_vec }
+/// pub struct MyStruct<'a> {
+///     a_field: &'a u32,
 /// }
 ///
-/// let value = MyStruct { a_vec: vec![1, 2, 3] };
-/// verify_that!(value, property!(MyStruct.get_a_slice(), points_to(contains(eq(1)))))
+/// let content = 100;
+/// let value = MyStruct { a_field: &content };
+/// verify_that!(value, result_of!(|s: &MyStruct| s.a_field, points_to(eq(100))))
 /// #    .unwrap();
 /// ```
+///
+/// In both cases, since the closure is returning a reference, one must "dereference"
+/// the output using the matcher [`points_to`][crate::matchers::points_to].
 ///
 /// When the method returns a _string slice_, one does _not_ add `*`:
 ///
@@ -130,31 +115,41 @@
 /// }
 ///
 /// let value = MyStruct { a_string: "A string".into() };
-/// verify_that!(value, property!(MyStruct.get_a_string(), eq("A string")))
+/// verify_that!(value, result_of!(|s: &MyStruct| s.get_a_string(), eq("A string")))
 /// #    .unwrap();
 /// ```
 ///
 /// This is because the value against which one is matching is _already_ a `&str`,
 /// so the types match.
 ///
-/// ## Methods taking additional arguments
+/// ## Closures moving data out of the struct are allowed
 ///
-/// The method may also take additional arguments:
+/// Normally one cannot create a closure which takes a shared reference to a struct
+/// and moves data out of that struct.
+///
+/// ```compile_fail
+/// pub struct MyStruct {
+///     a_string: String,
+/// }
+/// let closure: |s: &MyStruct| -> String = |s| s.a_string; // Error: Moving data from behind a shared reference!
+/// ```
+///
+/// However, with `result_of!`, this is allowed:
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # #[derive(Debug)]
-/// # pub struct MyStruct {
-/// #     a_field: u32,
-/// # }
-/// impl MyStruct {
-///     pub fn add_to_a_field(&self, a: u32) -> u32 { self.a_field + a }
+/// #[derive(Debug)]
+/// pub struct MyStruct {
+///     a_string: String,
 /// }
 ///
-/// # let value = vec![MyStruct { a_field: 100 }];
-/// verify_that!(value, contains(property!(MyStruct.add_to_a_field(50), eq(150))))
+/// let value = MyStruct { a_string: "A string".into() };
+/// verify_that!(value, result_of!(|s: &MyStruct| s.a_string, eq("A string")))
 /// #    .unwrap();
 /// ```
+///
+/// This is because the closure is rewritten by the macro so that it no longer moves
+/// data.
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __result_of {
