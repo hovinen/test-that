@@ -67,6 +67,84 @@ fn matches_when_closure_returns_non_copy_struct() -> Result<()> {
 }
 
 #[test]
+fn matches_when_closure_returns_field_with_foreign_lifetime() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a>(&'a u32);
+    let content = 10;
+    let value = AStruct(&content);
+    verify_that!(value, result_of!(|s: &AStruct| s.0, points_to(eq(10))))
+}
+
+#[test]
+fn matches_when_closure_returns_field_whose_type_is_struct_with_foreign_lifetime() -> Result<()> {
+    #[derive(PartialEq, Debug)]
+    struct StructWithLifetime<'a>(&'a u32);
+    #[derive(Debug)]
+    struct AStruct<'a>(StructWithLifetime<'a>);
+    let content = 10;
+    let value = AStruct(StructWithLifetime(&content));
+    verify_that!(value, result_of!(|s: &AStruct| s.0, eq(StructWithLifetime(&10))))
+}
+
+#[test]
+fn matches_when_closure_returns_field_whose_type_is_struct_with_narrowed_lifetime() -> Result<()> {
+    #[derive(PartialEq, Debug)]
+    struct StructWithLifetime<'a>(&'a u32);
+    #[derive(Debug)]
+    struct AStruct<'a>(&'a u32);
+    impl<'a> AStruct<'a> {
+        fn get_field<'b>(&'b self) -> StructWithLifetime<'b> {
+            StructWithLifetime(self.0)
+        }
+    }
+    let content = 10;
+    let value = AStruct(&content);
+    verify_that!(value, result_of!(|s: &AStruct| s.get_field(), eq(StructWithLifetime(&10))))
+}
+
+#[test]
+fn matches_when_closure_returns_option_and_using_some_matcher() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a>(&'a u32);
+    impl<'a> AStruct<'a> {
+        fn get_option_of_field(&self) -> Option<&'a u32> {
+            Some(self.0)
+        }
+    }
+    let content = 10;
+    let value = AStruct(&content);
+    verify_that!(value, result_of!(|s: &AStruct| s.get_option_of_field(), some(points_to(eq(10)))))
+}
+
+#[test]
+fn matches_when_closure_returns_result_and_using_ok_matcher() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a>(&'a u32);
+    impl<'a> AStruct<'a> {
+        fn get_result_of_field(&self) -> std::result::Result<&'a u32, ()> {
+            Ok(self.0)
+        }
+    }
+    let content = 10;
+    let value = AStruct(&content);
+    verify_that!(value, result_of!(|s: &AStruct| s.get_result_of_field(), ok(points_to(eq(10)))))
+}
+
+#[test]
+fn matches_when_closure_returns_result_and_using_err_matcher() -> Result<()> {
+    #[derive(Debug)]
+    struct AStruct<'a>(&'a u32);
+    impl<'a> AStruct<'a> {
+        fn get_result_of_field(&self) -> std::result::Result<(), &'a u32> {
+            Err(self.0)
+        }
+    }
+    let content = 10;
+    let value = AStruct(&content);
+    verify_that!(value, result_of!(|s: &AStruct| s.get_result_of_field(), err(points_to(eq(10)))))
+}
+
+#[test]
 fn matches_struct_with_matching_property() -> Result<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &SomeStruct| s.get_property(), eq(10)))
