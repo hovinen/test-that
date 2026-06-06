@@ -284,6 +284,7 @@ impl<T: Clone> Path<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::prelude::TestResult as Result;
     use crate::prelude::*;
     use quickcheck::{Arbitrary, TestResult, quickcheck};
 

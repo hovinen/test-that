@@ -23,15 +23,15 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(Some("Some value"), some(eq("Some value")))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(None::<&str>, some(eq("Some value")))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(Some("Some value"), some(eq("Some other value")))?;   // Fails
 /// #     Ok(())
 /// # }
@@ -85,7 +85,7 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn some_matches_option_with_value() -> Result<()> {
+    fn some_matches_option_with_value() -> TestResult<()> {
         let matcher = some(eq(1));
 
         let result = matcher.matches(&Some(1));
@@ -94,7 +94,7 @@ mod tests {
     }
 
     #[test]
-    fn some_does_not_match_option_with_wrong_value() -> Result<()> {
+    fn some_does_not_match_option_with_wrong_value() -> TestResult<()> {
         let matcher = some(eq(1));
 
         let result = matcher.matches(&Some(0));
@@ -103,12 +103,12 @@ mod tests {
     }
 
     #[test]
-    fn some_does_not_match_option_with_none() -> Result<()> {
+    fn some_does_not_match_option_with_none() -> TestResult<()> {
         verify_that!(None::<i32>, not(some(eq(1))))
     }
 
     #[test]
-    fn some_full_error_message() -> Result<()> {
+    fn some_full_error_message() -> TestResult<()> {
         let result = verify_that!(Some(2), some(eq(1)));
         verify_that!(
             result,
@@ -125,7 +125,7 @@ mod tests {
     }
 
     #[test]
-    fn some_describe_matches() -> Result<()> {
+    fn some_describe_matches() -> TestResult<()> {
         verify_that!(
             some(eq(1)).describe(MatcherResult::Match),
             displays_as(eq("has a value which is equal to 1"))
@@ -133,7 +133,7 @@ mod tests {
     }
 
     #[test]
-    fn some_describe_does_not_match() -> Result<()> {
+    fn some_describe_does_not_match() -> TestResult<()> {
         verify_that!(
             some(eq(1)).describe(MatcherResult::NoMatch),
             displays_as(eq("is None or has a value which isn't equal to 1"))
@@ -141,13 +141,13 @@ mod tests {
     }
 
     #[test]
-    fn some_explain_match_with_none() -> Result<()> {
+    fn some_explain_match_with_none() -> TestResult<()> {
         let result = verify_that!(None::<i32>, some(eq(1)));
         verify_that!(result, err(displays_as(contains_substring("which is None"))))
     }
 
     #[test]
-    fn some_explain_match_with_some_success() -> Result<()> {
+    fn some_explain_match_with_some_success() -> TestResult<()> {
         verify_that!(
             some(eq(1)).explain_match(&Some(1)),
             displays_as(eq("which has a value\n  which is equal to 1"))
@@ -155,7 +155,7 @@ mod tests {
     }
 
     #[test]
-    fn some_explain_match_with_some_fail() -> Result<()> {
+    fn some_explain_match_with_some_fail() -> TestResult<()> {
         verify_that!(
             some(eq(1)).explain_match(&Some(2)),
             displays_as(eq("which has a value\n  which isn't equal to 1"))

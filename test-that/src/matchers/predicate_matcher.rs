@@ -23,7 +23,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(3, predicate(|x: &i32| x % 2 == 1))?;  // Passes
 /// #     Ok(())
 /// # }
@@ -176,17 +176,17 @@ mod tests {
     }
 
     #[test]
-    fn predicate_matcher_odd() -> Result<()> {
+    fn predicate_matcher_odd() -> TestResult<()> {
         verify_that!(1, is_odd())
     }
 
     #[test]
-    fn predicate_matcher_odd_explain_match_matches() -> Result<()> {
+    fn predicate_matcher_odd_explain_match_matches() -> TestResult<()> {
         verify_that!(is_odd().explain_match(&1), displays_as(eq("which is odd")))
     }
 
     #[test]
-    fn predicate_matcher_odd_explain_match_does_not_match() -> Result<()> {
+    fn predicate_matcher_odd_explain_match_does_not_match() -> TestResult<()> {
         verify_that!(is_odd().explain_match(&2), displays_as(eq("which is even")))
     }
 
@@ -196,22 +196,22 @@ mod tests {
     }
 
     #[test]
-    fn predicate_matcher_even() -> Result<()> {
+    fn predicate_matcher_even() -> TestResult<()> {
         verify_that!(2, is_even())
     }
 
     #[test]
-    fn predicate_matcher_even_explain_match_matches() -> Result<()> {
+    fn predicate_matcher_even_explain_match_matches() -> TestResult<()> {
         verify_that!(is_even().explain_match(&2), displays_as(eq("which matches")))
     }
 
     #[test]
-    fn predicate_matcher_even_explain_match_does_not_match() -> Result<()> {
+    fn predicate_matcher_even_explain_match_does_not_match() -> TestResult<()> {
         verify_that!(is_even().explain_match(&1), displays_as(eq("which does not match")))
     }
 
     #[test]
-    fn predicate_matcher_generator_lambda() -> Result<()> {
+    fn predicate_matcher_generator_lambda() -> TestResult<()> {
         let is_divisible_by = |quotient| {
             predicate(move |x: &i32| x % quotient == 0).with_description(
                 move || format!("is divisible by {quotient}"),
@@ -222,12 +222,12 @@ mod tests {
     }
 
     #[test]
-    fn predicate_matcher_inline() -> Result<()> {
+    fn predicate_matcher_inline() -> TestResult<()> {
         verify_that!(2048, predicate(|x: &i32| x.count_ones() == 1))
     }
 
     #[test]
-    fn predicate_matcher_function_pointer() -> Result<()> {
+    fn predicate_matcher_function_pointer() -> TestResult<()> {
         use std::time::Duration;
         verify_that!(Duration::new(0, 0), predicate(Duration::is_zero))
     }

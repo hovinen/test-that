@@ -34,7 +34,7 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let string_slice = "A string";
 /// verify_that!(string_slice, char_count(eq(8)))?;
 /// let non_ascii_string_slice = "Ä ſtřiɲğ";
@@ -50,7 +50,7 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let string_slice = "A string";
 /// verify_that!(string_slice, char_count(gt(4)))?;
 /// #     Ok(())
@@ -109,25 +109,25 @@ mod tests {
     use std::marker::PhantomData;
 
     #[test]
-    fn char_count_matches_string_slice() -> Result<()> {
+    fn char_count_matches_string_slice() -> TestResult<()> {
         let value = "abcd";
         verify_that!(value, char_count(eq(4)))
     }
 
     #[test]
-    fn char_count_matches_owned_string() -> Result<()> {
+    fn char_count_matches_owned_string() -> TestResult<()> {
         let value = String::from("abcd");
         verify_that!(value, char_count(eq(4)))
     }
 
     #[test]
-    fn char_count_counts_non_ascii_characters_correctly() -> Result<()> {
+    fn char_count_counts_non_ascii_characters_correctly() -> TestResult<()> {
         let value = "äöüß";
         verify_that!(value, char_count(eq(4)))
     }
 
     #[test]
-    fn char_count_explains_match() -> Result<()> {
+    fn char_count_explains_match() -> TestResult<()> {
         struct TestMatcher<T>(PhantomData<T>);
         impl<T: Debug> Matcher<T> for TestMatcher<T> {
             fn matches(&self, _: &T) -> MatcherResult {
@@ -150,7 +150,7 @@ mod tests {
     }
 
     #[test]
-    fn char_count_has_correct_failure_message() -> Result<()> {
+    fn char_count_has_correct_failure_message() -> TestResult<()> {
         let result = verify_that!("äöüß", char_count(eq(3)));
         verify_that!(
             result,

@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test_that::test]
-    fn just_fails() -> Result<()> {
+    fn just_fails() -> TestResult<()> {
         let argument = "An argument";
         fail!("Failure message with argument: {argument}").and_log_failure();
         Ok(())

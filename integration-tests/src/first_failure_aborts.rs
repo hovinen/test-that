@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test]
-    fn first_failure_aborts() -> Result<()> {
+    fn first_failure_aborts() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(3))?;
         verify_that!(value, eq(4)).and_log_failure();

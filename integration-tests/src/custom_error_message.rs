@@ -20,19 +20,19 @@ mod tests {
     use test_that::prelude::*;
 
     #[test]
-    fn should_fail_with_custom_error_message() -> Result<()> {
+    fn should_fail_with_custom_error_message() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(3)).failure_message("A custom error message")
     }
 
     #[test]
-    fn should_fail_with_custom_error_message_in_string() -> Result<()> {
+    fn should_fail_with_custom_error_message_in_string() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(3)).failure_message("A custom error message in a String".to_string())
     }
 
     #[test]
-    fn should_fail_with_custom_error_message_in_closure() -> Result<()> {
+    fn should_fail_with_custom_error_message_in_closure() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(3))
             .with_failure_message(|| "A custom error message from a closure".to_string())

@@ -33,7 +33,7 @@
 /// struct IntField {
 ///   int: i32
 /// }
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(IntField{int: 32}, field!(IntField.int, eq(32)))?;
 /// #     Ok(())
 /// # }
@@ -46,7 +46,7 @@
 /// # use test_that::prelude::*;
 /// #[derive(Debug)]
 /// struct IntField(i32);
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(IntField(32), field!(IntField.0, eq(32)))?;
 /// #     Ok(())
 /// # }
@@ -63,11 +63,11 @@
 ///     A(i32),
 ///     B,
 /// }
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(MyEnum::A(32), field!(MyEnum::A.0, eq(32)))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!(MyEnum::B, field!(MyEnum::A.0, eq(32)))?; // Fails: wrong enum variant
 /// #     Ok(())
 /// # }
@@ -83,7 +83,7 @@
 ///     #[derive(Debug)]
 ///     pub struct AStruct(pub i32);
 /// }
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(a_module::AStruct(32), field!(a_module::AStruct.0, eq(32)))?;
 /// #     Ok(())
 /// # }
@@ -100,7 +100,7 @@
 /// struct OuterStruct {
 ///     inner: InnerStruct,
 /// }
-/// # fn should_not_compile() -> Result<()> {
+/// # fn should_not_compile() -> TestResult<()> {
 /// verify_that!(value, field!(OuterStruct.inner.0, eq(32)))?; // Does not compile
 /// #     Ok(())
 /// # }

@@ -25,39 +25,39 @@ mod tests {
 
     #[rstest]
     #[test_that::test]
-    fn test_should_work_with_rstest_first() -> Result<()> {
+    fn test_should_work_with_rstest_first() -> TestResult<()> {
         verify_that!(1, eq(1))
     }
 
     #[rstest::rstest]
     #[test_that::test]
-    fn test_should_work_with_qualified_rstest_first() -> Result<()> {
+    fn test_should_work_with_qualified_rstest_first() -> TestResult<()> {
         verify_that!(1, eq(1))
     }
 
     #[test_that::test]
     #[rstest]
-    fn test_should_work_with_rstest_second() -> Result<()> {
+    fn test_should_work_with_rstest_second() -> TestResult<()> {
         verify_that!(1, eq(1))
     }
 
     #[test_that::test]
     #[rstest::rstest]
-    fn test_should_work_with_qualified_rstest_second() -> Result<()> {
+    fn test_should_work_with_qualified_rstest_second() -> TestResult<()> {
         verify_that!(1, eq(1))
     }
 
     #[rstest]
     #[case(1)]
     #[test_that::test]
-    fn paramterised_test_should_work_with_rstest_first(#[case] value: u32) -> Result<()> {
+    fn paramterised_test_should_work_with_rstest_first(#[case] value: u32) -> TestResult<()> {
         verify_that!(value, eq(value))
     }
 
     #[test_that::test]
     #[rstest]
     #[case(1)]
-    fn paramterised_test_should_work_with_rstest_second(#[case] value: u32) -> Result<()> {
+    fn paramterised_test_should_work_with_rstest_second(#[case] value: u32) -> TestResult<()> {
         verify_that!(value, eq(value))
     }
 
@@ -67,13 +67,13 @@ mod tests {
 
     #[test_that::test]
     #[submodule::test]
-    fn test_should_work_with_qualified_test_annotation() -> Result<()> {
+    fn test_should_work_with_qualified_test_annotation() -> TestResult<()> {
         verify_that!(1, eq(1))
     }
 
     #[test_that::test]
     #[test]
-    fn test_should_work_with_second_test_annotation() -> Result<()> {
+    fn test_should_work_with_second_test_annotation() -> TestResult<()> {
         verify_that!(1, eq(1))
     }
 }

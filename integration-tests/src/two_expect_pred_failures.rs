@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test_that::test]
-    fn verify_predicate_with_failure() -> Result<()> {
+    fn verify_predicate_with_failure() -> TestResult<()> {
         let a = 1;
         let b = 2;
         expect_pred!(eq_predicate(a, b));

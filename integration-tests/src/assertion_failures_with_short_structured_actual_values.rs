@@ -20,18 +20,18 @@ mod tests {
     use test_that::prelude::*;
 
     #[test]
-    fn should_fail_with_option_value() -> Result<()> {
+    fn should_fail_with_option_value() -> TestResult<()> {
         verify_that!(Some(1), some(eq(2)))
     }
 
     #[test]
-    fn should_fail_with_result_ok_value() -> Result<()> {
+    fn should_fail_with_result_ok_value() -> TestResult<()> {
         let value: std::result::Result<i32, ()> = Ok(1);
         verify_that!(value, ok(eq(2)))
     }
 
     #[test]
-    fn should_fail_with_result_err_value() -> Result<()> {
+    fn should_fail_with_result_err_value() -> TestResult<()> {
         let value: std::result::Result<(), i32> = Err(1);
         verify_that!(value, err(eq(2)))
     }

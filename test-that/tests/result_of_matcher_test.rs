@@ -39,25 +39,25 @@ impl SomeStruct {
 }
 
 #[test]
-fn matches_struct_with_matching_field_value() -> Result<()> {
+fn matches_struct_with_matching_field_value() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &SomeStruct| s.a_property, eq(10)))
 }
 
 #[test]
-fn does_not_match_struct_with_non_matching_field_value() -> Result<()> {
+fn does_not_match_struct_with_non_matching_field_value() -> TestResult<()> {
     let value = SomeStruct { a_property: 20 };
     verify_that!(value, not(result_of!(|s: &SomeStruct| s.a_property, eq(10))))
 }
 
 #[test]
-fn matches_when_closure_returns_reference_with_self_lifetime() -> Result<()> {
+fn matches_when_closure_returns_reference_with_self_lifetime() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &SomeStruct| &s.a_property, points_to(eq(10))))
 }
 
 #[test]
-fn matches_when_closure_returns_non_copy_struct() -> Result<()> {
+fn matches_when_closure_returns_non_copy_struct() -> TestResult<()> {
     #[derive(PartialEq, Debug)]
     struct NonCopyStruct(u32);
     #[derive(Debug)]
@@ -67,7 +67,7 @@ fn matches_when_closure_returns_non_copy_struct() -> Result<()> {
 }
 
 #[test]
-fn matches_when_closure_returns_field_with_foreign_lifetime() -> Result<()> {
+fn matches_when_closure_returns_field_with_foreign_lifetime() -> TestResult<()> {
     #[derive(Debug)]
     struct AStruct<'a>(&'a u32);
     let content = 10;
@@ -76,7 +76,8 @@ fn matches_when_closure_returns_field_with_foreign_lifetime() -> Result<()> {
 }
 
 #[test]
-fn matches_when_closure_returns_field_whose_type_is_struct_with_foreign_lifetime() -> Result<()> {
+fn matches_when_closure_returns_field_whose_type_is_struct_with_foreign_lifetime() -> TestResult<()>
+{
     #[derive(PartialEq, Debug)]
     struct StructWithLifetime<'a>(&'a u32);
     #[derive(Debug)]
@@ -87,7 +88,8 @@ fn matches_when_closure_returns_field_whose_type_is_struct_with_foreign_lifetime
 }
 
 #[test]
-fn matches_when_closure_returns_field_whose_type_is_struct_with_narrowed_lifetime() -> Result<()> {
+fn matches_when_closure_returns_field_whose_type_is_struct_with_narrowed_lifetime() -> TestResult<()>
+{
     #[derive(PartialEq, Debug)]
     struct StructWithLifetime<'a>(&'a u32);
     #[derive(Debug)]
@@ -103,7 +105,7 @@ fn matches_when_closure_returns_field_whose_type_is_struct_with_narrowed_lifetim
 }
 
 #[test]
-fn matches_when_closure_returns_option_and_using_some_matcher() -> Result<()> {
+fn matches_when_closure_returns_option_and_using_some_matcher() -> TestResult<()> {
     #[derive(Debug)]
     struct AStruct<'a>(&'a u32);
     impl<'a> AStruct<'a> {
@@ -117,7 +119,7 @@ fn matches_when_closure_returns_option_and_using_some_matcher() -> Result<()> {
 }
 
 #[test]
-fn matches_when_closure_returns_result_and_using_ok_matcher() -> Result<()> {
+fn matches_when_closure_returns_result_and_using_ok_matcher() -> TestResult<()> {
     #[derive(Debug)]
     struct AStruct<'a>(&'a u32);
     impl<'a> AStruct<'a> {
@@ -131,7 +133,7 @@ fn matches_when_closure_returns_result_and_using_ok_matcher() -> Result<()> {
 }
 
 #[test]
-fn matches_when_closure_returns_result_and_using_err_matcher() -> Result<()> {
+fn matches_when_closure_returns_result_and_using_err_matcher() -> TestResult<()> {
     #[derive(Debug)]
     struct AStruct<'a>(&'a u32);
     impl<'a> AStruct<'a> {
@@ -145,19 +147,19 @@ fn matches_when_closure_returns_result_and_using_err_matcher() -> Result<()> {
 }
 
 #[test]
-fn matches_struct_with_matching_property() -> Result<()> {
+fn matches_struct_with_matching_property() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &SomeStruct| s.get_property(), eq(10)))
 }
 
 #[test]
-fn matches_struct_with_matching_property_with_parameters() -> Result<()> {
+fn matches_struct_with_matching_property_with_parameters() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &SomeStruct| s.add_product_to_field(2, 3), eq(16)))
 }
 
 #[test]
-fn matches_struct_with_matching_property_with_captured_arguments() -> Result<()> {
+fn matches_struct_with_matching_property_with_captured_arguments() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     let arg1 = 2;
     let arg2 = 3;
@@ -165,19 +167,19 @@ fn matches_struct_with_matching_property_with_captured_arguments() -> Result<()>
 }
 
 #[test]
-fn matches_struct_with_matching_property_ref() -> Result<()> {
+fn matches_struct_with_matching_property_ref() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &SomeStruct| s.get_property_ref(), points_to(eq(10))))
 }
 
 #[test]
-fn matches_struct_with_matching_property_ref_with_qualified_type() -> Result<()> {
+fn matches_struct_with_matching_property_ref_with_qualified_type() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(value, result_of!(|s: &crate::SomeStruct| s.get_property_ref(), points_to(eq(10))))
 }
 
 #[test]
-fn matches_struct_with_matching_string_reference_property() -> Result<()> {
+fn matches_struct_with_matching_string_reference_property() -> TestResult<()> {
     #[derive(Debug)]
     struct StructWithString {
         property: String,
@@ -192,7 +194,7 @@ fn matches_struct_with_matching_string_reference_property() -> Result<()> {
 }
 
 #[test]
-fn matches_struct_with_matching_slice_property() -> Result<()> {
+fn matches_struct_with_matching_slice_property() -> TestResult<()> {
     #[derive(Debug)]
     struct StructWithVec {
         property: Vec<u32>,
@@ -207,7 +209,7 @@ fn matches_struct_with_matching_slice_property() -> Result<()> {
 }
 
 #[test]
-fn matches_struct_with_matching_property_ref_with_parameters() -> Result<()> {
+fn matches_struct_with_matching_property_ref_with_parameters() -> TestResult<()> {
     let value = SomeStruct { a_property: 10 };
     verify_that!(
         value,
@@ -216,7 +218,8 @@ fn matches_struct_with_matching_property_ref_with_parameters() -> Result<()> {
 }
 
 #[test]
-fn matches_struct_with_matching_property_ref_with_parameters_and_trailing_comma() -> Result<()> {
+fn matches_struct_with_matching_property_ref_with_parameters_and_trailing_comma() -> TestResult<()>
+{
     let value = SomeStruct { a_property: 10 };
     verify_that!(
         value,
@@ -225,13 +228,13 @@ fn matches_struct_with_matching_property_ref_with_parameters_and_trailing_comma(
 }
 
 #[test]
-fn does_not_match_struct_with_non_matching_property() -> Result<()> {
+fn does_not_match_struct_with_non_matching_property() -> TestResult<()> {
     let value = SomeStruct { a_property: 2 };
     verify_that!(value, not(result_of!(|s: &SomeStruct| s.get_property(), eq(1))))
 }
 
 #[test]
-fn describes_itself_in_matching_case() -> Result<()> {
+fn describes_itself_in_matching_case() -> TestResult<()> {
     let value = SomeStruct { a_property: 1 };
     let result = verify_that!(value, not(result_of!(|s: &SomeStruct| s.get_property(), eq(1))));
     verify_that!(
@@ -243,7 +246,7 @@ fn describes_itself_in_matching_case() -> Result<()> {
 }
 
 #[test]
-fn describes_itself_in_not_matching_case() -> Result<()> {
+fn describes_itself_in_not_matching_case() -> TestResult<()> {
     let value = SomeStruct { a_property: 2 };
     let result = verify_that!(value, result_of!(|s: &SomeStruct| s.get_property(), eq(1)));
     verify_that!(
@@ -255,7 +258,7 @@ fn describes_itself_in_not_matching_case() -> Result<()> {
 }
 
 #[test]
-fn explains_mismatch_referencing_explanation_of_inner_matcher() -> Result<()> {
+fn explains_mismatch_referencing_explanation_of_inner_matcher() -> TestResult<()> {
     #[derive(Debug)]
     struct SomeStruct;
     impl SomeStruct {
@@ -276,7 +279,7 @@ fn explains_mismatch_referencing_explanation_of_inner_matcher() -> Result<()> {
 }
 
 #[test]
-fn describes_itself_in_matching_case_for_ref() -> Result<()> {
+fn describes_itself_in_matching_case_for_ref() -> TestResult<()> {
     let value = SomeStruct { a_property: 2 };
     let result =
         verify_that!(value, result_of!(|s: &SomeStruct| s.get_property_ref(), points_to(eq(1))));
@@ -289,7 +292,7 @@ fn describes_itself_in_matching_case_for_ref() -> Result<()> {
 }
 
 #[test]
-fn describes_itself_in_not_matching_case_for_ref() -> Result<()> {
+fn describes_itself_in_not_matching_case_for_ref() -> TestResult<()> {
     let value = SomeStruct { a_property: 1 };
     let result = verify_that!(
         value,
@@ -304,7 +307,7 @@ fn describes_itself_in_not_matching_case_for_ref() -> Result<()> {
 }
 
 #[test]
-fn explains_mismatch_referencing_explanation_of_inner_matcher_for_ref() -> Result<()> {
+fn explains_mismatch_referencing_explanation_of_inner_matcher_for_ref() -> TestResult<()> {
     static EMPTY_COLLECTION: Vec<u32> = vec![];
     #[derive(Debug)]
     struct SomeStruct;
@@ -339,7 +342,7 @@ impl SomeStructWithAVec {
 }
 
 #[test]
-fn matches_struct_with_vec_containing_value() -> Result<()> {
+fn matches_struct_with_vec_containing_value() -> TestResult<()> {
     let value = SomeStructWithAVec { a_vec_property: vec![10] };
     verify_that!(
         value,
@@ -348,7 +351,7 @@ fn matches_struct_with_vec_containing_value() -> Result<()> {
 }
 
 #[test]
-fn matches_struct_with_vec_with_elements_are_value() -> Result<()> {
+fn matches_struct_with_vec_with_elements_are_value() -> TestResult<()> {
     let value = SomeStructWithAVec { a_vec_property: vec![10] };
     verify_that!(
         value,

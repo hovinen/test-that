@@ -23,15 +23,15 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> test_that::Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(Ok::<_, ()>("Some value"), ok(eq("Some value")))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> test_that::Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(Err::<&str, _>("An error"), ok(eq("An error")))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> test_that::Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(Ok::<_, ()>("Some value"), ok(eq("Some other value")))?;   // Fails
 /// #     Ok(())
 /// # }
@@ -90,7 +90,7 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn ok_matches_result_with_value() -> Result<()> {
+    fn ok_matches_result_with_value() -> TestResult<()> {
         let matcher = ok(eq(1));
         let value: std::result::Result<i32, i32> = Ok(1);
 
@@ -100,7 +100,7 @@ mod tests {
     }
 
     #[test]
-    fn ok_does_not_match_result_with_wrong_value() -> Result<()> {
+    fn ok_does_not_match_result_with_wrong_value() -> TestResult<()> {
         let matcher = ok(eq(1));
         let value: std::result::Result<i32, i32> = Ok(0);
 
@@ -110,7 +110,7 @@ mod tests {
     }
 
     #[test]
-    fn ok_does_not_match_result_with_err() -> Result<()> {
+    fn ok_does_not_match_result_with_err() -> TestResult<()> {
         let matcher = ok(eq(1));
         let value: std::result::Result<i32, i32> = Err(1);
 
@@ -120,7 +120,7 @@ mod tests {
     }
 
     #[test]
-    fn ok_full_error_message() -> Result<()> {
+    fn ok_full_error_message() -> TestResult<()> {
         let result = verify_that!(Ok::<i32, i32>(1), ok(eq(2)));
 
         verify_that!(
@@ -138,7 +138,7 @@ mod tests {
     }
 
     #[test]
-    fn ok_describe_matches() -> Result<()> {
+    fn ok_describe_matches() -> TestResult<()> {
         let result = verify_that!(Ok::<i32, i32>(2), ok(eq(1)));
         verify_that!(
             result,

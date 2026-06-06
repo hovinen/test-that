@@ -269,11 +269,11 @@
 ///     B,
 /// }
 ///
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(MyEnum::A(123), matches_pattern!(MyEnum::A(eq(123))))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!(MyEnum::B, matches_pattern!(MyEnum::A(eq(123))))?; // Fails - wrong enum variant
 /// #     Ok(())
 /// # }

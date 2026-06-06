@@ -31,22 +31,22 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass_1() -> Result<()> {
+/// # fn should_pass_1() -> TestResult<()> {
 /// verify_that!(1.0, near(1.0, 0.1))?; // Passes
 /// verify_that!(1.01, near(1.0, 0.1))?; // Passes
 /// verify_that!(1.25, near(1.0, 0.25))?; // Passes
 /// verify_that!(0.75, near(1.0, 0.25))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(1.101, near(1.0, 0.1))?; // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(0.899, near(1.0, 0.1))?; // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_pass_2() -> Result<()> {
+/// # fn should_pass_2() -> TestResult<()> {
 /// verify_that!(100.25, near(100.0, 0.25))?; // Passes
 /// #     Ok(())
 /// # }
@@ -62,15 +62,15 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(f64::INFINITY, near(0.0, f64::MAX))?; // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(0.0, near(f64::INFINITY, f64::MAX))?; // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_3() -> Result<()> {
+/// # fn should_fail_3() -> TestResult<()> {
 /// verify_that!(f64::INFINITY, near(f64::INFINITY, f64::MAX))?; // Fails
 /// #     Ok(())
 /// # }
@@ -83,15 +83,15 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(f64::NAN, near(0.0, f64::MAX))?; // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(0.0, near(f64::NAN, f64::MAX))?; // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_3() -> Result<()> {
+/// # fn should_fail_3() -> TestResult<()> {
 /// verify_that!(f64::NAN, near(f64::NAN, f64::MAX))?; // Fails
 /// #     Ok(())
 /// # }
@@ -105,7 +105,7 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(f64::NAN, near(f64::NAN, f64::MAX).nans_are_equal())?; // Passes
 /// #     Ok(())
 /// # }
@@ -202,7 +202,7 @@ mod tests {
     use crate::prelude::*;
 
     #[test]
-    fn matches_value_inside_range() -> Result<()> {
+    fn matches_value_inside_range() -> TestResult<()> {
         let matcher = near(1.0f64, 0.1f64);
 
         let result = matcher.matches(&1.0f64);
@@ -211,7 +211,7 @@ mod tests {
     }
 
     #[test]
-    fn matches_value_at_low_end_of_range() -> Result<()> {
+    fn matches_value_at_low_end_of_range() -> TestResult<()> {
         let matcher = near(1.0f64, 0.1f64);
 
         let result = matcher.matches(&0.9f64);
@@ -220,7 +220,7 @@ mod tests {
     }
 
     #[test]
-    fn matches_value_at_high_end_of_range() -> Result<()> {
+    fn matches_value_at_high_end_of_range() -> TestResult<()> {
         let matcher = near(1.0f64, 0.25f64);
 
         let result = matcher.matches(&1.25f64);
@@ -229,7 +229,7 @@ mod tests {
     }
 
     #[test]
-    fn does_not_match_value_below_low_end_of_range() -> Result<()> {
+    fn does_not_match_value_below_low_end_of_range() -> TestResult<()> {
         let matcher = near(1.0f64, 0.1f64);
 
         let result = matcher.matches(&0.899999f64);
@@ -238,7 +238,7 @@ mod tests {
     }
 
     #[test]
-    fn does_not_match_value_above_high_end_of_range() -> Result<()> {
+    fn does_not_match_value_above_high_end_of_range() -> TestResult<()> {
         let matcher = near(1.0f64, 0.1f64);
 
         let result = matcher.matches(&1.100001f64);
@@ -247,7 +247,7 @@ mod tests {
     }
 
     #[test]
-    fn nan_is_not_near_a_number() -> Result<()> {
+    fn nan_is_not_near_a_number() -> TestResult<()> {
         let matcher = near(0.0f64, f64::MAX);
 
         let result = matcher.matches(&f64::NAN);
@@ -256,32 +256,32 @@ mod tests {
     }
 
     #[test]
-    fn nan_is_not_near_nan_by_default() -> Result<()> {
+    fn nan_is_not_near_nan_by_default() -> TestResult<()> {
         verify_that!(f64::NAN, not(near(f64::NAN, f64::MAX)))
     }
 
     #[test]
-    fn nan_is_not_near_nan_when_explicitly_configured() -> Result<()> {
+    fn nan_is_not_near_nan_when_explicitly_configured() -> TestResult<()> {
         verify_that!(f64::NAN, not(near(f64::NAN, f64::MAX).nans_are_not_equal()))
     }
 
     #[test]
-    fn nan_is_near_nan_if_nans_are_equal() -> Result<()> {
+    fn nan_is_near_nan_if_nans_are_equal() -> TestResult<()> {
         verify_that!(f64::NAN, near(f64::NAN, f64::MAX).nans_are_equal())
     }
 
     #[test]
-    fn nan_is_not_near_number_when_nans_are_equal() -> Result<()> {
+    fn nan_is_not_near_number_when_nans_are_equal() -> TestResult<()> {
         verify_that!(f64::NAN, not(near(0.0, f64::MAX).nans_are_equal()))
     }
 
     #[test]
-    fn number_is_not_near_nan_when_nans_are_equal() -> Result<()> {
+    fn number_is_not_near_nan_when_nans_are_equal() -> TestResult<()> {
         verify_that!(0.0, not(near(f64::NAN, f64::MAX).nans_are_equal()))
     }
 
     #[test]
-    fn inf_is_not_near_inf() -> Result<()> {
+    fn inf_is_not_near_inf() -> TestResult<()> {
         let matcher = near(f64::INFINITY, f64::MAX);
 
         let result = matcher.matches(&f64::INFINITY);
@@ -290,7 +290,7 @@ mod tests {
     }
 
     #[test]
-    fn inf_is_not_near_a_number() -> Result<()> {
+    fn inf_is_not_near_a_number() -> TestResult<()> {
         let matcher = near(f64::INFINITY, f64::MAX);
 
         let result = matcher.matches(&f64::MIN);
@@ -299,7 +299,7 @@ mod tests {
     }
 
     #[test]
-    fn any_two_numbers_are_within_inf_of_each_other() -> Result<()> {
+    fn any_two_numbers_are_within_inf_of_each_other() -> TestResult<()> {
         let matcher = near(f64::MIN, f64::INFINITY);
 
         let result = matcher.matches(&f64::MAX);
@@ -320,32 +320,32 @@ mod tests {
     }
 
     #[test]
-    fn approx_eq_matches_equal_number() -> Result<()> {
+    fn approx_eq_matches_equal_number() -> TestResult<()> {
         verify_that!(1.0f64, approx_eq(1.0f64))
     }
 
     #[test]
-    fn approx_eq_matches_really_close_f64_number() -> Result<()> {
+    fn approx_eq_matches_really_close_f64_number() -> TestResult<()> {
         verify_that!(1.0f64, approx_eq(1.0 + 16.0 * f64::EPSILON))
     }
 
     #[test]
-    fn approx_eq_matches_really_close_f64_number_to_large_number() -> Result<()> {
+    fn approx_eq_matches_really_close_f64_number_to_large_number() -> TestResult<()> {
         verify_that!(1000f64, approx_eq(1000.0 + 16000.0 * f64::EPSILON))
     }
 
     #[test]
-    fn approx_eq_matches_really_close_f64_number_to_zero() -> Result<()> {
+    fn approx_eq_matches_really_close_f64_number_to_zero() -> TestResult<()> {
         verify_that!(16.0 * f64::EPSILON, approx_eq(0.0))
     }
 
     #[test]
-    fn approx_eq_matches_really_close_f32_number() -> Result<()> {
+    fn approx_eq_matches_really_close_f32_number() -> TestResult<()> {
         verify_that!(1.0f32, approx_eq(1.0 + 16.0 * f32::EPSILON))
     }
 
     #[test]
-    fn approx_eq_does_not_match_distant_number() -> Result<()> {
+    fn approx_eq_does_not_match_distant_number() -> TestResult<()> {
         verify_that!(0.0f64, not(approx_eq(1.0f64)))
     }
 }

@@ -38,12 +38,12 @@
 /// Example:
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(42, eq(42))?; // This will pass.
 /// # Ok(())
 /// # }
 /// # should_pass().unwrap();
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// # test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
 /// verify_that!(42, eq(123)).and_log_failure();
 ///             // This will log a test failure and allow execution to continue.
@@ -71,11 +71,11 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!((123, 456), (eq(123), eq(456)))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!((123, 456), (eq(123), eq(0)))?; // Fails: second matcher does not match
 /// #     Ok(())
 /// # }
@@ -87,7 +87,7 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!((123, 456), not((eq(456), eq(123))))?; // Passes
 /// #     Ok(())
 /// # }
@@ -99,7 +99,7 @@
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;
-/// # fn should_not_compile() -> Result<()> {
+/// # fn should_not_compile() -> TestResult<()> {
 /// verify_that!((123, 456), (eq(123),))?; // Does not compile: wrong tuple size
 /// verify_that!((123, "A string"), (eq(123), eq(456)))?; // Does not compile: wrong type
 /// #     Ok(())
@@ -164,7 +164,7 @@ macro_rules! verify_that {
 /// # /* The attribute macro would prevent the function from being compiled in a doctest.
 /// #[test]
 /// # */
-/// fn test() -> Result<()> {
+/// fn test() -> TestResult<()> {
 ///     let a = 1;
 ///     let b = 7;
 ///     let n = 5;
@@ -283,14 +283,14 @@ macro_rules! verify_pred {
 /// macro has no effect on the flow of control but instead returns a `Result`
 /// which must be handled by the invoking function. This can be done with the
 /// question mark operator (as above) or the method
-/// [`and_log_failure`](crate::GoogleTestSupport::and_log_failure).
+/// [`and_log_failure`](crate::TestResultExt::and_log_failure).
 #[macro_export]
 macro_rules! fail {
     ($($message:expr),+) => {{
         // We wrap this in a function so that we can annotate it with the must_use attribute.
         // must_use on expressions is still experimental.
         #[must_use = "The assertion result must be evaluated to affect the test result."]
-        fn create_fail_result(message: String) -> $crate::Result<()> {
+        fn create_fail_result(message: String) -> $crate::TestResult<()> {
             Err($crate::internal::test_outcome::TestAssertionFailure::create(format!(
                 "{}\n{}",
                 message,
@@ -410,7 +410,7 @@ macro_rules! assert_pred {
 /// occur in the same thread as that running the test itself.
 ///
 /// Invoking this macro is equivalent to using
-/// [`and_log_failure`](crate::GoogleTestSupport::and_log_failure) as follows:
+/// [`and_log_failure`](crate::TestResultExt::and_log_failure) as follows:
 ///
 /// ```ignore
 /// verify_that!(actual, expected).and_log_failure()
@@ -444,7 +444,7 @@ macro_rules! assert_pred {
 #[macro_export]
 macro_rules! expect_that {
     ($actual:expr, $expected:expr $(,)?) => {{
-        use $crate::GoogleTestSupport;
+        use $crate::TestResultExt;
         $crate::verify_that!($actual, $expected).and_log_failure();
     }};
 
@@ -466,7 +466,7 @@ macro_rules! expect_that {
 /// occur in the same thread as that running the test itself.
 ///
 /// Invoking this macro is equivalent to using
-/// [`and_log_failure`](crate::GoogleTestSupport::and_log_failure) as follows:
+/// [`and_log_failure`](crate::TestResultExt::and_log_failure) as follows:
 ///
 /// ```ignore
 /// verify_pred!(predicate(...)).and_log_failure()
@@ -474,7 +474,7 @@ macro_rules! expect_that {
 #[macro_export]
 macro_rules! expect_pred {
     ($($content:tt)*) => {{
-        use $crate::GoogleTestSupport;
+        use $crate::TestResultExt;
         $crate::verify_pred!($($content)*).and_log_failure();
     }};
 }

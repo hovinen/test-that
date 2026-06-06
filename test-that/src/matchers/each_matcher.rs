@@ -28,7 +28,7 @@ use std::marker::PhantomData;
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
-/// # fn should_pass_1() -> Result<()> {
+/// # fn should_pass_1() -> TestResult<()> {
 /// let value = vec![1, 2, 3];
 /// verify_that!(value, each(gt(0)))?;  // Passes
 /// let array_value = [1, 2, 3];
@@ -37,13 +37,13 @@ use std::marker::PhantomData;
 /// verify_that!(*slice_value, each(gt(0)))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// #     let value = vec![1, 2, 3];
 /// verify_that!(value, each(lt(2)))?;  // Fails: 2 and 3 are not less than 2
 /// #     Ok(())
 /// # }
 ///
-/// # fn should_pass_2() -> Result<()> {
+/// # fn should_pass_2() -> TestResult<()> {
 /// let value: HashSet<i32> = [1, 2, 3].into();
 /// verify_that!(value, each(gt(0)))?;  // Passes
 /// #     Ok(())
@@ -57,7 +57,7 @@ use std::marker::PhantomData;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value = &[1, 2, 3];
 /// verify_that!(value, points_to(each(gt(0))))?;
 /// #     Ok(())
@@ -69,7 +69,7 @@ use std::marker::PhantomData;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value = &[1, 2, 3];
 /// verify_that!(*value, each(gt(0)))?;
 /// #     Ok(())
@@ -197,51 +197,51 @@ mod tests {
     use std::collections::HashSet;
 
     #[test]
-    fn each_matches_empty_vec() -> Result<()> {
+    fn each_matches_empty_vec() -> TestResult<()> {
         let value: Vec<i32> = vec![];
         verify_that!(value, each(gt(0)))
     }
 
     #[test]
-    fn each_matches_vec_with_one_element() -> Result<()> {
+    fn each_matches_vec_with_one_element() -> TestResult<()> {
         verify_that!(vec![1], each(gt(0)))
     }
 
     #[test]
-    fn each_matches_array_with_one_element() -> Result<()> {
+    fn each_matches_array_with_one_element() -> TestResult<()> {
         verify_that!([1], each(gt(0)))
     }
 
     #[test]
-    fn each_matches_ref_to_array_using_deref_notation() -> Result<()> {
+    fn each_matches_ref_to_array_using_deref_notation() -> TestResult<()> {
         let value = [1];
         let reference = &value;
         verify_that!(*reference, each(gt(0)))
     }
 
     #[test]
-    fn each_matches_ref_to_array_using_points_to() -> Result<()> {
+    fn each_matches_ref_to_array_using_points_to() -> TestResult<()> {
         let value = [1];
         let reference = &value;
         verify_that!(reference, points_to(each(gt(0))))
     }
 
     #[test]
-    fn each_matches_slice_using_deref_notation() -> Result<()> {
+    fn each_matches_slice_using_deref_notation() -> TestResult<()> {
         let value = vec![1];
         let slice = value.as_slice();
         verify_that!(*slice, each(gt(0)))
     }
 
     #[test]
-    fn each_matches_slice_using_points_to() -> Result<()> {
+    fn each_matches_slice_using_points_to() -> TestResult<()> {
         let value = vec![1];
         let slice = value.as_slice();
         verify_that!(slice, points_to(each(gt(0))))
     }
 
     #[test]
-    fn each_matches_vec_with_two_elements() -> Result<()> {
+    fn each_matches_vec_with_two_elements() -> TestResult<()> {
         let value = vec![1, 2];
         verify_that!(value, each(gt(0)))
     }
@@ -259,30 +259,30 @@ mod tests {
 
     #[test]
     fn each_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!(OwnedItemContainer(vec![1]), each(eq(1)))
     }
 
     #[test]
-    fn each_matches_hash_set_with_one_element() -> Result<()> {
+    fn each_matches_hash_set_with_one_element() -> TestResult<()> {
         let value: HashSet<i32> = [1].into();
         verify_that!(value, each(gt(0)))
     }
 
     #[test]
-    fn each_does_not_match_when_first_element_does_not_match() -> Result<()> {
+    fn each_does_not_match_when_first_element_does_not_match() -> TestResult<()> {
         let value = vec![0];
         verify_that!(value, not(each(gt(1))))
     }
 
     #[test]
-    fn each_does_not_match_when_second_element_does_not_match() -> Result<()> {
+    fn each_does_not_match_when_second_element_does_not_match() -> TestResult<()> {
         let value = vec![2, 0];
         verify_that!(value, not(each(gt(1))))
     }
 
     #[test]
-    fn each_shows_correct_message_when_first_item_does_not_match() -> Result<()> {
+    fn each_shows_correct_message_when_first_item_does_not_match() -> TestResult<()> {
         let result = verify_that!(vec![0, 2, 3], each(gt(0)));
 
         verify_that!(
@@ -298,7 +298,7 @@ mod tests {
     }
 
     #[test]
-    fn each_shows_correct_message_when_second_item_does_not_match() -> Result<()> {
+    fn each_shows_correct_message_when_second_item_does_not_match() -> TestResult<()> {
         let result = verify_that!(vec![1, 0, 3], each(gt(0)));
 
         verify_that!(
@@ -314,7 +314,7 @@ mod tests {
     }
 
     #[test]
-    fn each_shows_correct_message_when_first_two_items_do_not_match() -> Result<()> {
+    fn each_shows_correct_message_when_first_two_items_do_not_match() -> TestResult<()> {
         let result = verify_that!(vec![0, 1, 3], each(gt(1)));
 
         verify_that!(
@@ -331,7 +331,7 @@ mod tests {
         )
     }
     #[test]
-    fn each_shows_inner_explanation() -> Result<()> {
+    fn each_shows_inner_explanation() -> TestResult<()> {
         let result = verify_that!(vec![vec![1, 2], vec![1]], each(each(eq(1))));
 
         verify_that!(

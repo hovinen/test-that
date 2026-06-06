@@ -22,7 +22,7 @@ struct IntField {
 }
 
 #[test]
-fn field_matches_integer_field() -> Result<()> {
+fn field_matches_integer_field() -> TestResult<()> {
     verify_that!(IntField { int: 32 }, field!(IntField.int, eq(32)))
 }
 
@@ -32,12 +32,12 @@ struct StringField {
 }
 
 #[test]
-fn field_matches_string_field() -> Result<()> {
+fn field_matches_string_field() -> TestResult<()> {
     verify_that!(StringField { strink: "yes".to_string() }, field!(StringField.strink, eq("yes")))
 }
 
 #[test]
-fn field_error_message_shows_field_name_and_inner_matcher() -> Result<()> {
+fn field_error_message_shows_field_name_and_inner_matcher() -> TestResult<()> {
     let matcher = field!(IntField.int, eq(31));
 
     verify_that!(
@@ -54,7 +54,7 @@ mod sub {
 }
 
 #[test]
-fn struct_in_other_module_matches() -> Result<()> {
+fn struct_in_other_module_matches() -> TestResult<()> {
     verify_that!(sub::SubStruct { field: 32 }, field!(sub::SubStruct.field, eq(32)))
 }
 
@@ -62,12 +62,12 @@ fn struct_in_other_module_matches() -> Result<()> {
 struct Tuple(i32, #[allow(unused)] String);
 
 #[test]
-fn tuple_matches_with_index() -> Result<()> {
+fn tuple_matches_with_index() -> TestResult<()> {
     verify_that!(Tuple(32, "yes".to_string()), field!(Tuple.0, eq(32)))
 }
 
 #[test]
-fn matches_enum_value() -> Result<()> {
+fn matches_enum_value() -> TestResult<()> {
     #[derive(Debug)]
     enum AnEnum {
         AValue(u32),
@@ -78,7 +78,7 @@ fn matches_enum_value() -> Result<()> {
 }
 
 #[test]
-fn shows_correct_failure_message_for_wrong_struct_entry() -> Result<()> {
+fn shows_correct_failure_message_for_wrong_struct_entry() -> TestResult<()> {
     #[derive(Debug)]
     struct AStruct {
         a: Vec<u32>,
@@ -96,7 +96,7 @@ fn shows_correct_failure_message_for_wrong_struct_entry() -> Result<()> {
 }
 
 #[test]
-fn does_not_match_enum_value_with_wrong_enum_variant() -> Result<()> {
+fn does_not_match_enum_value_with_wrong_enum_variant() -> TestResult<()> {
     #[derive(Debug)]
     enum AnEnum {
         #[allow(dead_code)] // This variant is intentionally unused.
@@ -109,7 +109,7 @@ fn does_not_match_enum_value_with_wrong_enum_variant() -> Result<()> {
 }
 
 #[test]
-fn shows_correct_failure_message_for_wrong_enum_value() -> Result<()> {
+fn shows_correct_failure_message_for_wrong_enum_value() -> TestResult<()> {
     #[derive(Debug)]
     enum AnEnum {
         #[allow(dead_code)] // This variant is intentionally unused.
@@ -129,7 +129,7 @@ fn shows_correct_failure_message_for_wrong_enum_value() -> Result<()> {
 }
 
 #[test]
-fn shows_correct_failure_message_for_wrong_enum_value_with_tuple_field() -> Result<()> {
+fn shows_correct_failure_message_for_wrong_enum_value_with_tuple_field() -> TestResult<()> {
     #[derive(Debug)]
     enum AnEnum {
         #[allow(dead_code)] // This variant is intentionally unused.
@@ -147,7 +147,7 @@ fn shows_correct_failure_message_for_wrong_enum_value_with_tuple_field() -> Resu
 }
 
 #[test]
-fn shows_correct_failure_message_for_wrong_enum_value_with_named_field() -> Result<()> {
+fn shows_correct_failure_message_for_wrong_enum_value_with_named_field() -> TestResult<()> {
     #[derive(Debug)]
     enum AnEnum {
         #[allow(dead_code)] // This variant is intentionally unused.
@@ -168,7 +168,7 @@ fn shows_correct_failure_message_for_wrong_enum_value_with_named_field() -> Resu
 }
 
 #[test]
-fn matches_struct_like_enum_value() -> Result<()> {
+fn matches_struct_like_enum_value() -> TestResult<()> {
     #[derive(Debug)]
     enum AnEnum {
         AValue { a_field: u32 },

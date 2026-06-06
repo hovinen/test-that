@@ -17,32 +17,32 @@ use test_that::prelude::*;
 use indoc::indoc;
 
 #[test]
-fn matches_any_value_when_list_is_empty() -> Result<()> {
+fn matches_any_value_when_list_is_empty() -> TestResult<()> {
     verify_that!((), all!())
 }
 
 #[test]
-fn matches_value_with_single_matching_component() -> Result<()> {
+fn matches_value_with_single_matching_component() -> TestResult<()> {
     verify_that!(123, all!(eq(123)))
 }
 
 #[test]
-fn does_not_match_value_with_single_non_matching_component() -> Result<()> {
+fn does_not_match_value_with_single_non_matching_component() -> TestResult<()> {
     verify_that!(123, not(all!(eq(456))))
 }
 
 #[test]
-fn matches_value_with_two_matching_components() -> Result<()> {
+fn matches_value_with_two_matching_components() -> TestResult<()> {
     verify_that!("A string", all!(starts_with("A"), ends_with("string")))
 }
 
 #[test]
-fn does_not_match_value_with_one_non_matching_component_among_two_components() -> Result<()> {
+fn does_not_match_value_with_one_non_matching_component_among_two_components() -> TestResult<()> {
     verify_that!(123, not(all!(eq(123), eq(456))))
 }
 
 #[test]
-fn supports_trailing_comma() -> Result<()> {
+fn supports_trailing_comma() -> TestResult<()> {
     verify_that!(
         "An important string",
         all!(starts_with("An"), contains_substring("important"), ends_with("string"),)
@@ -50,7 +50,7 @@ fn supports_trailing_comma() -> Result<()> {
 }
 
 #[test]
-fn admits_matchers_without_static_lifetime() -> Result<()> {
+fn admits_matchers_without_static_lifetime() -> TestResult<()> {
     #[derive(Debug, PartialEq)]
     struct AStruct(i32);
     let expected_value = AStruct(123);
@@ -58,7 +58,7 @@ fn admits_matchers_without_static_lifetime() -> Result<()> {
 }
 
 #[test]
-fn mismatch_description_two_failed_matchers() -> Result<()> {
+fn mismatch_description_two_failed_matchers() -> TestResult<()> {
     verify_that!(
         all!(starts_with("One"), starts_with("Two")).explain_match("Three"),
         displays_as(eq("* which does not start with \"One\"\n* which does not start with \"Two\""))
@@ -66,12 +66,12 @@ fn mismatch_description_two_failed_matchers() -> Result<()> {
 }
 
 #[test]
-fn mismatch_description_empty_matcher() -> Result<()> {
+fn mismatch_description_empty_matcher() -> TestResult<()> {
     verify_that!(all!().explain_match("Three"), displays_as(eq("which is anything")))
 }
 
 #[test]
-fn all_multiple_failed_assertions() -> Result<()> {
+fn all_multiple_failed_assertions() -> TestResult<()> {
     let result = verify_that!(4, all![eq(1), eq(2), eq(3)]);
     verify_that!(
         result,
@@ -91,7 +91,7 @@ fn all_multiple_failed_assertions() -> Result<()> {
 }
 
 #[test]
-fn formats_error_message_correctly_when_all_is_inside_some() -> Result<()> {
+fn formats_error_message_correctly_when_all_is_inside_some() -> TestResult<()> {
     let value = Some(4);
     let result = verify_that!(value, some(all![eq(1), eq(2), eq(3)]));
     verify_that!(
@@ -113,7 +113,7 @@ fn formats_error_message_correctly_when_all_is_inside_some() -> Result<()> {
 }
 
 #[test]
-fn formats_error_message_correctly_when_all_is_inside_ok() -> Result<()> {
+fn formats_error_message_correctly_when_all_is_inside_ok() -> TestResult<()> {
     let value: std::result::Result<i32, std::io::Error> = Ok(4);
     let result = verify_that!(value, ok(all![eq(1), eq(2), eq(3)]));
     verify_that!(
@@ -135,7 +135,7 @@ fn formats_error_message_correctly_when_all_is_inside_ok() -> Result<()> {
 }
 
 #[test]
-fn formats_error_message_correctly_when_all_is_inside_err() -> Result<()> {
+fn formats_error_message_correctly_when_all_is_inside_err() -> TestResult<()> {
     let value: std::result::Result<(), &'static str> = Err("An error");
     let result = verify_that!(value, err(all![starts_with("Not"), ends_with("problem")]));
     verify_that!(

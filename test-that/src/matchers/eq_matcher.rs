@@ -26,11 +26,11 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(123, eq(123))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!(123, eq(234))?; // Fails
 /// #     Ok(())
 /// # }
@@ -45,7 +45,7 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(String::from("Some value"), eq("Some value"))?; // Passes
 /// #     Ok(())
 /// # }
@@ -140,30 +140,30 @@ mod tests {
     use serial_test::serial;
 
     #[test]
-    fn eq_matches_string_reference_with_string_reference() -> Result<()> {
+    fn eq_matches_string_reference_with_string_reference() -> TestResult<()> {
         verify_that!("A string", eq("A string"))
     }
 
     #[test]
-    fn eq_matches_owned_string_with_string_reference() -> Result<()> {
+    fn eq_matches_owned_string_with_string_reference() -> TestResult<()> {
         let value = "A string".to_string();
         verify_that!(value, eq("A string"))
     }
 
     #[test]
-    fn eq_matches_owned_string_reference_with_string_reference() -> Result<()> {
+    fn eq_matches_owned_string_reference_with_string_reference() -> TestResult<()> {
         let value = "A string".to_string();
         verify_that!(&value, eq("A string"))
     }
 
     #[test]
-    fn eq_matches_i32_with_i32() -> Result<()> {
+    fn eq_matches_i32_with_i32() -> TestResult<()> {
         verify_that!(123, eq(123))
     }
 
     #[test]
     #[serial]
-    fn eq_struct_debug_diff() -> Result<()> {
+    fn eq_struct_debug_diff() -> TestResult<()> {
         #[derive(Debug, PartialEq)]
         struct Strukt {
             int: i32,
@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn eq_vec_debug_diff() -> Result<()> {
+    fn eq_vec_debug_diff() -> TestResult<()> {
         let result = verify_that!(vec![1, 2, 3], eq(vec![1, 3, 4]));
         verify_that!(
             result,
@@ -216,7 +216,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn eq_vec_debug_diff_length_mismatch() -> Result<()> {
+    fn eq_vec_debug_diff_length_mismatch() -> TestResult<()> {
         let result = verify_that!(vec![1, 2, 3, 4, 5], eq(vec![1, 3, 5]));
         verify_that!(
             result,
@@ -240,7 +240,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn eq_debug_diff_common_lines_omitted() -> Result<()> {
+    fn eq_debug_diff_common_lines_omitted() -> TestResult<()> {
         let result = verify_that!((1..50).collect::<Vec<_>>(), eq((3..52).collect::<Vec<_>>()));
         verify_that!(
             result,
@@ -265,7 +265,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn eq_debug_diff_5_common_lines_not_omitted() -> Result<()> {
+    fn eq_debug_diff_5_common_lines_not_omitted() -> TestResult<()> {
         let result = verify_that!((1..8).collect::<Vec<_>>(), eq((3..10).collect::<Vec<_>>()));
         verify_that!(
             result,
@@ -290,7 +290,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn eq_debug_diff_start_common_lines_omitted() -> Result<()> {
+    fn eq_debug_diff_start_common_lines_omitted() -> TestResult<()> {
         let result = verify_that!((1..50).collect::<Vec<_>>(), eq((1..52).collect::<Vec<_>>()));
         verify_that!(
             result,
@@ -312,7 +312,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn eq_debug_diff_end_common_lines_omitted() -> Result<()> {
+    fn eq_debug_diff_end_common_lines_omitted() -> TestResult<()> {
         let result = verify_that!((1..52).collect::<Vec<_>>(), eq((3..52).collect::<Vec<_>>()));
         verify_that!(
             result,
@@ -333,7 +333,7 @@ mod tests {
     }
 
     #[test]
-    fn eq_multi_line_string_debug_diff() -> Result<()> {
+    fn eq_multi_line_string_debug_diff() -> TestResult<()> {
         let result = verify_that!("One\nTwo\nThree", eq("One\nSix\nThree"));
         // TODO: b/257454450 - Make this more useful, by potentially unescaping the
         // line return.
@@ -351,7 +351,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn match_explanation_contains_diff_of_strings_if_more_than_one_line() -> Result<()> {
+    fn match_explanation_contains_diff_of_strings_if_more_than_one_line() -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "
@@ -383,7 +383,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn match_explanation_does_not_show_diff_if_actual_value_is_single_line() -> Result<()> {
+    fn match_explanation_does_not_show_diff_if_actual_value_is_single_line() -> TestResult<()> {
         let result = verify_that!(
             "First line",
             eq(indoc!(
@@ -403,7 +403,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn match_explanation_does_not_show_diff_if_expected_value_is_single_line() -> Result<()> {
+    fn match_explanation_does_not_show_diff_if_expected_value_is_single_line() -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "

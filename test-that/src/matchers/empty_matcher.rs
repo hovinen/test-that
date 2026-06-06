@@ -28,7 +28,7 @@ use std::fmt::Debug;
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value: Vec<i32> = vec![];
 /// verify_that!(value, empty())?;
 /// let value: HashSet<i32> = HashSet::new();
@@ -43,7 +43,7 @@ use std::fmt::Debug;
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value: &[u32] = &[];
 /// verify_that!(*value, empty())?;
 /// #     Ok(())
@@ -79,61 +79,61 @@ mod tests {
     use std::collections::HashSet;
 
     #[test]
-    fn empty_matcher_matches_empty_vec() -> Result<()> {
+    fn empty_matcher_matches_empty_vec() -> TestResult<()> {
         let value: Vec<i32> = vec![];
         verify_that!(value, empty())
     }
 
     #[test]
-    fn empty_matcher_matches_empty_array() -> Result<()> {
+    fn empty_matcher_matches_empty_array() -> TestResult<()> {
         verify_that!([] as [u32; 0], empty())
     }
 
     #[test]
-    fn empty_matcher_matches_empty_ref_to_array_with_points_to() -> Result<()> {
+    fn empty_matcher_matches_empty_ref_to_array_with_points_to() -> TestResult<()> {
         verify_that!(&([] as [u32; 0]), points_to(empty()))
     }
 
     #[test]
-    fn empty_matcher_matches_empty_ref_to_array_with_deref_notation() -> Result<()> {
+    fn empty_matcher_matches_empty_ref_to_array_with_deref_notation() -> TestResult<()> {
         let value: [u32; 0] = [];
         let reference = &value;
         verify_that!(*reference, empty())
     }
 
     #[test]
-    fn empty_matcher_matches_empty_slice_with_points_to() -> Result<()> {
+    fn empty_matcher_matches_empty_slice_with_points_to() -> TestResult<()> {
         let value: Vec<u32> = vec![];
         let slice = value.as_slice();
         verify_that!(slice, points_to(empty()))
     }
 
     #[test]
-    fn empty_matcher_matches_empty_slice_with_deref_notation() -> Result<()> {
+    fn empty_matcher_matches_empty_slice_with_deref_notation() -> TestResult<()> {
         let value: Vec<u32> = vec![];
         let slice = value.as_slice();
         verify_that!(*slice, empty())
     }
 
     #[test]
-    fn empty_matcher_does_not_match_non_empty_vec() -> Result<()> {
+    fn empty_matcher_does_not_match_non_empty_vec() -> TestResult<()> {
         verify_that!(vec![1, 2, 3], not(empty()))
     }
 
     #[test]
-    fn empty_matcher_does_not_match_non_empty_array() -> Result<()> {
+    fn empty_matcher_does_not_match_non_empty_array() -> TestResult<()> {
         verify_that!([1, 2, 3], not(empty()))
     }
 
     #[test]
-    fn empty_matcher_does_not_match_non_empty_slice() -> Result<()> {
+    fn empty_matcher_does_not_match_non_empty_slice() -> TestResult<()> {
         let value: Vec<u32> = vec![1, 2, 3];
         let slice = value.as_slice();
         verify_that!(*slice, not(empty()))
     }
 
     #[test]
-    fn empty_matcher_matches_empty_hash_set() -> Result<()> {
+    fn empty_matcher_matches_empty_hash_set() -> TestResult<()> {
         let value: HashSet<i32> = HashSet::new();
         verify_that!(value, empty())
     }
@@ -151,7 +151,7 @@ mod tests {
 
     #[test]
     fn empty_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!(OwnedItemContainer(vec![]), empty())
     }
 }

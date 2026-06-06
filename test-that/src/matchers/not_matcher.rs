@@ -23,11 +23,11 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(0, not(eq(1)))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!(0, not(eq(0)))?; // Fails
 /// #     Ok(())
 /// # }
@@ -73,7 +73,7 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn matches_when_inner_matcher_does_not_match() -> Result<()> {
+    fn matches_when_inner_matcher_does_not_match() -> TestResult<()> {
         let matcher = not(eq(1));
 
         let result = matcher.matches(&0);
@@ -82,7 +82,7 @@ mod tests {
     }
 
     #[test]
-    fn does_not_match_when_inner_matcher_matches() -> Result<()> {
+    fn does_not_match_when_inner_matcher_matches() -> TestResult<()> {
         let matcher = not(eq(1));
 
         let result = matcher.matches(&1);
@@ -91,7 +91,7 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_references_actual_value() -> Result<()> {
+    fn match_explanation_references_actual_value() -> TestResult<()> {
         let result = verify_that!([1], not(container_eq([1])));
 
         verify_that!(

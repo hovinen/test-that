@@ -30,7 +30,7 @@ impl StructWithField {
 }
 
 #[test]
-fn can_use_displays_as_inside_ok() -> Result<()> {
+fn can_use_displays_as_inside_ok() -> TestResult<()> {
     let subject = StructWithField { field: 123 };
 
     verify_that!(
@@ -42,7 +42,7 @@ fn can_use_displays_as_inside_ok() -> Result<()> {
 }
 
 #[test]
-fn can_use_displays_as_inside_err() -> Result<()> {
+fn can_use_displays_as_inside_err() -> TestResult<()> {
     let subject = StructWithField { field: 123 };
 
     verify_that!(

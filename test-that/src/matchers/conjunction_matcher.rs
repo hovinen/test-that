@@ -74,12 +74,12 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn and_true_true_matches() -> Result<()> {
+    fn and_true_true_matches() -> TestResult<()> {
         verify_that!(1, anything().and(anything()))
     }
 
     #[test]
-    fn and_true_false_does_not_match() -> Result<()> {
+    fn and_true_false_does_not_match() -> TestResult<()> {
         let result = verify_that!(1, anything().and(not(anything())));
         verify_that!(
             result,
@@ -95,7 +95,7 @@ mod tests {
     }
 
     #[test]
-    fn and_false_true_does_not_match() -> Result<()> {
+    fn and_false_true_does_not_match() -> TestResult<()> {
         let result = verify_that!(1, not(anything()).and(anything()));
         verify_that!(
             result,
@@ -111,7 +111,7 @@ mod tests {
     }
 
     #[test]
-    fn and_false_false_does_not_match() -> Result<()> {
+    fn and_false_false_does_not_match() -> TestResult<()> {
         let result = verify_that!(1, not(anything()).and(not(anything())));
         verify_that!(
             result,
@@ -129,7 +129,7 @@ mod tests {
     }
 
     #[test]
-    fn chained_and_matches() -> Result<()> {
+    fn chained_and_matches() -> TestResult<()> {
         #[derive(Debug)]
         struct Struct {
             a: i32,
@@ -143,12 +143,12 @@ mod tests {
     }
 
     #[test]
-    fn works_with_str_slices() -> Result<()> {
+    fn works_with_str_slices() -> TestResult<()> {
         verify_that!("A string", starts_with("A").and(ends_with("string")))
     }
 
     #[test]
-    fn works_with_owned_strings() -> Result<()> {
+    fn works_with_owned_strings() -> TestResult<()> {
         verify_that!("A string".to_string(), starts_with("A").and(ends_with("string")))
     }
 }

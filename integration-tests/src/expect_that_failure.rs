@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test_that::test]
-    fn should_fail_but_not_abort() -> Result<()> {
+    fn should_fail_but_not_abort() -> TestResult<()> {
         let value = 2;
         expect_that!(value, eq(3));
         Ok(())

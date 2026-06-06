@@ -33,15 +33,15 @@ use std::ops::Deref;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass_1() -> Result<()> {
+/// # fn should_pass_1() -> TestResult<()> {
 /// verify_that!("Some value", contains_substring("Some"))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!("Another value", contains_substring("Some"))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_pass_2() -> Result<()> {
+/// # fn should_pass_2() -> TestResult<()> {
 /// verify_that!("Some value".to_string(), contains_substring("value"))?;   // Passes
 /// verify_that!("Some value", contains_substring("value".to_string()))?;   // Passes
 /// #     Ok(())
@@ -73,19 +73,19 @@ pub fn contains_substring<T>(expected: T) -> StrMatcher<T> {
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass_1() -> Result<()> {
+/// # fn should_pass_1() -> TestResult<()> {
 /// verify_that!("Some value", starts_with("Some"))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!("Another value", starts_with("Some"))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!("Some value", starts_with("value"))?;  // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_pass_2() -> Result<()> {
+/// # fn should_pass_2() -> TestResult<()> {
 /// verify_that!("Some value".to_string(), starts_with("Some"))?;   // Passes
 /// verify_that!("Some value", starts_with("Some".to_string()))?;   // Passes
 /// #     Ok(())
@@ -112,19 +112,19 @@ pub fn starts_with<T>(expected: T) -> StrMatcher<T> {
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass_1() -> Result<()> {
+/// # fn should_pass_1() -> TestResult<()> {
 /// verify_that!("Some value", ends_with("value"))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!("Some value", ends_with("other value"))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!("Some value", ends_with("Some"))?;  // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_pass_2() -> Result<()> {
+/// # fn should_pass_2() -> TestResult<()> {
 /// verify_that!("Some value".to_string(), ends_with("value"))?;   // Passes
 /// verify_that!("Some value", ends_with("value".to_string()))?;   // Passes
 /// #     Ok(())
@@ -157,7 +157,7 @@ pub trait StrMatcherConfigurator<ExpectedT> {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_pass() -> Result<()> {
+    /// # fn should_pass() -> TestResult<()> {
     /// verify_that!("A string", eq("   A string").ignoring_leading_whitespace())?; // Passes
     /// verify_that!("   A string", eq("A string").ignoring_leading_whitespace())?; // Passes
     /// #     Ok(())
@@ -177,7 +177,7 @@ pub trait StrMatcherConfigurator<ExpectedT> {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_pass() -> Result<()> {
+    /// # fn should_pass() -> TestResult<()> {
     /// verify_that!("A string", eq("A string   ").ignoring_trailing_whitespace())?; // Passes
     /// verify_that!("A string   ", eq("A string").ignoring_trailing_whitespace())?; // Passes
     /// #     Ok(())
@@ -197,7 +197,7 @@ pub trait StrMatcherConfigurator<ExpectedT> {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_pass() -> Result<()> {
+    /// # fn should_pass() -> TestResult<()> {
     /// verify_that!("A string", eq("   A string   ").ignoring_outer_whitespace())?; // Passes
     /// verify_that!("   A string   ", eq("A string").ignoring_outer_whitespace())?; // Passes
     /// #     Ok(())
@@ -220,11 +220,11 @@ pub trait StrMatcherConfigurator<ExpectedT> {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_pass() -> Result<()> {
+    /// # fn should_pass() -> TestResult<()> {
     /// verify_that!("Some value", eq("SOME VALUE").ignoring_ascii_case())?;  // Passes
     /// #     Ok(())
     /// # }
-    /// # fn should_fail() -> Result<()> {
+    /// # fn should_fail() -> TestResult<()> {
     /// verify_that!("Another value", eq("Some value").ignoring_ascii_case())?;   // Fails
     /// #     Ok(())
     /// # }
@@ -241,11 +241,11 @@ pub trait StrMatcherConfigurator<ExpectedT> {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_pass() -> Result<()> {
+    /// # fn should_pass() -> TestResult<()> {
     /// verify_that!("Some value\nSome value", contains_substring("value").times(eq(2)))?; // Passes
     /// #     Ok(())
     /// # }
-    /// # fn should_fail() -> Result<()> {
+    /// # fn should_fail() -> TestResult<()> {
     /// verify_that!("Some value", contains_substring("value").times(eq(2)))?; // Fails
     /// #     Ok(())
     /// # }
@@ -258,7 +258,7 @@ pub trait StrMatcherConfigurator<ExpectedT> {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_fail() -> Result<()> {
+    /// # fn should_fail() -> TestResult<()> {
     /// // Fails: substrings distinct but not disjoint!
     /// verify_that!("ababab", contains_substring("abab").times(eq(2)))?;
     /// #     Ok(())
@@ -585,221 +585,225 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn matches_string_reference_with_equal_string_reference() -> Result<()> {
+    fn matches_string_reference_with_equal_string_reference() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!("A string", matcher)
     }
 
     #[test]
-    fn does_not_match_string_reference_with_non_equal_string_reference() -> Result<()> {
+    fn does_not_match_string_reference_with_non_equal_string_reference() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("Another string");
         verify_that!("A string", not(matcher))
     }
 
     #[test]
-    fn matches_owned_string_with_string_reference() -> Result<()> {
+    fn matches_owned_string_with_string_reference() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         let value = "A string".to_string();
         verify_that!(value, matcher)
     }
 
     #[test]
-    fn matches_owned_string_reference_with_string_reference() -> Result<()> {
+    fn matches_owned_string_reference_with_string_reference() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         let value = "A string".to_string();
         verify_that!(&value, matcher)
     }
 
     #[test]
-    fn ignores_leading_whitespace_in_expected_when_requested() -> Result<()> {
+    fn ignores_leading_whitespace_in_expected_when_requested() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config(" \n\tA string");
         verify_that!("A string", matcher.ignoring_leading_whitespace())
     }
 
     #[test]
-    fn ignores_leading_whitespace_in_actual_when_requested() -> Result<()> {
+    fn ignores_leading_whitespace_in_actual_when_requested() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!(" \n\tA string", matcher.ignoring_leading_whitespace())
     }
 
     #[test]
-    fn does_not_match_unequal_remaining_string_when_ignoring_leading_whitespace() -> Result<()> {
+    fn does_not_match_unequal_remaining_string_when_ignoring_leading_whitespace() -> TestResult<()>
+    {
         let matcher = StrMatcher::with_default_config(" \n\tAnother string");
         verify_that!("A string", not(matcher.ignoring_leading_whitespace()))
     }
 
     #[test]
-    fn remains_sensitive_to_trailing_whitespace_when_ignoring_leading_whitespace() -> Result<()> {
+    fn remains_sensitive_to_trailing_whitespace_when_ignoring_leading_whitespace() -> TestResult<()>
+    {
         let matcher = StrMatcher::with_default_config("A string \n\t");
         verify_that!("A string", not(matcher.ignoring_leading_whitespace()))
     }
 
     #[test]
-    fn ignores_trailing_whitespace_in_expected_when_requested() -> Result<()> {
+    fn ignores_trailing_whitespace_in_expected_when_requested() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string \n\t");
         verify_that!("A string", matcher.ignoring_trailing_whitespace())
     }
 
     #[test]
-    fn ignores_trailing_whitespace_in_actual_when_requested() -> Result<()> {
+    fn ignores_trailing_whitespace_in_actual_when_requested() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!("A string \n\t", matcher.ignoring_trailing_whitespace())
     }
 
     #[test]
-    fn does_not_match_unequal_remaining_string_when_ignoring_trailing_whitespace() -> Result<()> {
+    fn does_not_match_unequal_remaining_string_when_ignoring_trailing_whitespace() -> TestResult<()>
+    {
         let matcher = StrMatcher::with_default_config("Another string \n\t");
         verify_that!("A string", not(matcher.ignoring_trailing_whitespace()))
     }
 
     #[test]
-    fn remains_sensitive_to_leading_whitespace_when_ignoring_trailing_whitespace() -> Result<()> {
+    fn remains_sensitive_to_leading_whitespace_when_ignoring_trailing_whitespace() -> TestResult<()>
+    {
         let matcher = StrMatcher::with_default_config(" \n\tA string");
         verify_that!("A string", not(matcher.ignoring_trailing_whitespace()))
     }
 
     #[test]
-    fn ignores_leading_and_trailing_whitespace_in_expected_when_requested() -> Result<()> {
+    fn ignores_leading_and_trailing_whitespace_in_expected_when_requested() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config(" \n\tA string \n\t");
         verify_that!("A string", matcher.ignoring_outer_whitespace())
     }
 
     #[test]
-    fn ignores_leading_and_trailing_whitespace_in_actual_when_requested() -> Result<()> {
+    fn ignores_leading_and_trailing_whitespace_in_actual_when_requested() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!(" \n\tA string \n\t", matcher.ignoring_outer_whitespace())
     }
 
     #[test]
-    fn respects_ascii_case_by_default() -> Result<()> {
+    fn respects_ascii_case_by_default() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!("A STRING", not(matcher))
     }
 
     #[test]
-    fn ignores_ascii_case_when_requested() -> Result<()> {
+    fn ignores_ascii_case_when_requested() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!("A STRING", matcher.ignoring_ascii_case())
     }
 
     #[test]
-    fn allows_ignoring_leading_whitespace_from_eq() -> Result<()> {
+    fn allows_ignoring_leading_whitespace_from_eq() -> TestResult<()> {
         verify_that!("A string", eq(" \n\tA string").ignoring_leading_whitespace())
     }
 
     #[test]
-    fn allows_ignoring_trailing_whitespace_from_eq() -> Result<()> {
+    fn allows_ignoring_trailing_whitespace_from_eq() -> TestResult<()> {
         verify_that!("A string", eq("A string \n\t").ignoring_trailing_whitespace())
     }
 
     #[test]
-    fn allows_ignoring_outer_whitespace_from_eq() -> Result<()> {
+    fn allows_ignoring_outer_whitespace_from_eq() -> TestResult<()> {
         verify_that!("A string", eq(" \n\tA string \n\t").ignoring_outer_whitespace())
     }
 
     #[test]
-    fn allows_ignoring_ascii_case_from_eq() -> Result<()> {
+    fn allows_ignoring_ascii_case_from_eq() -> TestResult<()> {
         verify_that!("A string", eq("A STRING").ignoring_ascii_case())
     }
 
     #[test]
-    fn allows_ignoring_ascii_case_from_eq_deref_of_str_slice() -> Result<()> {
+    fn allows_ignoring_ascii_case_from_eq_deref_of_str_slice() -> TestResult<()> {
         verify_that!("A string", eq_deref_of("A STRING").ignoring_ascii_case())
     }
 
     #[test]
-    fn allows_ignoring_ascii_case_from_eq_deref_of_owned_string() -> Result<()> {
+    fn allows_ignoring_ascii_case_from_eq_deref_of_owned_string() -> TestResult<()> {
         verify_that!("A string", eq_deref_of("A STRING".to_string()).ignoring_ascii_case())
     }
 
     #[test]
-    fn matches_string_containing_expected_value_in_contains_mode() -> Result<()> {
+    fn matches_string_containing_expected_value_in_contains_mode() -> TestResult<()> {
         verify_that!("Some string", contains_substring("str"))
     }
 
     #[test]
     fn matches_string_containing_expected_value_in_contains_mode_while_ignoring_ascii_case()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!("Some string", contains_substring("STR").ignoring_ascii_case())
     }
 
     #[test]
-    fn contains_substring_matches_correct_number_of_substrings() -> Result<()> {
+    fn contains_substring_matches_correct_number_of_substrings() -> TestResult<()> {
         verify_that!("Some string", contains_substring("str").times(eq(1)))
     }
 
     #[test]
-    fn contains_substring_does_not_match_incorrect_number_of_substrings() -> Result<()> {
+    fn contains_substring_does_not_match_incorrect_number_of_substrings() -> TestResult<()> {
         verify_that!("Some string\nSome string", not(contains_substring("string").times(eq(1))))
     }
 
     #[test]
-    fn contains_substring_does_not_match_when_substrings_overlap() -> Result<()> {
+    fn contains_substring_does_not_match_when_substrings_overlap() -> TestResult<()> {
         verify_that!("ababab", not(contains_substring("abab").times(eq(2))))
     }
 
     #[test]
-    fn starts_with_matches_string_reference_with_prefix() -> Result<()> {
+    fn starts_with_matches_string_reference_with_prefix() -> TestResult<()> {
         verify_that!("Some value", starts_with("Some"))
     }
 
     #[test]
-    fn starts_with_matches_string_reference_with_prefix_ignoring_ascii_case() -> Result<()> {
+    fn starts_with_matches_string_reference_with_prefix_ignoring_ascii_case() -> TestResult<()> {
         verify_that!("Some value", starts_with("SOME").ignoring_ascii_case())
     }
 
     #[test]
-    fn starts_with_does_not_match_wrong_prefix_ignoring_ascii_case() -> Result<()> {
+    fn starts_with_does_not_match_wrong_prefix_ignoring_ascii_case() -> TestResult<()> {
         verify_that!("Some value", not(starts_with("OTHER").ignoring_ascii_case()))
     }
 
     #[test]
-    fn ends_with_does_not_match_short_string_ignoring_ascii_case() -> Result<()> {
+    fn ends_with_does_not_match_short_string_ignoring_ascii_case() -> TestResult<()> {
         verify_that!("Some", not(starts_with("OTHER").ignoring_ascii_case()))
     }
 
     #[test]
-    fn starts_with_does_not_match_string_without_prefix() -> Result<()> {
+    fn starts_with_does_not_match_string_without_prefix() -> TestResult<()> {
         verify_that!("Some value", not(starts_with("Another")))
     }
 
     #[test]
-    fn starts_with_does_not_match_string_with_substring_not_at_beginning() -> Result<()> {
+    fn starts_with_does_not_match_string_with_substring_not_at_beginning() -> TestResult<()> {
         verify_that!("Some value", not(starts_with("value")))
     }
 
     #[test]
-    fn ends_with_matches_string_reference_with_suffix() -> Result<()> {
+    fn ends_with_matches_string_reference_with_suffix() -> TestResult<()> {
         verify_that!("Some value", ends_with("value"))
     }
 
     #[test]
-    fn ends_with_matches_string_reference_with_suffix_ignoring_ascii_case() -> Result<()> {
+    fn ends_with_matches_string_reference_with_suffix_ignoring_ascii_case() -> TestResult<()> {
         verify_that!("Some value", ends_with("VALUE").ignoring_ascii_case())
     }
 
     #[test]
-    fn ends_with_does_not_match_wrong_suffix_ignoring_ascii_case() -> Result<()> {
+    fn ends_with_does_not_match_wrong_suffix_ignoring_ascii_case() -> TestResult<()> {
         verify_that!("Some value", not(ends_with("OTHER").ignoring_ascii_case()))
     }
 
     #[test]
-    fn ends_with_does_not_match_too_short_string_ignoring_ascii_case() -> Result<()> {
+    fn ends_with_does_not_match_too_short_string_ignoring_ascii_case() -> TestResult<()> {
         verify_that!("Some", not(ends_with("OTHER").ignoring_ascii_case()))
     }
 
     #[test]
-    fn ends_with_does_not_match_string_without_suffix() -> Result<()> {
+    fn ends_with_does_not_match_string_without_suffix() -> TestResult<()> {
         verify_that!("Some value", not(ends_with("other value")))
     }
 
     #[test]
-    fn ends_with_does_not_match_string_with_substring_not_at_end() -> Result<()> {
+    fn ends_with_does_not_match_string_with_substring_not_at_end() -> TestResult<()> {
         verify_that!("Some value", not(ends_with("Some")))
     }
 
     #[test]
-    fn describes_itself_for_matching_result() -> Result<()> {
+    fn describes_itself_for_matching_result() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -808,7 +812,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_non_matching_result() -> Result<()> {
+    fn describes_itself_for_non_matching_result() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string");
         verify_that!(
             matcher.describe(MatcherResult::NoMatch),
@@ -817,7 +821,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_matching_result_ignoring_leading_whitespace() -> Result<()> {
+    fn describes_itself_for_matching_result_ignoring_leading_whitespace() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string").ignoring_leading_whitespace();
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -826,7 +830,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_non_matching_result_ignoring_leading_whitespace() -> Result<()> {
+    fn describes_itself_for_non_matching_result_ignoring_leading_whitespace() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string").ignoring_leading_whitespace();
         verify_that!(
             matcher.describe(MatcherResult::NoMatch),
@@ -835,7 +839,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_matching_result_ignoring_trailing_whitespace() -> Result<()> {
+    fn describes_itself_for_matching_result_ignoring_trailing_whitespace() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string").ignoring_trailing_whitespace();
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -844,8 +848,8 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_matching_result_ignoring_leading_and_trailing_whitespace() -> Result<()>
-    {
+    fn describes_itself_for_matching_result_ignoring_leading_and_trailing_whitespace()
+    -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string").ignoring_outer_whitespace();
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -854,7 +858,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_matching_result_ignoring_ascii_case() -> Result<()> {
+    fn describes_itself_for_matching_result_ignoring_ascii_case() -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string").ignoring_ascii_case();
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -864,7 +868,7 @@ mod tests {
 
     #[test]
     fn describes_itself_for_matching_result_ignoring_ascii_case_and_leading_whitespace()
-    -> Result<()> {
+    -> TestResult<()> {
         let matcher = StrMatcher::with_default_config("A string")
             .ignoring_leading_whitespace()
             .ignoring_ascii_case();
@@ -877,7 +881,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_matching_result_in_contains_mode() -> Result<()> {
+    fn describes_itself_for_matching_result_in_contains_mode() -> TestResult<()> {
         let matcher = contains_substring("A string");
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -886,7 +890,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_non_matching_result_in_contains_mode() -> Result<()> {
+    fn describes_itself_for_non_matching_result_in_contains_mode() -> TestResult<()> {
         let matcher = contains_substring("A string");
         verify_that!(
             matcher.describe(MatcherResult::NoMatch),
@@ -895,7 +899,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_with_count_number() -> Result<()> {
+    fn describes_itself_with_count_number() -> TestResult<()> {
         let matcher = contains_substring("A string").times(gt(2));
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -904,7 +908,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_matching_result_in_starts_with_mode() -> Result<()> {
+    fn describes_itself_for_matching_result_in_starts_with_mode() -> TestResult<()> {
         let matcher = starts_with("A string");
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -913,7 +917,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_non_matching_result_in_starts_with_mode() -> Result<()> {
+    fn describes_itself_for_non_matching_result_in_starts_with_mode() -> TestResult<()> {
         let matcher = starts_with("A string");
         verify_that!(
             matcher.describe(MatcherResult::NoMatch),
@@ -922,7 +926,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_matching_result_in_ends_with_mode() -> Result<()> {
+    fn describes_itself_for_matching_result_in_ends_with_mode() -> TestResult<()> {
         let matcher = ends_with("A string");
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -931,7 +935,7 @@ mod tests {
     }
 
     #[test]
-    fn describes_itself_for_non_matching_result_in_ends_with_mode() -> Result<()> {
+    fn describes_itself_for_non_matching_result_in_ends_with_mode() -> TestResult<()> {
         let matcher = ends_with("A string");
         verify_that!(
             matcher.describe(MatcherResult::NoMatch),
@@ -940,7 +944,7 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_contains_diff_of_strings_if_more_than_one_line() -> Result<()> {
+    fn match_explanation_contains_diff_of_strings_if_more_than_one_line() -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "
@@ -971,7 +975,8 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_for_starts_with_ignores_trailing_lines_in_actual_string() -> Result<()> {
+    fn match_explanation_for_starts_with_ignores_trailing_lines_in_actual_string() -> TestResult<()>
+    {
         let result = verify_that!(
             indoc!(
                 "
@@ -1005,7 +1010,7 @@ mod tests {
 
     #[test]
     fn match_explanation_for_starts_with_includes_both_versions_of_differing_last_line()
-    -> Result<()> {
+    -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "
@@ -1035,7 +1040,7 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_for_ends_with_ignores_leading_lines_in_actual_string() -> Result<()> {
+    fn match_explanation_for_ends_with_ignores_leading_lines_in_actual_string() -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "
@@ -1069,8 +1074,8 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_for_contains_substring_ignores_outer_lines_in_actual_string() -> Result<()>
-    {
+    fn match_explanation_for_contains_substring_ignores_outer_lines_in_actual_string()
+    -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "
@@ -1107,7 +1112,7 @@ mod tests {
 
     #[test]
     fn match_explanation_for_contains_substring_shows_diff_when_first_and_last_line_are_incomplete()
-    -> Result<()> {
+    -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "
@@ -1146,7 +1151,8 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_for_eq_does_not_ignore_trailing_lines_in_actual_string() -> Result<()> {
+    fn match_explanation_for_eq_does_not_ignore_trailing_lines_in_actual_string() -> TestResult<()>
+    {
         let result = verify_that!(
             indoc!(
                 "
@@ -1179,7 +1185,7 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_does_not_show_diff_if_actual_value_is_single_line() -> Result<()> {
+    fn match_explanation_does_not_show_diff_if_actual_value_is_single_line() -> TestResult<()> {
         let result = verify_that!(
             "First line",
             starts_with(indoc!(
@@ -1197,7 +1203,7 @@ mod tests {
     }
 
     #[test]
-    fn match_explanation_does_not_show_diff_if_expected_value_is_single_line() -> Result<()> {
+    fn match_explanation_does_not_show_diff_if_expected_value_is_single_line() -> TestResult<()> {
         let result = verify_that!(
             indoc!(
                 "

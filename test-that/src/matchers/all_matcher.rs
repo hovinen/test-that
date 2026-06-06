@@ -26,11 +26,11 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!("A string", all!(starts_with("A"), ends_with("string")))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!("A string", all!(starts_with("A"), ends_with("not a string")))?; // Fails
 /// #     Ok(())
 /// # }
@@ -43,7 +43,7 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(10, gt(9).and(lt(11)))?; // Also passes
 /// #     Ok(())
 /// # }
@@ -158,7 +158,7 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn description_shows_more_than_one_matcher() -> Result<()> {
+    fn description_shows_more_than_one_matcher() -> TestResult<()> {
         let first_matcher = starts_with("A");
         let second_matcher = ends_with("string");
         let matcher: internal::AllMatcher<String, 2> = all!(first_matcher, second_matcher);
@@ -175,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    fn description_shows_one_matcher_directly() -> Result<()> {
+    fn description_shows_one_matcher_directly() -> TestResult<()> {
         let first_matcher = starts_with("A");
         let matcher: internal::AllMatcher<String, 1> = all!(first_matcher);
 
@@ -186,8 +186,8 @@ mod tests {
     }
 
     #[test]
-    fn mismatch_description_shows_which_matcher_failed_if_more_than_one_constituent() -> Result<()>
-    {
+    fn mismatch_description_shows_which_matcher_failed_if_more_than_one_constituent()
+    -> TestResult<()> {
         let first_matcher = starts_with("Another");
         let second_matcher = ends_with("string");
         let matcher: internal::AllMatcher<str, 2> = all!(first_matcher, second_matcher);
@@ -199,7 +199,7 @@ mod tests {
     }
 
     #[test]
-    fn mismatch_description_is_simple_when_only_one_consistuent() -> Result<()> {
+    fn mismatch_description_is_simple_when_only_one_consistuent() -> TestResult<()> {
         let first_matcher = starts_with("Another");
         let matcher: internal::AllMatcher<str, 1> = all!(first_matcher);
 

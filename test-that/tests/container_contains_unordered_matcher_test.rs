@@ -19,40 +19,40 @@ use test_that::matcher::Matcher;
 use test_that::prelude::*;
 
 #[test]
-fn contains_exactly_matches_empty_vector() -> Result<()> {
+fn contains_exactly_matches_empty_vector() -> TestResult<()> {
     let value: Vec<u32> = vec![];
     verify_that!(value, contains_exactly![])
 }
 
 #[test]
-fn contains_exactly_matches_empty_vector_with_trailing_comma() -> Result<()> {
+fn contains_exactly_matches_empty_vector_with_trailing_comma() -> TestResult<()> {
     let value: Vec<u32> = vec![];
     verify_that!(value, contains_exactly![,])
 }
 
 #[test]
-fn contains_exactly_matches_empty_array() -> Result<()> {
+fn contains_exactly_matches_empty_array() -> TestResult<()> {
     let value: [u32; 0] = [];
     verify_that!(value, contains_exactly![])
 }
 
 #[test]
-fn contains_exactly_matches_vec() -> Result<()> {
+fn contains_exactly_matches_vec() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], contains_exactly![eq(1), eq(2), eq(3)])
 }
 
 #[test]
-fn contains_exactly_matches_vec_with_trailing_comma() -> Result<()> {
+fn contains_exactly_matches_vec_with_trailing_comma() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], contains_exactly![eq(1), eq(2), eq(3),])
 }
 
 #[test]
-fn contains_exactly_matches_vec_out_of_order() -> Result<()> {
+fn contains_exactly_matches_vec_out_of_order() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], contains_exactly![eq(2), eq(3), eq(1)])
 }
 
 #[test]
-fn contains_exactly_matches_vec_with_repetition() -> Result<()> {
+fn contains_exactly_matches_vec_with_repetition() -> TestResult<()> {
     verify_that!(
         vec![1, 2, 3, 1, 2, 3],
         contains_exactly![eq(1), eq(1), eq(2), eq(2), eq(3), eq(3)]
@@ -60,56 +60,56 @@ fn contains_exactly_matches_vec_with_repetition() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_matches_vec_with_ambigous_matchers() -> Result<()> {
+fn contains_exactly_matches_vec_with_ambigous_matchers() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], contains_exactly![anything(), anything(), eq(1)])
 }
 
 #[test]
-fn contains_exactly_does_not_match_vec_when_no_perfect_match_is_possible() -> Result<()> {
+fn contains_exactly_does_not_match_vec_when_no_perfect_match_is_possible() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], not(contains_exactly![ge(3), eq(3), eq(1)]))
 }
 
 #[test]
-fn contains_exactly_does_not_match_vector_with_extra_elements() -> Result<()> {
+fn contains_exactly_does_not_match_vector_with_extra_elements() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], not(contains_exactly![eq(1), eq(2)]))
 }
 
 #[test]
-fn contains_exactly_does_not_match_vector_with_missing_elements() -> Result<()> {
+fn contains_exactly_does_not_match_vector_with_missing_elements() -> TestResult<()> {
     verify_that!(vec![1, 2], not(contains_exactly![eq(1), eq(2), eq(3)]))
 }
 
 #[test]
-fn contains_exactly_matches_array() -> Result<()> {
+fn contains_exactly_matches_array() -> TestResult<()> {
     verify_that!([1, 2, 3], contains_exactly![eq(1), eq(2), eq(3)])
 }
 
 #[test]
-fn contains_exactly_matches_ref_of_array_with_points_to() -> Result<()> {
+fn contains_exactly_matches_ref_of_array_with_points_to() -> TestResult<()> {
     verify_that!(&[1, 2, 3], points_to(contains_exactly![eq(1), eq(2), eq(3)]))
 }
 
 #[test]
-fn contains_exactly_matches_ref_of_array_with_deref_notation() -> Result<()> {
+fn contains_exactly_matches_ref_of_array_with_deref_notation() -> TestResult<()> {
     let value = &[1, 2, 3];
     verify_that!(*value, contains_exactly![eq(1), eq(2), eq(3)])
 }
 
 #[test]
-fn contains_exactly_matches_slice_with_points_to() -> Result<()> {
+fn contains_exactly_matches_slice_with_points_to() -> TestResult<()> {
     let value = vec![1, 2, 3];
     verify_that!(value.as_slice(), points_to(contains_exactly![eq(1), eq(2), eq(3)]))
 }
 
 #[test]
-fn contains_exactly_matches_slice_with_deref_notation() -> Result<()> {
+fn contains_exactly_matches_slice_with_deref_notation() -> TestResult<()> {
     let value = vec![1, 2, 3];
     let slice = value.as_slice();
     verify_that!(*slice, contains_exactly![eq(1), eq(2), eq(3)])
 }
 
 #[test]
-fn contains_exactly_matches_vec_with_references() -> Result<()> {
+fn contains_exactly_matches_vec_with_references() -> TestResult<()> {
     verify_that!(
         vec![&1, &2, &3],
         contains_exactly![points_to(eq(1)), points_to(eq(2)), points_to(eq(3))]
@@ -117,7 +117,7 @@ fn contains_exactly_matches_vec_with_references() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_matches_vec_of_string_slices() -> Result<()> {
+fn contains_exactly_matches_vec_of_string_slices() -> TestResult<()> {
     verify_that!(
         vec!["String 1", "String 2", "String 3"],
         contains_exactly![
@@ -129,7 +129,7 @@ fn contains_exactly_matches_vec_of_string_slices() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+fn contains_exactly_matches_vec_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
     let string_1 = String::from("String 1");
     let string_2 = String::from("String 2");
     let string_3 = String::from("String 3");
@@ -144,7 +144,7 @@ fn contains_exactly_matches_vec_of_string_slices_with_non_static_lifetime() -> R
 }
 
 #[test]
-fn contains_exactly_matches_slice_of_string_slices() -> Result<()> {
+fn contains_exactly_matches_slice_of_string_slices() -> TestResult<()> {
     let value = vec!["String 1", "String 2", "String 3"];
     verify_that!(
         value.as_slice(),
@@ -157,7 +157,7 @@ fn contains_exactly_matches_slice_of_string_slices() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()> {
+fn contains_exactly_matches_slice_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
     let string_1 = String::from("String 1");
     let string_2 = String::from("String 2");
     let string_3 = String::from("String 3");
@@ -173,12 +173,12 @@ fn contains_exactly_matches_slice_of_string_slices_with_non_static_lifetime() ->
 }
 
 #[test]
-fn matches_with_curly_bracket_notation() -> Result<()> {
+fn matches_with_curly_bracket_notation() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], {eq(3), eq(2), eq(1)})
 }
 
 #[test]
-fn contains_exactly_admits_matchers_without_static_lifetime() -> Result<()> {
+fn contains_exactly_admits_matchers_without_static_lifetime() -> TestResult<()> {
     #[derive(Debug, PartialEq)]
     struct AStruct(i32);
     let expected_value = AStruct(123);
@@ -186,7 +186,7 @@ fn contains_exactly_admits_matchers_without_static_lifetime() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_produces_correct_failure_explanation() -> Result<()> {
+fn contains_exactly_produces_correct_failure_explanation() -> TestResult<()> {
     let result = verify_that!([1, 4, 3], contains_exactly![eq(1), eq(2), eq(3)]);
     verify_that!(
         result,
@@ -204,7 +204,7 @@ fn contains_exactly_produces_correct_failure_explanation() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_produces_correct_failure_explanation_for_no_perfect_match() -> Result<()> {
+fn contains_exactly_produces_correct_failure_explanation_for_no_perfect_match() -> TestResult<()> {
     let result = verify_that!([1, 1, 2], contains_exactly![eq(1), eq(2), eq(2)]);
     verify_that!(
         result,
@@ -220,7 +220,7 @@ fn contains_exactly_produces_correct_failure_explanation_for_no_perfect_match() 
 }
 
 #[test]
-fn contains_exactly_failure_explanation_contains_clause_about_missing_element() -> Result<()> {
+fn contains_exactly_failure_explanation_contains_clause_about_missing_element() -> TestResult<()> {
     let result = verify_that!([1, 1, 3], contains_exactly![eq(1), eq(2), eq(3)]);
     verify_that!(
         result,
@@ -231,7 +231,7 @@ fn contains_exactly_failure_explanation_contains_clause_about_missing_element() 
 }
 
 #[test]
-fn contains_exactly_produces_correct_failure_message_when_matchers_are_nested() -> Result<()> {
+fn contains_exactly_produces_correct_failure_message_when_matchers_are_nested() -> TestResult<()> {
     let result = verify_that!(
         [[0, 1], [1, 2]],
         contains_exactly![contains_exactly![eq(1), eq(2)], contains_exactly![eq(2), eq(3)]]
@@ -254,13 +254,13 @@ fn contains_exactly_produces_correct_failure_message_when_matchers_are_nested() 
 }
 
 #[test]
-fn contains_exactly_explains_mismatch_due_to_wrong_size() -> Result<()> {
+fn contains_exactly_explains_mismatch_due_to_wrong_size() -> TestResult<()> {
     let result = verify_that!([2, 3], contains_exactly![eq(2), eq(3), eq(4)]);
     verify_that!(result, err(displays_as(contains_substring("which has size 2 (expected 3)"))))
 }
 
 #[test]
-fn contains_exactly_works_when_matcher_is_created_in_subroutine() -> Result<()> {
+fn contains_exactly_works_when_matcher_is_created_in_subroutine() -> TestResult<()> {
     fn create_matcher() -> impl Matcher<Vec<i32>> {
         contains_exactly![eq(1)]
     }
@@ -279,12 +279,12 @@ impl<'a> IntoIterator for &'a OwnedItemContainer {
 }
 
 #[test]
-fn contains_exactly_matches_container_a_ref_of_which_produces_owned_items() -> Result<()> {
+fn contains_exactly_matches_container_a_ref_of_which_produces_owned_items() -> TestResult<()> {
     verify_that!(OwnedItemContainer(vec![1, 2, 3]), contains_exactly![eq(3), eq(2), eq(1)])
 }
 
 #[test]
-fn contains_exactly_matches_hash_map() -> Result<()> {
+fn contains_exactly_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
         contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
@@ -292,7 +292,7 @@ fn contains_exactly_matches_hash_map() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_matches_hash_map_with_trailing_comma() -> Result<()> {
+fn contains_exactly_matches_hash_map_with_trailing_comma() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
         contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three")),]
@@ -300,7 +300,7 @@ fn contains_exactly_matches_hash_map_with_trailing_comma() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_does_not_match_hash_map_with_wrong_key() -> Result<()> {
+fn contains_exactly_does_not_match_hash_map_with_wrong_key() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (4, "Three")]),
         not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
@@ -308,7 +308,7 @@ fn contains_exactly_does_not_match_hash_map_with_wrong_key() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_does_not_match_hash_map_with_wrong_value() -> Result<()> {
+fn contains_exactly_does_not_match_hash_map_with_wrong_value() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Four")]),
         not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
@@ -316,7 +316,7 @@ fn contains_exactly_does_not_match_hash_map_with_wrong_value() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_does_not_match_hash_map_missing_element() -> Result<()> {
+fn contains_exactly_does_not_match_hash_map_missing_element() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two")]),
         not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
@@ -324,7 +324,7 @@ fn contains_exactly_does_not_match_hash_map_missing_element() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_does_not_match_hash_map_with_extra_element() -> Result<()> {
+fn contains_exactly_does_not_match_hash_map_with_extra_element() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
         not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One"))])
@@ -332,7 +332,7 @@ fn contains_exactly_does_not_match_hash_map_with_extra_element() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_does_not_match_hash_map_with_mismatched_key_and_value() -> Result<()> {
+fn contains_exactly_does_not_match_hash_map_with_mismatched_key_and_value() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Three"), (3, "Two")]),
         not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
@@ -340,7 +340,7 @@ fn contains_exactly_does_not_match_hash_map_with_mismatched_key_and_value() -> R
 }
 
 #[test]
-fn contains_exactly_with_map_admits_matchers_without_static_lifetime() -> Result<()> {
+fn contains_exactly_with_map_admits_matchers_without_static_lifetime() -> TestResult<()> {
     #[derive(Debug, PartialEq)]
     struct AStruct(i32);
     let expected_value = AStruct(123);
@@ -351,7 +351,7 @@ fn contains_exactly_with_map_admits_matchers_without_static_lifetime() -> Result
 }
 
 #[test]
-fn contains_exactly_works_when_matcher_for_maps_is_created_in_subroutine() -> Result<()> {
+fn contains_exactly_works_when_matcher_for_maps_is_created_in_subroutine() -> TestResult<()> {
     fn create_matcher() -> impl Matcher<HashMap<i32, i32>> {
         contains_exactly![(eq(1) => eq(1))]
     }
@@ -359,17 +359,17 @@ fn contains_exactly_works_when_matcher_for_maps_is_created_in_subroutine() -> Re
 }
 
 #[test]
-fn contains_each_matches_when_one_to_one_correspondence_present() -> Result<()> {
+fn contains_each_matches_when_one_to_one_correspondence_present() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], contains_each!(eq(2), eq(3), eq(4)))
 }
 
 #[test]
-fn contains_each_supports_trailing_comma() -> Result<()> {
+fn contains_each_supports_trailing_comma() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], contains_each!(eq(2), eq(3), eq(4),))
 }
 
 #[test]
-fn contains_each_matches_hash_map() -> Result<()> {
+fn contains_each_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
         contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One"))]
@@ -377,7 +377,7 @@ fn contains_each_matches_hash_map() -> Result<()> {
 }
 
 #[test]
-fn contains_each_matches_hash_map_with_trailing_comma() -> Result<()> {
+fn contains_each_matches_hash_map_with_trailing_comma() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
         contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One")),]
@@ -385,32 +385,32 @@ fn contains_each_matches_hash_map_with_trailing_comma() -> Result<()> {
 }
 
 #[test]
-fn contains_each_matches_when_no_matchers_present() -> Result<()> {
+fn contains_each_matches_when_no_matchers_present() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], contains_each!())
 }
 
 #[test]
-fn contains_each_matches_when_no_matchers_present_and_trailing_comma() -> Result<()> {
+fn contains_each_matches_when_no_matchers_present_and_trailing_comma() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], contains_each!(,))
 }
 
 #[test]
-fn contains_each_matches_when_list_is_empty_and_no_matchers_present() -> Result<()> {
+fn contains_each_matches_when_list_is_empty_and_no_matchers_present() -> TestResult<()> {
     verify_that!(Vec::<u32>::new(), contains_each!())
 }
 
 #[test]
-fn contains_each_matches_when_excess_elements_present() -> Result<()> {
+fn contains_each_matches_when_excess_elements_present() -> TestResult<()> {
     verify_that!(vec![1, 2, 3, 4], contains_each!(eq(2), eq(3), eq(4)))
 }
 
 #[test]
-fn contains_each_does_not_match_when_matchers_are_unmatched() -> Result<()> {
+fn contains_each_does_not_match_when_matchers_are_unmatched() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], not(contains_each!(eq(2), eq(3), eq(4))))
 }
 
 #[test]
-fn contains_each_explains_mismatch_due_to_wrong_size() -> Result<()> {
+fn contains_each_explains_mismatch_due_to_wrong_size() -> TestResult<()> {
     let result = verify_that!([2, 3], contains_each![eq(2), eq(3), eq(4)]);
     verify_that!(
         result,
@@ -419,7 +419,7 @@ fn contains_each_explains_mismatch_due_to_wrong_size() -> Result<()> {
 }
 
 #[test]
-fn contains_each_explains_missing_element_in_mismatch() -> Result<()> {
+fn contains_each_explains_missing_element_in_mismatch() -> TestResult<()> {
     let result = verify_that!([1, 2, 3], contains_each![eq(2), eq(3), eq(4)]);
     verify_that!(
         result,
@@ -430,7 +430,7 @@ fn contains_each_explains_missing_element_in_mismatch() -> Result<()> {
 }
 
 #[test]
-fn contains_each_explains_missing_elements_in_mismatch() -> Result<()> {
+fn contains_each_explains_missing_elements_in_mismatch() -> TestResult<()> {
     let result = verify_that!([0, 1, 2, 3], contains_each![eq(2), eq(3), eq(4), eq(5)]);
     verify_that!(
         result,
@@ -441,7 +441,7 @@ fn contains_each_explains_missing_elements_in_mismatch() -> Result<()> {
 }
 
 #[test]
-fn contains_each_explains_mismatch_due_to_no_graph_matching_found() -> Result<()> {
+fn contains_each_explains_mismatch_due_to_no_graph_matching_found() -> TestResult<()> {
     let result = verify_that!([1, 2], contains_each![ge(2), ge(2)]);
     verify_that!(
         result,
@@ -455,29 +455,29 @@ fn contains_each_explains_mismatch_due_to_no_graph_matching_found() -> Result<()
 }
 
 #[test]
-fn is_contained_in_matches_with_empty_vector() -> Result<()> {
+fn is_contained_in_matches_with_empty_vector() -> TestResult<()> {
     let value: Vec<u32> = vec![];
     verify_that!(value, is_contained_in!())
 }
 
 #[test]
-fn is_contained_in_matches_with_empty_vector_and_trailing_comma() -> Result<()> {
+fn is_contained_in_matches_with_empty_vector_and_trailing_comma() -> TestResult<()> {
     let value: Vec<u32> = vec![];
     verify_that!(value, is_contained_in!(,))
 }
 
 #[test]
-fn is_contained_in_matches_when_one_to_one_correspondence_present() -> Result<()> {
+fn is_contained_in_matches_when_one_to_one_correspondence_present() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], is_contained_in!(eq(2), eq(3), eq(4)))
 }
 
 #[test]
-fn is_contained_supports_trailing_comma() -> Result<()> {
+fn is_contained_supports_trailing_comma() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], is_contained_in!(eq(2), eq(3), eq(4),))
 }
 
 #[test]
-fn is_contained_in_matches_hash_map() -> Result<()> {
+fn is_contained_in_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two")]),
         is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
@@ -485,7 +485,7 @@ fn is_contained_in_matches_hash_map() -> Result<()> {
 }
 
 #[test]
-fn is_contained_in_matches_hash_map_with_trailing_comma() -> Result<()> {
+fn is_contained_in_matches_hash_map_with_trailing_comma() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two")]),
         is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three")),]
@@ -493,23 +493,23 @@ fn is_contained_in_matches_hash_map_with_trailing_comma() -> Result<()> {
 }
 
 #[test]
-fn is_contained_in_matches_when_container_is_empty() -> Result<()> {
+fn is_contained_in_matches_when_container_is_empty() -> TestResult<()> {
     let value = Vec::<i32>::new();
     verify_that!(value, is_contained_in!(eq(2), eq(3), eq(4)))
 }
 
 #[test]
-fn is_contained_in_matches_when_excess_matchers_present() -> Result<()> {
+fn is_contained_in_matches_when_excess_matchers_present() -> TestResult<()> {
     verify_that!(vec![3, 4], is_contained_in!(eq(2), eq(3), eq(4)))
 }
 
 #[test]
-fn is_contained_in_does_not_match_when_elements_are_unmatched() -> Result<()> {
+fn is_contained_in_does_not_match_when_elements_are_unmatched() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], not(is_contained_in!(eq(2), eq(3), eq(4))))
 }
 
 #[test]
-fn is_contained_in_explains_mismatch_due_to_wrong_size() -> Result<()> {
+fn is_contained_in_explains_mismatch_due_to_wrong_size() -> TestResult<()> {
     let result = verify_that!([2, 3, 4], is_contained_in![eq(2), eq(3)]);
     verify_that!(
         result,
@@ -518,7 +518,7 @@ fn is_contained_in_explains_mismatch_due_to_wrong_size() -> Result<()> {
 }
 
 #[test]
-fn is_contained_in_explains_missing_element_in_mismatch() -> Result<()> {
+fn is_contained_in_explains_missing_element_in_mismatch() -> TestResult<()> {
     let result = verify_that!([1, 2, 3], is_contained_in![eq(2), eq(3), eq(4)]);
     verify_that!(
         result,
@@ -529,7 +529,7 @@ fn is_contained_in_explains_missing_element_in_mismatch() -> Result<()> {
 }
 
 #[test]
-fn is_contained_in_explains_missing_elements_in_mismatch() -> Result<()> {
+fn is_contained_in_explains_missing_elements_in_mismatch() -> TestResult<()> {
     let result = verify_that!([0, 1, 2, 3], is_contained_in![eq(2), eq(3), eq(4), eq(5)]);
     verify_that!(
         result,
@@ -540,7 +540,7 @@ fn is_contained_in_explains_missing_elements_in_mismatch() -> Result<()> {
 }
 
 #[test]
-fn is_contained_in_explains_mismatch_due_to_no_graph_matching_found() -> Result<()> {
+fn is_contained_in_explains_mismatch_due_to_no_graph_matching_found() -> TestResult<()> {
     let result = verify_that!([1, 2], is_contained_in![ge(1), ge(3)]);
     verify_that!(
         result,

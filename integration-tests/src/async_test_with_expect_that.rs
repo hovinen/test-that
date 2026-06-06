@@ -24,7 +24,7 @@ mod tests {
 
     #[test_that::test]
     #[tokio::test]
-    async fn async_test_failure_with_non_fatal_assertion() -> Result<()> {
+    async fn async_test_failure_with_non_fatal_assertion() -> TestResult<()> {
         sleep(Duration::from_millis(1)).await;
         expect_that!(2, eq(3));
         Ok(())
@@ -32,7 +32,7 @@ mod tests {
 
     #[test_that::test]
     #[tokio::test]
-    async fn async_test_failure_with_fatal_assertion() -> Result<()> {
+    async fn async_test_failure_with_fatal_assertion() -> TestResult<()> {
         sleep(Duration::from_millis(1)).await;
         verify_that!(3, eq(4))?;
         Ok(())

@@ -19,13 +19,13 @@ use test_that::prelude::*;
 use proptest::test_runner::{Config, TestRunner};
 
 #[test]
-fn numbers_are_greater_than_zero() -> Result<()> {
+fn numbers_are_greater_than_zero() -> TestResult<()> {
     let mut runner = TestRunner::new(Config::default());
     runner.run(&(1..100i32), |v| Ok(verify_that!(v, gt(0))?)).or_fail()
 }
 
 #[test]
-fn strings_are_nonempty() -> Result<()> {
+fn strings_are_nonempty() -> TestResult<()> {
     let mut runner = TestRunner::new(Config::default());
     runner.run(&"[a-zA-Z0-9]+", |v| Ok(verify_that!(v, not(eq("")))?)).or_fail()
 }

@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test_that::test]
-    fn verify_predicate_on_method_in_submodule_with_failure() -> Result<()> {
+    fn verify_predicate_on_method_in_submodule_with_failure() -> TestResult<()> {
         let a = 1;
         let b = 2;
         verify_pred!(a_submodule::A_STRUCT_IN_SUBMODULE.eq_predicate_as_method(a, b))

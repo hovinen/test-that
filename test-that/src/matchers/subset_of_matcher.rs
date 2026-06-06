@@ -33,14 +33,14 @@ use std::{fmt::Debug, marker::PhantomData};
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
-/// # fn should_pass_1() -> Result<()> {
+/// # fn should_pass_1() -> TestResult<()> {
 /// let value = vec![1, 2, 3];
 /// verify_that!(value, subset_of([1, 2, 3, 4]))?;  // Passes
 /// let array_value = [1, 2, 3];
 /// verify_that!(array_value, subset_of([1, 2, 3, 4]))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// # let value = vec![1, 2, 3];
 /// verify_that!(value, subset_of([1, 2]))?;  // Fails: 3 is not in the superset
 /// #     Ok(())
@@ -48,7 +48,7 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_pass_1().unwrap();
 /// # should_fail().unwrap_err();
 ///
-/// # fn should_pass_2() -> Result<()> {
+/// # fn should_pass_2() -> TestResult<()> {
 /// let value: HashSet<i32> = [1, 2, 3].into();
 /// verify_that!(value, subset_of([1, 2, 3]))?;  // Passes
 /// #     Ok(())
@@ -60,7 +60,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value: Vec<i32> = vec![0, 0, 1];
 /// verify_that!(value, subset_of([0, 1]))?;  // Passes
 /// verify_that!(value, subset_of([0, 1, 1]))?;  // Passes
@@ -73,7 +73,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value = &[1, 2, 3];
 /// verify_that!(*value, subset_of([1, 2, 3]))?;
 /// #     Ok(())
@@ -182,62 +182,62 @@ mod tests {
     use std::collections::HashSet;
 
     #[test]
-    fn subset_of_matches_empty_vec() -> Result<()> {
+    fn subset_of_matches_empty_vec() -> TestResult<()> {
         let value: Vec<i32> = vec![];
         verify_that!(value, subset_of([]))
     }
 
     #[test]
-    fn subset_of_matches_vec_with_one_element_with_array() -> Result<()> {
+    fn subset_of_matches_vec_with_one_element_with_array() -> TestResult<()> {
         verify_that!(vec![1], subset_of([1]))
     }
 
     #[test]
-    fn subset_of_matches_vec_with_one_element_with_vec() -> Result<()> {
+    fn subset_of_matches_vec_with_one_element_with_vec() -> TestResult<()> {
         verify_that!(vec![1], subset_of(vec![1]))
     }
 
     #[test]
-    fn subset_of_matches_array_of_one_element_with_array() -> Result<()> {
+    fn subset_of_matches_array_of_one_element_with_array() -> TestResult<()> {
         verify_that!([1], subset_of([1]))
     }
 
     #[test]
-    fn subset_of_matches_vec_with_two_elements() -> Result<()> {
+    fn subset_of_matches_vec_with_two_elements() -> TestResult<()> {
         verify_that!(vec![1, 2], subset_of([1, 2]))
     }
 
     #[test]
-    fn subset_of_matches_vec_when_expected_has_excess_element() -> Result<()> {
+    fn subset_of_matches_vec_when_expected_has_excess_element() -> TestResult<()> {
         verify_that!(vec![1, 2], subset_of([1, 2, 3]))
     }
 
     #[test]
-    fn subset_of_matches_vec_when_expected_has_excess_element_first() -> Result<()> {
+    fn subset_of_matches_vec_when_expected_has_excess_element_first() -> TestResult<()> {
         verify_that!(vec![1, 2], subset_of([3, 1, 2]))
     }
 
     #[test]
-    fn subset_of_matches_array_ref_with_one_element_using_points_to() -> Result<()> {
+    fn subset_of_matches_array_ref_with_one_element_using_points_to() -> TestResult<()> {
         let value = &[1];
         verify_that!(value, points_to(subset_of([1])))
     }
 
     #[test]
-    fn subset_of_matches_array_ref_with_one_element_using_deref_notation() -> Result<()> {
+    fn subset_of_matches_array_ref_with_one_element_using_deref_notation() -> TestResult<()> {
         let value = &[1];
         verify_that!(*value, subset_of([1]))
     }
 
     #[test]
-    fn subset_of_matches_slice_with_one_element_using_points_to() -> Result<()> {
+    fn subset_of_matches_slice_with_one_element_using_points_to() -> TestResult<()> {
         let value = vec![1];
         let slice = value.as_slice();
         verify_that!(slice, points_to(subset_of([1])))
     }
 
     #[test]
-    fn subset_of_matches_slice_with_one_element_using_deref_notation() -> Result<()> {
+    fn subset_of_matches_slice_with_one_element_using_deref_notation() -> TestResult<()> {
         let value = vec![1];
         let slice = value.as_slice();
         verify_that!(*slice, subset_of([1]))
@@ -256,12 +256,12 @@ mod tests {
 
     #[test]
     fn subset_of_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!(OwnedItemContainer(vec![1]), subset_of([1]))
     }
 
     #[test]
-    fn subset_of_matches_vec_of_string_slices() -> Result<()> {
+    fn subset_of_matches_vec_of_string_slices() -> TestResult<()> {
         verify_that!(
             vec!["String 1", "String 2", "String 3"],
             subset_of(["String 1", "String 2", "String 3"])
@@ -269,7 +269,7 @@ mod tests {
     }
 
     #[test]
-    fn subset_of_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+    fn subset_of_matches_vec_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
         let string_1 = String::from("String 1");
         let string_2 = String::from("String 2");
         let string_3 = String::from("String 3");
@@ -280,13 +280,13 @@ mod tests {
     }
 
     #[test]
-    fn subset_of_matches_slice_of_string_slices() -> Result<()> {
+    fn subset_of_matches_slice_of_string_slices() -> TestResult<()> {
         let value = vec!["String 1", "String 2", "String 3"];
         verify_that!(value.as_slice(), points_to(subset_of(["String 1", "String 2", "String 3"])))
     }
 
     #[test]
-    fn subset_of_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()> {
+    fn subset_of_matches_slice_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
         let string_1 = String::from("String 1");
         let string_2 = String::from("String 2");
         let string_3 = String::from("String 3");
@@ -295,22 +295,22 @@ mod tests {
     }
 
     #[test]
-    fn subset_of_matches_hash_set_with_one_element() -> Result<()> {
+    fn subset_of_matches_hash_set_with_one_element() -> TestResult<()> {
         verify_that!(HashSet::from([1]), subset_of([1]))
     }
 
     #[test]
-    fn subset_of_does_not_match_when_first_element_does_not_match() -> Result<()> {
+    fn subset_of_does_not_match_when_first_element_does_not_match() -> TestResult<()> {
         verify_that!(vec![0], not(subset_of([1])))
     }
 
     #[test]
-    fn subset_of_does_not_match_when_second_element_does_not_match() -> Result<()> {
+    fn subset_of_does_not_match_when_second_element_does_not_match() -> TestResult<()> {
         verify_that!(vec![2, 0], not(subset_of([2])))
     }
 
     #[test]
-    fn subset_of_shows_correct_message_when_first_item_does_not_match() -> Result<()> {
+    fn subset_of_shows_correct_message_when_first_item_does_not_match() -> TestResult<()> {
         let result = verify_that!(vec![0, 2, 3], subset_of([1, 2, 3]));
 
         verify_that!(
@@ -331,7 +331,7 @@ mod tests {
     }
 
     #[test]
-    fn subset_of_shows_correct_message_when_second_item_does_not_match() -> Result<()> {
+    fn subset_of_shows_correct_message_when_second_item_does_not_match() -> TestResult<()> {
         let result = verify_that!(vec![1, 0, 3], subset_of([1, 2, 3]));
 
         verify_that!(
@@ -352,7 +352,7 @@ mod tests {
     }
 
     #[test]
-    fn subset_of_shows_correct_message_when_first_two_items_do_not_match() -> Result<()> {
+    fn subset_of_shows_correct_message_when_first_two_items_do_not_match() -> TestResult<()> {
         let result = verify_that!(vec![0, 0, 3], subset_of([1, 2, 3]));
 
         verify_that!(

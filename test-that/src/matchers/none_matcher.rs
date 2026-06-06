@@ -21,11 +21,11 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(None::<()>, none())?;   // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!(Some("Some value"), none())?;  // Fails
 /// #     Ok(())
 /// # }
@@ -60,7 +60,7 @@ mod tests {
     use crate::prelude::*;
 
     #[test]
-    fn none_matches_option_with_none() -> Result<()> {
+    fn none_matches_option_with_none() -> TestResult<()> {
         let matcher = none();
 
         let result = matcher.matches(&None::<i32>);
@@ -69,7 +69,7 @@ mod tests {
     }
 
     #[test]
-    fn none_does_not_match_option_with_value() -> Result<()> {
+    fn none_does_not_match_option_with_value() -> TestResult<()> {
         let matcher = none();
 
         let result = matcher.matches(&Some(0));

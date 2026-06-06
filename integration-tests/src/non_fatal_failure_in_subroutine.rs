@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test_that::test]
-    fn calls_verify_that_in_subroutine() -> Result<()> {
+    fn calls_verify_that_in_subroutine() -> TestResult<()> {
         verify_that_things_are_okay(2);
         Ok(())
     }

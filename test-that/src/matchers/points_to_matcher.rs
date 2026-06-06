@@ -26,7 +26,7 @@ use std::ops::Deref;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(Box::new(123), points_to(eq(123)))?;
 /// #     Ok(())
 /// # }
@@ -69,22 +69,22 @@ mod tests {
     use std::rc::Rc;
 
     #[test]
-    fn points_to_matches_box_of_int_with_int() -> Result<()> {
+    fn points_to_matches_box_of_int_with_int() -> TestResult<()> {
         verify_that!(Box::new(123), points_to(eq(123)))
     }
 
     #[test]
-    fn points_to_matches_rc_of_int_with_int() -> Result<()> {
+    fn points_to_matches_rc_of_int_with_int() -> TestResult<()> {
         verify_that!(Rc::new(123), points_to(eq(123)))
     }
 
     #[test]
-    fn points_to_matches_box_of_owned_string_with_string_reference() -> Result<()> {
+    fn points_to_matches_box_of_owned_string_with_string_reference() -> TestResult<()> {
         verify_that!(Rc::new("A string".to_string()), points_to(eq("A string")))
     }
 
     #[test]
-    fn match_explanation_references_actual_value() -> Result<()> {
+    fn match_explanation_references_actual_value() -> TestResult<()> {
         let result = verify_that!(&vec![1], points_to(container_eq([])));
 
         verify_that!(

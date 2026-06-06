@@ -23,15 +23,15 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> test_that::Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(Err::<(), _>("Some error"), err(eq("Some error")))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> test_that::Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(Ok::<_, &str>("A value"), err(eq("A value")))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> test_that::Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(Err::<(), _>("Some error"), err(eq("Some other error")))?;   // Fails
 /// #     Ok(())
 /// # }
@@ -88,7 +88,7 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn err_matches_result_with_err_value() -> Result<()> {
+    fn err_matches_result_with_err_value() -> TestResult<()> {
         let matcher = err(eq(1));
         let value: std::result::Result<i32, i32> = Err(1);
 
@@ -98,7 +98,7 @@ mod tests {
     }
 
     #[test]
-    fn err_does_not_match_result_with_wrong_err_value() -> Result<()> {
+    fn err_does_not_match_result_with_wrong_err_value() -> TestResult<()> {
         let matcher = err(eq(1));
         let value: std::result::Result<i32, i32> = Err(0);
 
@@ -108,7 +108,7 @@ mod tests {
     }
 
     #[test]
-    fn err_does_not_match_result_with_ok() -> Result<()> {
+    fn err_does_not_match_result_with_ok() -> TestResult<()> {
         let matcher = err(eq(1));
         let value: std::result::Result<i32, i32> = Ok(1);
 
@@ -118,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn err_full_error_message() -> Result<()> {
+    fn err_full_error_message() -> TestResult<()> {
         let result = verify_that!(Err::<i32, i32>(1), err(eq(2)));
 
         verify_that!(
@@ -136,7 +136,7 @@ mod tests {
     }
 
     #[test]
-    fn err_describe_matches() -> Result<()> {
+    fn err_describe_matches() -> TestResult<()> {
         let result = verify_that!(Err::<i32, i32>(2), err(eq(1)));
         verify_that!(
             result,

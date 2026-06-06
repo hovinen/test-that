@@ -45,22 +45,22 @@ mod tests {
     use crate::prelude::*;
 
     #[test]
-    fn matches_f32_nan() -> Result<()> {
+    fn matches_f32_nan() -> TestResult<()> {
         verify_that!(f32::NAN, is_nan())
     }
 
     #[test]
-    fn does_not_match_f32_number() -> Result<()> {
+    fn does_not_match_f32_number() -> TestResult<()> {
         verify_that!(0.0f32, not(is_nan()))
     }
 
     #[test]
-    fn matches_f64_nan() -> Result<()> {
+    fn matches_f64_nan() -> TestResult<()> {
         verify_that!(f64::NAN, is_nan())
     }
 
     #[test]
-    fn does_not_match_f64_number() -> Result<()> {
+    fn does_not_match_f64_number() -> TestResult<()> {
         verify_that!(0.0f64, not(is_nan()))
     }
 }

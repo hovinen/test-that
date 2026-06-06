@@ -241,20 +241,20 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn renders_single_fragment() -> Result<()> {
+    fn renders_single_fragment() -> TestResult<()> {
         let description: Description = "A B C".into();
         verify_that!(description, displays_as(eq("A B C")))
     }
 
     #[test]
-    fn renders_two_fragments() -> Result<()> {
+    fn renders_two_fragments() -> TestResult<()> {
         let description =
             ["A B C".to_string(), "D E F".to_string()].into_iter().collect::<Description>();
         verify_that!(description, displays_as(eq("A B C\nD E F")))
     }
 
     #[test]
-    fn nested_description_is_indented() -> Result<()> {
+    fn nested_description_is_indented() -> TestResult<()> {
         let description = Description::new()
             .text("Header")
             .nested(["A B C".to_string()].into_iter().collect::<Description>());
@@ -262,7 +262,7 @@ mod tests {
     }
 
     #[test]
-    fn nested_description_indents_two_elements() -> Result<()> {
+    fn nested_description_indents_two_elements() -> TestResult<()> {
         let description = Description::new().text("Header").nested(
             ["A B C".to_string(), "D E F".to_string()].into_iter().collect::<Description>(),
         );
@@ -270,62 +270,62 @@ mod tests {
     }
 
     #[test]
-    fn nested_description_indents_one_element_on_two_lines() -> Result<()> {
+    fn nested_description_indents_one_element_on_two_lines() -> TestResult<()> {
         let description = Description::new().text("Header").nested("A B C\nD E F".into());
         verify_that!(description, displays_as(eq("Header\n  A B C\n  D E F")))
     }
 
     #[test]
-    fn single_fragment_renders_with_bullet_when_bullet_list_enabled() -> Result<()> {
+    fn single_fragment_renders_with_bullet_when_bullet_list_enabled() -> TestResult<()> {
         let description = Description::new().text("A B C").bullet_list();
         verify_that!(description, displays_as(eq("* A B C")))
     }
 
     #[test]
-    fn single_nested_fragment_renders_with_bullet_when_bullet_list_enabled() -> Result<()> {
+    fn single_nested_fragment_renders_with_bullet_when_bullet_list_enabled() -> TestResult<()> {
         let description = Description::new().nested("A B C".into()).bullet_list();
         verify_that!(description, displays_as(eq("* A B C")))
     }
 
     #[test]
-    fn two_fragments_render_with_bullet_when_bullet_list_enabled() -> Result<()> {
+    fn two_fragments_render_with_bullet_when_bullet_list_enabled() -> TestResult<()> {
         let description = Description::new().text("A B C").text("D E F").bullet_list();
         verify_that!(description, displays_as(eq("* A B C\n* D E F")))
     }
 
     #[test]
-    fn two_nested_fragments_render_with_bullet_when_bullet_list_enabled() -> Result<()> {
+    fn two_nested_fragments_render_with_bullet_when_bullet_list_enabled() -> TestResult<()> {
         let description =
             Description::new().nested("A B C".into()).nested("D E F".into()).bullet_list();
         verify_that!(description, displays_as(eq("* A B C\n* D E F")))
     }
 
     #[test]
-    fn single_fragment_with_more_than_one_line_renders_with_one_bullet() -> Result<()> {
+    fn single_fragment_with_more_than_one_line_renders_with_one_bullet() -> TestResult<()> {
         let description = Description::new().text("A B C\nD E F").bullet_list();
         verify_that!(description, displays_as(eq("* A B C\n  D E F")))
     }
 
     #[test]
-    fn single_fragment_renders_with_enumeration_when_enumerate_enabled() -> Result<()> {
+    fn single_fragment_renders_with_enumeration_when_enumerate_enabled() -> TestResult<()> {
         let description = Description::new().text("A B C").enumerate();
         verify_that!(description, displays_as(eq("0. A B C")))
     }
 
     #[test]
-    fn two_fragments_render_with_enumeration_when_enumerate_enabled() -> Result<()> {
+    fn two_fragments_render_with_enumeration_when_enumerate_enabled() -> TestResult<()> {
         let description = Description::new().text("A B C").text("D E F").enumerate();
         verify_that!(description, displays_as(eq("0. A B C\n1. D E F")))
     }
 
     #[test]
-    fn single_fragment_with_two_lines_renders_with_one_enumeration_label() -> Result<()> {
+    fn single_fragment_with_two_lines_renders_with_one_enumeration_label() -> TestResult<()> {
         let description = Description::new().text("A B C\nD E F").enumerate();
         verify_that!(description, displays_as(eq("0. A B C\n   D E F")))
     }
 
     #[test]
-    fn multi_digit_enumeration_renders_with_correct_offset() -> Result<()> {
+    fn multi_digit_enumeration_renders_with_correct_offset() -> TestResult<()> {
         let description = ["A B C\nD E F"; 11]
             .into_iter()
             .map(str::to_string)

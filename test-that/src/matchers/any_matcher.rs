@@ -26,13 +26,13 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!("A string", any!(starts_with("A"), ends_with("string")))?; // Passes
 /// verify_that!("A string", any!(starts_with("A"), starts_with("string")))?; // Passes
 /// verify_that!("A string", any!(ends_with("A"), ends_with("string")))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!("A string", any!(starts_with("An"), ends_with("not a string")))?; // Fails
 /// #     Ok(())
 /// # }
@@ -45,7 +45,7 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(10, gt(9).or(lt(8)))?; // Also passes
 /// #     Ok(())
 /// # }
@@ -158,7 +158,7 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn description_shows_more_than_one_matcher() -> Result<()> {
+    fn description_shows_more_than_one_matcher() -> TestResult<()> {
         let first_matcher = starts_with("A");
         let second_matcher = ends_with("string");
         let matcher: internal::AnyMatcher<String, 2> = any!(first_matcher, second_matcher);
@@ -175,7 +175,7 @@ mod tests {
     }
 
     #[test]
-    fn description_shows_one_matcher_directly() -> Result<()> {
+    fn description_shows_one_matcher_directly() -> TestResult<()> {
         let first_matcher = starts_with("A");
         let matcher: internal::AnyMatcher<String, 1> = any!(first_matcher);
 
@@ -186,8 +186,8 @@ mod tests {
     }
 
     #[test]
-    fn mismatch_description_shows_which_matcher_failed_if_more_than_one_constituent() -> Result<()>
-    {
+    fn mismatch_description_shows_which_matcher_failed_if_more_than_one_constituent()
+    -> TestResult<()> {
         let first_matcher = starts_with("Another");
         let second_matcher = ends_with("string");
         let matcher: internal::AnyMatcher<str, 2> = any!(first_matcher, second_matcher);
@@ -199,7 +199,7 @@ mod tests {
     }
 
     #[test]
-    fn mismatch_description_is_simple_when_only_one_constituent() -> Result<()> {
+    fn mismatch_description_is_simple_when_only_one_constituent() -> TestResult<()> {
         let first_matcher = starts_with("Another");
         let matcher: internal::AnyMatcher<str, 1> = any!(first_matcher);
 

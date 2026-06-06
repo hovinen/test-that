@@ -66,22 +66,22 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn or_true_true_matches() -> Result<()> {
+    fn or_true_true_matches() -> TestResult<()> {
         verify_that!(1, anything().or(anything()))
     }
 
     #[test]
-    fn or_true_false_matches() -> Result<()> {
+    fn or_true_false_matches() -> TestResult<()> {
         verify_that!(1, anything().or(not(anything())))
     }
 
     #[test]
-    fn or_false_true_matches() -> Result<()> {
+    fn or_false_true_matches() -> TestResult<()> {
         verify_that!(1, not(anything()).or(anything()))
     }
 
     #[test]
-    fn or_false_false_does_not_match() -> Result<()> {
+    fn or_false_false_does_not_match() -> TestResult<()> {
         let result = verify_that!(1, not(anything()).or(not(anything())));
         verify_that!(
             result,
@@ -99,17 +99,17 @@ mod tests {
     }
 
     #[test]
-    fn chained_or_matches() -> Result<()> {
+    fn chained_or_matches() -> TestResult<()> {
         verify_that!(10, eq(1).or(eq(5)).or(ge(9)))
     }
 
     #[test]
-    fn works_with_str_slices() -> Result<()> {
+    fn works_with_str_slices() -> TestResult<()> {
         verify_that!("A string", ends_with("A").or(ends_with("string")))
     }
 
     #[test]
-    fn works_with_owned_strings() -> Result<()> {
+    fn works_with_owned_strings() -> TestResult<()> {
         verify_that!("A string".to_string(), ends_with("A").or(ends_with("string")))
     }
 }

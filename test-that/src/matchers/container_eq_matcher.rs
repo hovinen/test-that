@@ -43,7 +43,7 @@ use std::marker::PhantomData;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let vec = vec![1, 2, 3];
 /// verify_that!(vec, container_eq([1, 2, 3]))?;
 /// #     Ok(())
@@ -56,7 +56,7 @@ use std::marker::PhantomData;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let vec: Vec<String> = vec!["A string".into(), "Another string".into()];
 /// verify_that!(vec, container_eq(["A string", "Another string"]))?;
 /// #     Ok(())
@@ -72,7 +72,7 @@ use std::marker::PhantomData;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value = &[1, 2, 3];
 /// verify_that!(*value, container_eq([1, 2, 3]))?;
 /// #     Ok(())
@@ -251,47 +251,48 @@ mod tests {
     use std::collections::HashSet;
 
     #[test]
-    fn container_eq_returns_match_when_containers_match() -> Result<()> {
+    fn container_eq_returns_match_when_containers_match() -> TestResult<()> {
         verify_that!(vec![1, 2, 3], container_eq(vec![1, 2, 3]))
     }
 
     #[test]
-    fn container_eq_matches_array_with_array() -> Result<()> {
+    fn container_eq_matches_array_with_array() -> TestResult<()> {
         verify_that!([1, 2, 3], container_eq([1, 2, 3]))
     }
 
     #[test]
-    fn container_eq_matches_vec_with_array() -> Result<()> {
+    fn container_eq_matches_vec_with_array() -> TestResult<()> {
         verify_that!(vec![1, 2, 3], container_eq([1, 2, 3]))
     }
 
     #[test]
-    fn container_eq_matches_slice_using_points_to() -> Result<()> {
+    fn container_eq_matches_slice_using_points_to() -> TestResult<()> {
         let value = vec![1, 2, 3];
         let slice = value.as_slice();
         verify_that!(slice, points_to(container_eq([1, 2, 3])))
     }
 
     #[test]
-    fn container_eq_matches_slice_using_deref_notation() -> Result<()> {
+    fn container_eq_matches_slice_using_deref_notation() -> TestResult<()> {
         let value = vec![1, 2, 3];
         let slice = value.as_slice();
         verify_that!(*slice, container_eq([1, 2, 3]))
     }
 
     #[test]
-    fn container_eq_matches_ref_to_array_using_points_to() -> Result<()> {
+    fn container_eq_matches_ref_to_array_using_points_to() -> TestResult<()> {
         verify_that!(&[1, 2, 3], points_to(container_eq([1, 2, 3])))
     }
 
     #[test]
-    fn container_eq_matches_ref_to_array_using_deref_notation() -> Result<()> {
+    fn container_eq_matches_ref_to_array_using_deref_notation() -> TestResult<()> {
         let value = &[1, 2, 3];
         verify_that!(*value, container_eq([1, 2, 3]))
     }
 
     #[test]
-    fn container_eq_matches_owned_vec_of_owned_strings_with_array_of_string_slices() -> Result<()> {
+    fn container_eq_matches_owned_vec_of_owned_strings_with_array_of_string_slices()
+    -> TestResult<()> {
         verify_that!(
             vec!["A string".to_string(), "Another string".to_string()],
             container_eq(["A string", "Another string"])
@@ -300,7 +301,7 @@ mod tests {
 
     #[test]
     fn container_eq_does_not_match_vec_of_owned_strings_with_shorter_array_of_string_slices()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!(
             vec!["A string".to_string(), "Another string".to_string()],
             not(container_eq(["A string"]))
@@ -308,7 +309,7 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_matches_vec_of_string_slices_with_array_of_string_slices() -> Result<()> {
+    fn container_eq_matches_vec_of_string_slices_with_array_of_string_slices() -> TestResult<()> {
         verify_that!(
             vec!["A string", "Another string"],
             container_eq(["A string", "Another string"])
@@ -316,13 +317,13 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_matches_array_of_string_slices_with_array_of_string_slices() -> Result<()> {
+    fn container_eq_matches_array_of_string_slices_with_array_of_string_slices() -> TestResult<()> {
         verify_that!(["A string", "Another string"], container_eq(["A string", "Another string"]))
     }
 
     #[test]
     fn container_eq_matches_array_of_string_slices_with_non_static_lifetime_with_array_of_string_slices()
-    -> Result<()> {
+    -> TestResult<()> {
         let string_1 = String::from("A string");
         let string_2 = String::from("Another string");
         verify_that!(
@@ -332,12 +333,12 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_matches_hash_set_with_array() -> Result<()> {
+    fn container_eq_matches_hash_set_with_array() -> TestResult<()> {
         verify_that!(HashSet::from([1, 2, 3]), container_eq([1, 2, 3].into()))
     }
 
     #[test]
-    fn container_eq_produces_correct_failure_message() -> Result<()> {
+    fn container_eq_produces_correct_failure_message() -> TestResult<()> {
         let result = verify_that!(vec![1, 3, 2], container_eq(vec![1, 2, 3]));
         verify_that!(
             result,
@@ -353,7 +354,7 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_returns_mismatch_when_elements_out_of_order() -> Result<()> {
+    fn container_eq_returns_mismatch_when_elements_out_of_order() -> TestResult<()> {
         let result = verify_that!(vec![1, 3, 2], container_eq(vec![1, 2, 3]));
         verify_that!(
             result,
@@ -362,20 +363,20 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_mismatch_shows_missing_elements_in_container() -> Result<()> {
+    fn container_eq_mismatch_shows_missing_elements_in_container() -> TestResult<()> {
         let result = verify_that!(vec![1, 2], container_eq(vec![1, 2, 3]));
         verify_that!(result, err(displays_as(contains_substring("which is missing the element 3"))))
     }
 
     #[test]
     fn container_eq_mismatch_shows_missing_elements_in_container_when_matching_vec_with_array()
-    -> Result<()> {
+    -> TestResult<()> {
         let result = verify_that!(vec![1, 2], container_eq([1, 2, 3]));
         verify_that!(result, err(displays_as(contains_substring("which is missing the element 3"))))
     }
 
     #[test]
-    fn container_eq_mismatch_shows_surplus_elements_in_container() -> Result<()> {
+    fn container_eq_mismatch_shows_surplus_elements_in_container() -> TestResult<()> {
         let result = verify_that!(vec![1, 2, 3], container_eq(vec![1, 2]));
         verify_that!(
             result,
@@ -384,7 +385,7 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_mismatch_shows_missing_and_surplus_elements_in_container() -> Result<()> {
+    fn container_eq_mismatch_shows_missing_and_surplus_elements_in_container() -> TestResult<()> {
         let result = verify_that!(vec![1, 2, 4], container_eq(vec![1, 2, 3]));
         verify_that!(
             result,
@@ -395,7 +396,7 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_mismatch_does_not_show_duplicated_element() -> Result<()> {
+    fn container_eq_mismatch_does_not_show_duplicated_element() -> TestResult<()> {
         let result = verify_that!(vec![1, 2, 3, 3], container_eq(vec![1, 2, 3]));
         verify_that!(
             result,
@@ -404,7 +405,8 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_mismatch_with_str_slice_shows_missing_elements_in_container() -> Result<()> {
+    fn container_eq_mismatch_with_str_slice_shows_missing_elements_in_container() -> TestResult<()>
+    {
         let result =
             verify_that!(vec!["A".to_string(), "B".to_string()], container_eq(["A", "B", "C"]));
         verify_that!(
@@ -414,7 +416,8 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_mismatch_with_str_slice_shows_surplus_elements_in_container() -> Result<()> {
+    fn container_eq_mismatch_with_str_slice_shows_surplus_elements_in_container() -> TestResult<()>
+    {
         let result = verify_that!(
             vec!["A".to_string(), "B".to_string(), "C".to_string()],
             container_eq(["A", "B"])
@@ -438,12 +441,12 @@ mod tests {
 
     #[test]
     fn container_eq_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!(OwnedItemContainer(vec![1]), container_eq(OwnedItemContainer(vec![1])))
     }
 
     #[test]
-    fn container_eq_matches_vec_of_string_slices() -> Result<()> {
+    fn container_eq_matches_vec_of_string_slices() -> TestResult<()> {
         verify_that!(
             vec!["String 1", "String 2", "String 3"],
             container_eq(["String 1", "String 2", "String 3"])
@@ -451,7 +454,7 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+    fn container_eq_matches_vec_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
         let string_1 = String::from("String 1");
         let string_2 = String::from("String 2");
         let string_3 = String::from("String 3");
@@ -462,7 +465,7 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_matches_slice_of_string_slices() -> Result<()> {
+    fn container_eq_matches_slice_of_string_slices() -> TestResult<()> {
         let value = vec!["String 1", "String 2", "String 3"];
         verify_that!(
             value.as_slice(),
@@ -471,7 +474,7 @@ mod tests {
     }
 
     #[test]
-    fn container_eq_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()> {
+    fn container_eq_matches_slice_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
         let string_1 = String::from("String 1");
         let string_2 = String::from("String 2");
         let string_3 = String::from("String 3");

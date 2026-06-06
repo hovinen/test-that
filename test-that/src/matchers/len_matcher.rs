@@ -27,7 +27,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let array = [1,2,3];
 /// verify_that!(array, len(eq(3)))?;
 /// let vec = vec![1,2,3];
@@ -43,7 +43,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let vec = vec![1,2,3];
 /// verify_that!(vec, len(gt(1)))?;
 /// #     Ok(())
@@ -105,77 +105,77 @@ mod tests {
     use std::marker::PhantomData;
 
     #[test]
-    fn len_matcher_matches_vec() -> Result<()> {
+    fn len_matcher_matches_vec() -> TestResult<()> {
         verify_that!(vec![1, 2, 3], len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_array_reference_with_deref_notation() -> Result<()> {
+    fn len_matcher_matches_array_reference_with_deref_notation() -> TestResult<()> {
         let value = &[1, 2, 3];
         verify_that!(*value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_array_reference_points_to() -> Result<()> {
+    fn len_matcher_matches_array_reference_points_to() -> TestResult<()> {
         verify_that!(&[1, 2, 3], points_to(len(eq(3))))
     }
 
     #[test]
-    fn len_matcher_matches_slice_of_array() -> Result<()> {
+    fn len_matcher_matches_slice_of_array() -> TestResult<()> {
         let value = &[1, 2, 3];
         verify_that!(value[0..1], len(eq(1)))
     }
 
     #[test]
-    fn len_matcher_matches_slice_of_vec() -> Result<()> {
+    fn len_matcher_matches_slice_of_vec() -> TestResult<()> {
         let value = vec![1, 2, 3];
         let slice = value.as_slice();
         verify_that!(*slice, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_array() -> Result<()> {
+    fn len_matcher_matches_array() -> TestResult<()> {
         verify_that!([1, 2, 3], len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_btreemap() -> Result<()> {
+    fn len_matcher_matches_btreemap() -> TestResult<()> {
         let value = BTreeMap::from([(1, 2), (2, 3), (3, 4)]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_btreeset() -> Result<()> {
+    fn len_matcher_matches_btreeset() -> TestResult<()> {
         let value = BTreeSet::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_binaryheap() -> Result<()> {
+    fn len_matcher_matches_binaryheap() -> TestResult<()> {
         let value = BinaryHeap::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_hashmap() -> Result<()> {
+    fn len_matcher_matches_hashmap() -> TestResult<()> {
         let value = HashMap::from([(1, 2), (2, 3), (3, 4)]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_hashset() -> Result<()> {
+    fn len_matcher_matches_hashset() -> TestResult<()> {
         let value = HashSet::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_linkedlist() -> Result<()> {
+    fn len_matcher_matches_linkedlist() -> TestResult<()> {
         let value = LinkedList::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_matches_vecdeque() -> Result<()> {
+    fn len_matcher_matches_vecdeque() -> TestResult<()> {
         let value = VecDeque::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
@@ -193,12 +193,12 @@ mod tests {
 
     #[test]
     fn len_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!(OwnedItemContainer(vec![1, 2, 3]), len(eq(3)))
     }
 
     #[test]
-    fn len_matcher_explain_match() -> Result<()> {
+    fn len_matcher_explain_match() -> TestResult<()> {
         struct TestMatcher<T>(PhantomData<T>);
         impl<T: Debug> Matcher<T> for TestMatcher<T> {
             fn matches(&self, _: &T) -> MatcherResult {
@@ -221,7 +221,7 @@ mod tests {
     }
 
     #[test]
-    fn len_matcher_error_message() -> Result<()> {
+    fn len_matcher_error_message() -> TestResult<()> {
         let result = verify_that!(vec![1, 2, 3, 4], len(eq(3)));
         verify_that!(
             result,

@@ -27,11 +27,11 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(0, le(0))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!(1, le(0))?; // Fails
 /// #     Ok(())
 /// # }
@@ -45,7 +45,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;
-/// # fn should_not_compile() -> Result<()> {
+/// # fn should_not_compile() -> TestResult<()> {
 /// verify_that!(1u32, le(2u64))?; // Does not compile
 /// verify_that!(1u32 as u64, le(2u64))?; // Passes
 /// #     Ok(())
@@ -54,7 +54,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;
-/// # fn should_not_compile() -> Result<()> {
+/// # fn should_not_compile() -> TestResult<()> {
 /// let actual: &u32 = &1;
 /// let expected: u32 = 2;
 /// verify_that!(actual, le(expected))?; // Does not compile
@@ -64,7 +64,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let actual: &u32 = &1;
 /// let expected: u32 = 2;
 /// verify_that!(actual, le(&expected))?; // Compiles and passes
@@ -112,33 +112,33 @@ mod tests {
     use std::ffi::OsString;
 
     #[test]
-    fn le_matches_i32_with_i32() -> Result<()> {
+    fn le_matches_i32_with_i32() -> TestResult<()> {
         let actual: i32 = 0;
         let expected: i32 = 0;
         verify_that!(actual, le(expected))
     }
 
     #[test]
-    fn le_does_not_match_bigger_i32() -> Result<()> {
+    fn le_does_not_match_bigger_i32() -> TestResult<()> {
         let matcher = le(0);
         let result = matcher.matches(&1);
         verify_that!(result, eq(MatcherResult::NoMatch))
     }
 
     #[test]
-    fn le_matches_smaller_str() -> Result<()> {
+    fn le_matches_smaller_str() -> TestResult<()> {
         verify_that!("A", le("B"))
     }
 
     #[test]
-    fn le_does_not_match_bigger_str() -> Result<()> {
+    fn le_does_not_match_bigger_str() -> TestResult<()> {
         let matcher = le("a");
         let result = matcher.matches(&"z");
         verify_that!(result, eq(MatcherResult::NoMatch))
     }
 
     #[test]
-    fn le_mismatch_contains_actual_and_expected() -> Result<()> {
+    fn le_mismatch_contains_actual_and_expected() -> TestResult<()> {
         let result = verify_that!(489, le(294));
         let formatted_message = format!("{}", result.unwrap_err());
 
@@ -167,14 +167,14 @@ mod tests {
     // `verify_that(actual, le(expected))` works if `actual <= expected` works
     // (regardless whether the `expected <= actual` works`).
     #[test]
-    fn le_matches_owned_osstring_reference_with_string_reference() -> Result<()> {
+    fn le_matches_owned_osstring_reference_with_string_reference() -> TestResult<()> {
         let expected = "B";
         let actual: OsString = "A".into();
         verify_that!(&actual, le(expected))
     }
 
     #[test]
-    fn le_matches_ipv6addr_with_ipaddr() -> Result<()> {
+    fn le_matches_ipv6addr_with_ipaddr() -> TestResult<()> {
         use std::net::IpAddr;
         use std::net::Ipv6Addr;
         let actual: IpAddr = "127.0.0.1".parse().unwrap();
@@ -183,7 +183,7 @@ mod tests {
     }
 
     #[test]
-    fn le_matches_with_custom_partial_ord() -> Result<()> {
+    fn le_matches_with_custom_partial_ord() -> TestResult<()> {
         /// A custom "number" that is lower than all other numbers. The only
         /// things we define about this "special" number is `PartialOrd` and
         /// `PartialEq` against `u32`.

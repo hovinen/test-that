@@ -27,15 +27,15 @@ use std::ops::Deref;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass_1() -> Result<()> {
+/// # fn should_pass_1() -> TestResult<()> {
 /// verify_that!("Some value", contains_regex("S.*e"))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!("Another value", contains_regex("Some"))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_pass_2() -> Result<()> {
+/// # fn should_pass_2() -> TestResult<()> {
 /// verify_that!("Some value".to_string(), contains_regex("v.*e"))?;   // Passes
 /// verify_that!("Some value", contains_regex("v.*e".to_string()))?;   // Passes
 /// #     Ok(())
@@ -91,7 +91,7 @@ mod tests {
     use crate::prelude::*;
 
     #[test]
-    fn contains_regex_matches_string_reference_with_pattern() -> Result<()> {
+    fn contains_regex_matches_string_reference_with_pattern() -> TestResult<()> {
         let matcher = contains_regex("S.*val");
 
         let result = matcher.matches("Some value");
@@ -100,7 +100,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_regex_does_not_match_string_without_pattern() -> Result<()> {
+    fn contains_regex_does_not_match_string_without_pattern() -> TestResult<()> {
         let matcher = contains_regex("Another");
 
         let result = matcher.matches("Some value");
@@ -109,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_regex_matches_owned_string_with_pattern() -> Result<()> {
+    fn contains_regex_matches_owned_string_with_pattern() -> TestResult<()> {
         let matcher = contains_regex("value");
 
         let result = matcher.matches(&"Some value".to_string());
@@ -118,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_regex_matches_string_reference_with_owned_string() -> Result<()> {
+    fn contains_regex_matches_string_reference_with_owned_string() -> TestResult<()> {
         let matcher = contains_regex("value");
 
         let result = matcher.matches("Some value");
@@ -127,12 +127,12 @@ mod tests {
     }
 
     #[test]
-    fn verify_that_works_with_owned_string() -> Result<()> {
+    fn verify_that_works_with_owned_string() -> TestResult<()> {
         verify_that!("Some value".to_string(), contains_regex("value"))
     }
 
     #[test]
-    fn contains_regex_displays_quoted_debug_of_pattern() -> Result<()> {
+    fn contains_regex_displays_quoted_debug_of_pattern() -> TestResult<()> {
         let matcher = contains_regex("\n");
 
         verify_that!(

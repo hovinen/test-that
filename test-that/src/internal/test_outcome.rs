@@ -58,7 +58,7 @@ impl TestOutcome {
     ///
     /// Otherwise, this returns `Result::Err` precisely when a test failure has
     /// been recorded with
-    /// [`and_log_failure`](crate::GoogleTestSupport::and_log_failure).
+    /// [`and_log_failure`](crate::TestResultExt::and_log_failure).
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]

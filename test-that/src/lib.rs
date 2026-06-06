@@ -43,9 +43,9 @@ pub mod matchers;
 /// }
 /// ```
 pub mod prelude {
-    pub use super::GoogleTestSupport;
     pub use super::OrFailExt;
-    pub use super::Result;
+    pub use super::TestResult;
+    pub use super::TestResultExt;
     pub use super::matcher::Matcher;
     pub use super::matcher::MatcherExt;
     pub use super::matchers::*;
@@ -62,14 +62,14 @@ use internal::test_outcome::{TestAssertionFailure, TestOutcome};
 ///
 /// The assertions [`verify_that!`][crate::verify_that],
 /// [`verify_pred!`][crate::verify_pred], and [`fail!`][crate::fail] evaluate
-/// to `Result<()>`. A test function may return `Result<()>` in combination with
-/// those macros to abort immediately on assertion failure.
+/// to `TestResult<()>`. A test function may return `TestResult<()>` in combination
+/// with those macros to abort immediately on assertion failure.
 ///
 /// This can be used with subroutines which may cause the test to fatally fail
 /// and which return some value needed by the caller. For example:
 ///
 /// ```ignore
-/// fn load_file_content_as_string() -> Result<String> {
+/// fn load_file_content_as_string() -> TestResult<String> {
 ///     let file_stream = load_file().err_to_test_failure()?;
 ///     Ok(file_stream.to_string())
 /// }
@@ -79,17 +79,16 @@ use internal::test_outcome::{TestAssertionFailure, TestOutcome};
 /// of the (fatal) assertion failure which generated this result. Non-fatal
 /// assertion failures, which log the failure and report the test as having
 /// failed but allow it to continue running, are not encoded in this type.
-pub type Result<T> = std::result::Result<T, TestAssertionFailure>;
+pub type TestResult<T> = std::result::Result<T, TestAssertionFailure>;
 
 /// Returns a [`Result`] corresponding to the outcome of the currently running
 /// test.
 ///
 /// This returns `Result::Err` precisely if the current test has recorded at
 /// least one test assertion failure via [`expect_that!`][crate::expect_that],
-/// [`expect_pred!`][crate::expect_pred], or
-/// [`GoogleTestSupport::and_log_failure`]. It can be used in concert with the
-/// `?` operator to continue execution of the test conditionally on there not
-/// having been any failure yet.
+/// [`expect_pred!`][crate::expect_pred], or [`TestResultExt::and_log_failure`].
+/// It can be used in concert with the `?` operator to continue execution of the
+/// test conditionally on there not having been any failure yet.
 ///
 /// This requires the use of the [`#[test_that::test]`][crate::test] attribute
 /// macro.
@@ -101,7 +100,7 @@ pub type Result<T> = std::result::Result<T, TestAssertionFailure>;
 /// # */
 /// # fn foo() -> u32 { 1 }
 /// # fn bar() -> u32 { 2 }
-/// fn should_fail_and_not_execute_last_assertion() -> Result<()> {
+/// fn should_fail_and_not_execute_last_assertion() -> TestResult<()> {
 /// #   test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
 ///     expect_that!(foo(), eq(2));     // May fail, but will not abort the test.
 ///     expect_that!(bar(), gt(1));     // May fail, but will not abort the test.
@@ -110,12 +109,12 @@ pub type Result<T> = std::result::Result<T, TestAssertionFailure>;
 /// }
 /// # verify_that!(should_fail_and_not_execute_last_assertion(), err(displays_as(contains_substring("Test failed")))).unwrap();
 /// ```
-pub fn verify_current_test_outcome() -> Result<()> {
+pub fn verify_current_test_outcome() -> TestResult<()> {
     TestOutcome::get_current_test_outcome()
 }
 
-/// Adds to `Result` support for GoogleTest Rust functionality.
-pub trait GoogleTestSupport {
+/// Adds to `Result` support for Test That! functionality.
+pub trait TestResultExt {
     /// If `self` is a `Result::Err`, writes to `stdout` a failure report
     /// and marks the test failed. Otherwise, does nothing.
     ///
@@ -146,7 +145,7 @@ pub trait GoogleTestSupport {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_fail() -> Result<()> {
+    /// # fn should_fail() -> TestResult<()> {
     /// let actual = 0;
     /// verify_that!(actual, eq(42)).failure_message("Actual was wrong!")?;
     /// # Ok(())
@@ -167,7 +166,7 @@ pub trait GoogleTestSupport {
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_fail() -> Result<()> {
+    /// # fn should_fail() -> TestResult<()> {
     /// let actual = 0;
     /// verify_that!(actual, eq(42))
     ///    .failure_message(format!("Actual {} was wrong!", actual))?;
@@ -177,7 +176,7 @@ pub trait GoogleTestSupport {
     /// #     .unwrap();
     /// ```
     ///
-    /// However, consider using [`GoogleTestSupport::with_failure_message`]
+    /// However, consider using [`TestResultExt::with_failure_message`]
     /// instead in that case to avoid unnecessary memory allocation when the
     /// message is not needed.
     fn failure_message(self, message: impl Into<String>) -> Self;
@@ -185,13 +184,13 @@ pub trait GoogleTestSupport {
     /// Adds the output of the closure `provider` to the logged failure message
     /// if `self` is a `Result::Err`. Otherwise, does nothing.
     ///
-    /// This is analogous to [`GoogleTestSupport::failure_message`] but
+    /// This is analogous to [`TestResultExt::failure_message`] but
     /// only executes the closure `provider` if it actually produces the
     /// message, thus saving possible memory allocation.
     ///
     /// ```
     /// # use test_that::prelude::*;
-    /// # fn should_fail() -> Result<()> {
+    /// # fn should_fail() -> TestResult<()> {
     /// let actual = 0;
     /// verify_that!(actual, eq(42))
     ///    .with_failure_message(|| format!("Actual {} was wrong!", actual))?;
@@ -203,7 +202,7 @@ pub trait GoogleTestSupport {
     fn with_failure_message(self, provider: impl FnOnce() -> String) -> Self;
 }
 
-impl<T> GoogleTestSupport for std::result::Result<T, TestAssertionFailure> {
+impl<T> TestResultExt for std::result::Result<T, TestAssertionFailure> {
     fn and_log_failure(self) {
         TestOutcome::ensure_text_context_present();
         if let Err(failure) = self {
@@ -231,8 +230,8 @@ impl<T> GoogleTestSupport for std::result::Result<T, TestAssertionFailure> {
 ///
 /// A type can implement this trait to provide an easy way to return immediately
 /// from a test in conjunction with the `?` operator. This is useful for
-/// [`Result`][std::result::Result] types whose `Result::Err` variant does not
-/// implement [`std::error::Error`].
+/// [`Result`] types whose `Result::Err` variant does not implement
+/// [`std::error::Error`].
 ///
 /// There is an implementation of this trait for [`anyhow::Error`] (which does
 /// not implement `std::error::Error`) when the `anyhow` feature is enabled.
@@ -254,7 +253,7 @@ pub trait OrFailExt<T> {
     /// Typically, the `Self` type is itself a [`std::result::Result`]. This
     /// method should then map the `Err` variant to a [`TestAssertionFailure`]
     /// and leave the `Ok` variant unchanged.
-    fn or_fail(self) -> Result<T>;
+    fn or_fail(self) -> TestResult<T>;
 }
 
 #[cfg(feature = "anyhow")]

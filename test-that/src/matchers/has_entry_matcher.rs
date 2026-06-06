@@ -25,17 +25,17 @@ use std::hash::Hash;
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value = HashMap::from([(0, 1), (1, -1)]);
 /// verify_that!(value, has_entry(0, eq(1)))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// # let value = HashMap::from([(0, 1), (1, -1)]);
 /// verify_that!(value, has_entry(1, gt(0)))?;  // Fails: value not matched
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// # let value = HashMap::from([(0, 1), (1, -1)]);
 /// verify_that!(value, has_entry(2, eq(0)))?;  // Fails: key not present
 /// #     Ok(())
@@ -51,7 +51,7 @@ use std::hash::Hash;
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let value = HashMap::from([(0, 1), (1, -1)]);
 /// verify_that!(value.into_iter().collect::<Vec<_>>(), contains(eq((0, 1))))?;
 /// #     Ok(())
@@ -125,31 +125,31 @@ mod tests {
     use std::collections::HashMap;
 
     #[test]
-    fn has_entry_does_not_match_empty_hash_map() -> Result<()> {
+    fn has_entry_does_not_match_empty_hash_map() -> TestResult<()> {
         let value: HashMap<i32, i32> = HashMap::new();
         verify_that!(value, not(has_entry(0, eq(0))))
     }
 
     #[test]
-    fn has_entry_matches_hash_map_with_value() -> Result<()> {
+    fn has_entry_matches_hash_map_with_value() -> TestResult<()> {
         let value: HashMap<i32, i32> = HashMap::from([(0, 0)]);
         verify_that!(value, has_entry(0, eq(0)))
     }
 
     #[test]
-    fn has_entry_does_not_match_hash_map_with_wrong_value() -> Result<()> {
+    fn has_entry_does_not_match_hash_map_with_wrong_value() -> TestResult<()> {
         let value: HashMap<i32, i32> = HashMap::from([(0, 1)]);
         verify_that!(value, not(has_entry(0, eq(0))))
     }
 
     #[test]
-    fn has_entry_does_not_match_hash_map_with_wrong_key() -> Result<()> {
+    fn has_entry_does_not_match_hash_map_with_wrong_key() -> TestResult<()> {
         let value: HashMap<i32, i32> = HashMap::from([(1, 0)]);
         verify_that!(value, not(has_entry(0, eq(0))))
     }
 
     #[test]
-    fn has_entry_shows_correct_message_when_key_is_not_present() -> Result<()> {
+    fn has_entry_shows_correct_message_when_key_is_not_present() -> TestResult<()> {
         let result = verify_that!(HashMap::from([(0, 0)]), has_entry(1, eq(0)));
 
         verify_that!(
@@ -166,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    fn has_entry_shows_correct_message_when_key_has_non_matching_value() -> Result<()> {
+    fn has_entry_shows_correct_message_when_key_has_non_matching_value() -> TestResult<()> {
         let result = verify_that!(HashMap::from([(0, 0)]), has_entry(0, eq(1)));
 
         verify_that!(

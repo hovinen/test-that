@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test]
-    fn should_fail() -> Result<()> {
+    fn should_fail() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(3))?;
         Ok(())

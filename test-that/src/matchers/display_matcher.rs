@@ -69,21 +69,21 @@ mod tests {
     use std::fmt::{Debug, Display, Error, Formatter};
 
     #[test]
-    fn display_matches_i32() -> Result<()> {
+    fn display_matches_i32() -> TestResult<()> {
         let value = 32;
         verify_that!(value, displays_as(eq("32")))?;
         Ok(())
     }
 
     #[test]
-    fn display_matches_str() -> Result<()> {
+    fn display_matches_str() -> TestResult<()> {
         let value = "32";
         verify_that!(value, displays_as(eq("32")))?;
         Ok(())
     }
 
     #[test]
-    fn display_matches_struct() -> Result<()> {
+    fn display_matches_struct() -> TestResult<()> {
         #[allow(dead_code)]
         #[derive(Debug)]
         struct Struct {
@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn display_displays_error_message_with_explanation_from_inner_matcher() -> Result<()> {
+    fn display_displays_error_message_with_explanation_from_inner_matcher() -> TestResult<()> {
         let result = verify_that!("123\n234", displays_as(eq("123\n345")));
 
         verify_that!(

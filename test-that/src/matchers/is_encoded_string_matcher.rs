@@ -28,19 +28,19 @@ use std::fmt::Debug;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let bytes: &[u8] = "A string".as_bytes();
 /// verify_that!(bytes, is_utf8_string(eq("A string")))?; // Passes
 /// let bytes: Vec<u8> = "A string".as_bytes().to_vec();
 /// verify_that!(bytes, is_utf8_string(eq("A string")))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// # let bytes: &[u8] = "A string".as_bytes();
 /// verify_that!(bytes, is_utf8_string(eq("Another string")))?; // Fails (inner matcher does not match)
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// let bytes: Vec<u8> = vec![255, 64, 128, 32];
 /// verify_that!(bytes, is_utf8_string(anything()))?; // Fails (not UTF-8 encoded)
 /// #     Ok(())
@@ -102,32 +102,32 @@ mod tests {
     use crate::prelude::*;
 
     #[test]
-    fn matches_string_as_byte_slice() -> Result<()> {
+    fn matches_string_as_byte_slice() -> TestResult<()> {
         verify_that!("A string".as_bytes(), is_utf8_string(eq("A string")))
     }
 
     #[test]
-    fn matches_string_as_byte_vec() -> Result<()> {
+    fn matches_string_as_byte_vec() -> TestResult<()> {
         verify_that!("A string".as_bytes().to_vec(), is_utf8_string(eq("A string")))
     }
 
     #[test]
-    fn matches_string_with_utf_8_encoded_sequences() -> Result<()> {
+    fn matches_string_with_utf_8_encoded_sequences() -> TestResult<()> {
         verify_that!("äöüÄÖÜ".as_bytes().to_vec(), is_utf8_string(eq("äöüÄÖÜ")))
     }
 
     #[test]
-    fn does_not_match_non_equal_string() -> Result<()> {
+    fn does_not_match_non_equal_string() -> TestResult<()> {
         verify_that!("äöüÄÖÜ".as_bytes().to_vec(), not(is_utf8_string(eq("A string"))))
     }
 
     #[test]
-    fn does_not_match_non_utf_8_encoded_byte_sequence() -> Result<()> {
+    fn does_not_match_non_utf_8_encoded_byte_sequence() -> TestResult<()> {
         verify_that!(&[192, 64, 255, 32], not(is_utf8_string(eq("A string"))))
     }
 
     #[test]
-    fn has_correct_description_in_matched_case() -> Result<()> {
+    fn has_correct_description_in_matched_case() -> TestResult<()> {
         let matcher = is_utf8_string(eq("A string"));
 
         verify_that!(
@@ -137,7 +137,7 @@ mod tests {
     }
 
     #[test]
-    fn has_correct_description_in_not_matched_case() -> Result<()> {
+    fn has_correct_description_in_not_matched_case() -> TestResult<()> {
         let matcher = is_utf8_string(eq("A string"));
 
         verify_that!(
@@ -147,7 +147,7 @@ mod tests {
     }
 
     #[test]
-    fn has_correct_explanation_in_matched_case() -> Result<()> {
+    fn has_correct_explanation_in_matched_case() -> TestResult<()> {
         let explanation = is_utf8_string(eq("A string")).explain_match(&"A string".as_bytes());
 
         verify_that!(
@@ -157,14 +157,14 @@ mod tests {
     }
 
     #[test]
-    fn has_correct_explanation_when_byte_array_is_not_utf8_encoded() -> Result<()> {
+    fn has_correct_explanation_when_byte_array_is_not_utf8_encoded() -> TestResult<()> {
         let explanation = is_utf8_string(eq("A string")).explain_match(&&[192, 128, 0, 64]);
 
         verify_that!(explanation, displays_as(starts_with("which is not a UTF-8 encoded string: ")))
     }
 
     #[test]
-    fn has_correct_explanation_when_inner_matcher_does_not_match() -> Result<()> {
+    fn has_correct_explanation_when_inner_matcher_does_not_match() -> TestResult<()> {
         let explanation =
             is_utf8_string(eq("A string")).explain_match(&"Another string".as_bytes());
 

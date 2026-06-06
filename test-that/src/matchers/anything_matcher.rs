@@ -26,7 +26,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let option = Some("Some value");
 /// verify_that!(option, some(anything()))?;
 /// #     Ok(())
@@ -60,21 +60,21 @@ mod tests {
     use crate::prelude::*;
 
     #[test]
-    fn anything_matches_i32() -> Result<()> {
+    fn anything_matches_i32() -> TestResult<()> {
         let value = 32;
         verify_that!(value, anything())?;
         Ok(())
     }
 
     #[test]
-    fn anything_matches_str() -> Result<()> {
+    fn anything_matches_str() -> TestResult<()> {
         let value = "32";
         verify_that!(value, anything())?;
         Ok(())
     }
 
     #[test]
-    fn anything_matches_option() -> Result<()> {
+    fn anything_matches_option() -> TestResult<()> {
         let value = Some(32);
         verify_that!(value, some(anything()))?;
         Ok(())

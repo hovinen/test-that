@@ -20,7 +20,7 @@ mod tests {
     use test_that::prelude::*;
 
     #[test]
-    fn should_fail_due_to_error_in_subroutine() -> Result<()> {
+    fn should_fail_due_to_error_in_subroutine() -> TestResult<()> {
         returns_anyhow_error().or_fail()?;
         Ok(())
     }

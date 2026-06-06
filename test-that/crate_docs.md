@@ -52,7 +52,7 @@ fn two_logged_failures() {
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test]
 # */
-fn fails_immediately_without_panic() -> Result<()> {
+fn fails_immediately_without_panic() -> TestResult<()> {
     let value = 2;
     verify_that!(value, eq(4))?; // Test fails and aborts.
     verify_that!(value, eq(2))?; // Never executes.
@@ -62,7 +62,7 @@ fn fails_immediately_without_panic() -> Result<()> {
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test]
 # */
-fn simple_assertion() -> Result<()> {
+fn simple_assertion() -> TestResult<()> {
     let value = 2;
     verify_that!(value, eq(4)) // One can also just return the last assertion.
 }
@@ -351,7 +351,7 @@ fn three_non_fatal_assertions() {
 ```
 
 This can be used in the same tests as `verify_that!`, in which case the test
-function must also return [`Result<()>`]:
+function must also return [`TestResult<()>`]:
 
 ```no_run
 use test_that::prelude::*;
@@ -359,7 +359,7 @@ use test_that::prelude::*;
 # /* Make sure this also compiles as a doctest.
 #[test_that::test]
 # */
-fn failing_non_fatal_assertion() -> Result<()> {
+fn failing_non_fatal_assertion() -> TestResult<()> {
     let value = 2;
     expect_that!(value, eq(3));  // Just marks the test as having failed.
     verify_that!(value, eq(2))?;  // Passes, so does not abort the test.
@@ -372,7 +372,7 @@ fn failing_non_fatal_assertion() -> Result<()> {
 use test_that::prelude::*;
 
 #[test_that::test]
-fn failing_fatal_assertion_after_non_fatal_assertion() -> Result<()> {
+fn failing_fatal_assertion_after_non_fatal_assertion() -> TestResult<()> {
     let value = 2;
     expect_that!(value, eq(2));  // Passes; test still considered passing.
     verify_that!(value, eq(3))?; // Fails and aborts the test.
@@ -394,7 +394,7 @@ fn stuff_is_correct(x: i32, y: i32) -> bool {
     x == y
 }
 
-# fn run_test() -> Result<()> {
+# fn run_test() -> TestResult<()> {
 let x = 3;
 let y = 4;
 verify_pred!(stuff_is_correct(x, y))?;
@@ -412,7 +412,7 @@ stuff_is_correct(x, y) was false with
   y = 4
 ```
 
-The `verify_pred!` invocation evaluates to a [`Result<()>`] just like
+The `verify_pred!` invocation evaluates to a [`TestResult<()>`] just like
 [`verify_that!`]. There is also a macro [`expect_pred!`] to make a non-fatal
 predicaticate assertion.
 
@@ -428,7 +428,7 @@ message:
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test]
 # */
-fn always_fails() -> Result<()> {
+fn always_fails() -> TestResult<()> {
     fail!("This test must fail with {}", "today")
 }
 # always_fails().unwrap_err();
@@ -453,7 +453,7 @@ GoogleTest Rust and invoke the extension method [`or_fail()`] on a
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test]
 # */
-fn has_anyhow_failure() -> Result<()> {
+fn has_anyhow_failure() -> TestResult<()> {
     Ok(just_return_error().or_fail()?)
 }
 
@@ -477,7 +477,7 @@ test is invoked with
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test]
 # */
-fn numbers_are_greater_than_zero() -> Result<()> {
+fn numbers_are_greater_than_zero() -> TestResult<()> {
     let mut runner = TestRunner::new(Config::default());
     runner.run(&(1..100i32), |v| Ok(verify_that!(v, gt(0))?)).or_fail()
 }
@@ -490,6 +490,6 @@ can automatically be converted into Proptest
 [`TestCaseError`](https://docs.rs/proptest/latest/proptest/test_runner/enum.TestCaseError.html)
 through the `?` operator as the example above shows.
 
-[`and_log_failure()`]: GoogleTestSupport::and_log_failure
+[`and_log_failure()`]: TestResultExt::and_log_failure
 [`or_fail()`]: OrFailExt::or_fail
 [`Matcher`]: matcher::Matcher

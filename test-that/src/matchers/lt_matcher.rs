@@ -27,11 +27,11 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(1, lt(2))?; // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail() -> Result<()> {
+/// # fn should_fail() -> TestResult<()> {
 /// verify_that!(2, lt(2))?; // Fails
 /// #     Ok(())
 /// # }
@@ -45,7 +45,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;
-/// # fn should_not_compile() -> Result<()> {
+/// # fn should_not_compile() -> TestResult<()> {
 /// verify_that!(123u32, lt(0u64))?; // Does not compile
 /// verify_that!(123u32 as u64, lt(100000000u64))?; // Passes
 /// #     Ok(())
@@ -54,7 +54,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;
-/// # fn should_not_compile() -> Result<()> {
+/// # fn should_not_compile() -> TestResult<()> {
 /// let actual: &u32 = &2;
 /// let expected: u32 = 70;
 /// verify_that!(actual, lt(expected))?; // Does not compile
@@ -64,7 +64,7 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// let actual: &u32 = &2;
 /// let expected: u32 = 70;
 /// verify_that!(actual, lt(&expected))?; // Compiles and passes
@@ -114,40 +114,40 @@ mod tests {
     use std::ffi::OsString;
 
     #[test]
-    fn lt_matches_i32_with_i32() -> Result<()> {
+    fn lt_matches_i32_with_i32() -> TestResult<()> {
         let actual: i32 = 10000;
         let expected: i32 = 20000;
         verify_that!(actual, lt(expected))
     }
 
     #[test]
-    fn lt_does_not_match_equal_i32() -> Result<()> {
+    fn lt_does_not_match_equal_i32() -> TestResult<()> {
         let matcher = lt(10);
         let result = matcher.matches(&10);
         verify_that!(result, eq(MatcherResult::NoMatch))
     }
 
     #[test]
-    fn lt_does_not_match_lower_i32() -> Result<()> {
+    fn lt_does_not_match_lower_i32() -> TestResult<()> {
         let matcher = lt(-50);
         let result = matcher.matches(&50);
         verify_that!(result, eq(MatcherResult::NoMatch))
     }
 
     #[test]
-    fn lt_matches_lesser_str() -> Result<()> {
+    fn lt_matches_lesser_str() -> TestResult<()> {
         verify_that!("A", lt("B"))
     }
 
     #[test]
-    fn lt_does_not_match_bigger_str() -> Result<()> {
+    fn lt_does_not_match_bigger_str() -> TestResult<()> {
         let matcher = lt("ab");
         let result = matcher.matches(&"az");
         verify_that!(result, eq(MatcherResult::NoMatch))
     }
 
     #[test]
-    fn lt_mismatch_contains_actual_and_expected() -> Result<()> {
+    fn lt_mismatch_contains_actual_and_expected() -> TestResult<()> {
         let result = verify_that!(481, lt(45));
         let formatted_message = format!("{}", result.unwrap_err());
 
@@ -176,14 +176,14 @@ mod tests {
     // `verify_that(actual, lt(expected))` works if `actual < expected` works
     // (regardless whether the `expected < actual` works`).
     #[test]
-    fn lt_matches_owned_osstring_reference_with_string_reference() -> Result<()> {
+    fn lt_matches_owned_osstring_reference_with_string_reference() -> TestResult<()> {
         let expected = "C";
         let actual: OsString = "B".to_string().into();
         verify_that!(&actual, lt(expected))
     }
 
     #[test]
-    fn lt_matches_ipv6addr_with_ipaddr() -> Result<()> {
+    fn lt_matches_ipv6addr_with_ipaddr() -> TestResult<()> {
         use std::net::IpAddr;
         use std::net::Ipv6Addr;
         let actual: IpAddr = "127.0.0.1".parse().unwrap();
@@ -192,7 +192,7 @@ mod tests {
     }
 
     #[test]
-    fn lt_matches_with_custom_partial_ord() -> Result<()> {
+    fn lt_matches_with_custom_partial_ord() -> TestResult<()> {
         /// A custom "number" that is smaller than all other numbers. The only
         /// things we define about this "special" number is `PartialOrd` and
         /// `PartialEq` against `u32`.

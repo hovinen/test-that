@@ -107,23 +107,23 @@ mod tests {
     struct NonCloneNonCopyStruct(i32);
 
     #[test]
-    fn matches_value_with_ref_to_equal_value() -> Result<()> {
+    fn matches_value_with_ref_to_equal_value() -> TestResult<()> {
         verify_that!(NonCloneNonCopyStruct(123), eq_deref_of(&NonCloneNonCopyStruct(123)))
     }
 
     #[test]
-    fn matches_value_with_box_of_equal_value() -> Result<()> {
+    fn matches_value_with_box_of_equal_value() -> TestResult<()> {
         verify_that!(NonCloneNonCopyStruct(123), eq_deref_of(Box::new(NonCloneNonCopyStruct(123))))
     }
 
     #[test]
-    fn does_not_match_value_with_non_equal_value() -> Result<()> {
+    fn does_not_match_value_with_non_equal_value() -> TestResult<()> {
         verify_that!(NonCloneNonCopyStruct(123), not(eq_deref_of(&NonCloneNonCopyStruct(234))))
     }
 
     #[test]
     #[serial]
-    fn shows_structured_diff() -> Result<()> {
+    fn shows_structured_diff() -> TestResult<()> {
         #[derive(Debug, PartialEq)]
         struct Strukt {
             int: i32,

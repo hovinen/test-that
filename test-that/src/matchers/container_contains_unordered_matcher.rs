@@ -22,19 +22,19 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(2), anything()])?;   // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(vec![1], contains_exactly![eq(1), ge(2)])?;              // Fails: container has wrong size
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(4), eq(2)])?; // Fails: second matcher not matched
 /// #     Ok(())
 /// # }
-/// # fn should_fail_3() -> Result<()> {
+/// # fn should_fail_3() -> TestResult<()> {
 /// verify_that!(vec![3, 2, 1], contains_exactly![ge(3), ge(3), ge(3)])?; // Fails: no 1:1 correspondence
 /// #     Ok(())
 /// # }
@@ -157,20 +157,20 @@ macro_rules! __contains_exactly {
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(vec![3, 2, 1], contains_each![eq(2), ge(3)])?;   // Passes
 /// verify_that!(vec![3, 2, 1], contains_each![ge(2), ge(2)])?;   // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(vec![1], contains_each![eq(1), ge(2)])?;         // Fails: container too small
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(vec![3, 2, 1], contains_each![eq(1), ge(4)])?;   // Fails: second matcher unmatched
 /// #     Ok(())
 /// # }
-/// # fn should_fail_3() -> Result<()> {
+/// # fn should_fail_3() -> TestResult<()> {
 /// verify_that!(vec![3, 2, 1], contains_each![ge(3), ge(3), ge(3)])?; // Fails: no matching
 /// #     Ok(())
 /// # }
@@ -261,20 +261,20 @@ macro_rules! __contains_each {
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(vec![2, 1], is_contained_in![eq(1), ge(2)])?;   // Passes
 /// verify_that!(vec![2, 1], is_contained_in![ge(1), ge(1)])?;   // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!(vec![1, 2, 3], is_contained_in![eq(1), ge(2)])?; // Fails: container too large
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(vec![2, 1], is_contained_in![eq(1), ge(4)])?;    // Fails: second matcher unmatched
 /// #     Ok(())
 /// # }
-/// # fn should_fail_3() -> Result<()> {
+/// # fn should_fail_3() -> TestResult<()> {
 /// verify_that!(vec![3, 1], is_contained_in![ge(3), ge(3), ge(3)])?; // Fails: no matching
 /// #     Ok(())
 /// # }
@@ -1099,7 +1099,7 @@ mod tests {
     use std::collections::HashMap;
 
     #[test]
-    fn has_correct_description_for_map() -> Result<()> {
+    fn has_correct_description_for_map() -> TestResult<()> {
         // ContainerContainsUnorderedMatcher maintains references to the matchers, so the
         // constituent matchers must live longer. Inside a verify_that! macro, the
         // compiler takes care of that, but when the matcher is created separately,
@@ -1127,7 +1127,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_exactly_description_no_full_match_with_map() -> Result<()> {
+    fn contains_exactly_description_no_full_match_with_map() -> TestResult<()> {
         // ContainerContainsUnorderedMatcher maintains references to the matchers, so the
         // constituent matchers must live longer. Inside a verify_that! macro, the
         // compiler takes care of that, but when the matcher is created separately,

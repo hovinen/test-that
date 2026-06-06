@@ -18,68 +18,68 @@ use test_that::matcher::Matcher;
 use test_that::prelude::*;
 
 #[test]
-fn contains_exactly_in_order_matches_empty_vector() -> Result<()> {
+fn contains_exactly_in_order_matches_empty_vector() -> TestResult<()> {
     let value: Vec<u32> = vec![];
     verify_that!(value, contains_exactly![].in_order())
 }
 
 #[test]
-fn contains_exactly_in_order_matches_empty_array() -> Result<()> {
+fn contains_exactly_in_order_matches_empty_array() -> TestResult<()> {
     let value: [u32; 0] = [];
     verify_that!(value, contains_exactly![].in_order())
 }
 
 #[test]
-fn contains_exactly_in_order_matches_vec() -> Result<()> {
+fn contains_exactly_in_order_matches_vec() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }
 
 #[test]
-fn contains_exactly_in_order_does_not_match_vec_out_of_order() -> Result<()> {
+fn contains_exactly_in_order_does_not_match_vec_out_of_order() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], not(contains_exactly![eq(2), eq(3), eq(1)].in_order()))
 }
 
 #[test]
-fn contains_exactly_in_order_does_not_match_vec_with_extra_elements() -> Result<()> {
+fn contains_exactly_in_order_does_not_match_vec_with_extra_elements() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], not(contains_exactly![eq(1), eq(2)].in_order()))
 }
 
 #[test]
-fn contains_exactly_in_order_does_not_match_vec_with_missing_elements() -> Result<()> {
+fn contains_exactly_in_order_does_not_match_vec_with_missing_elements() -> TestResult<()> {
     verify_that!(vec![1, 2], not(contains_exactly![eq(1), eq(2), eq(3)].in_order()))
 }
 
 #[test]
-fn contains_exactly_in_order_matches_array() -> Result<()> {
+fn contains_exactly_in_order_matches_array() -> TestResult<()> {
     verify_that!([1, 2, 3], contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }
 
 #[test]
-fn contains_exactly_in_order_matches_ref_of_array_with_points_to() -> Result<()> {
+fn contains_exactly_in_order_matches_ref_of_array_with_points_to() -> TestResult<()> {
     verify_that!(&[1, 2, 3], points_to(contains_exactly![eq(1), eq(2), eq(3)].in_order()))
 }
 
 #[test]
-fn contains_exactly_in_order_matches_ref_of_array_with_deref_notation() -> Result<()> {
+fn contains_exactly_in_order_matches_ref_of_array_with_deref_notation() -> TestResult<()> {
     let value = &[1, 2, 3];
     verify_that!(*value, contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }
 
 #[test]
-fn contains_exactly_in_order_matches_slice_with_points_to() -> Result<()> {
+fn contains_exactly_in_order_matches_slice_with_points_to() -> TestResult<()> {
     let value = vec![1, 2, 3];
     verify_that!(value.as_slice(), points_to(contains_exactly![eq(1), eq(2), eq(3)].in_order()))
 }
 
 #[test]
-fn contains_exactly_in_order_matches_slice_with_deref_notation() -> Result<()> {
+fn contains_exactly_in_order_matches_slice_with_deref_notation() -> TestResult<()> {
     let value = vec![1, 2, 3];
     let slice = value.as_slice();
     verify_that!(*slice, contains_exactly![eq(1), eq(2), eq(3)].in_order())
 }
 
 #[test]
-fn contains_exactly_in_order_matches_vec_of_string_slices() -> Result<()> {
+fn contains_exactly_in_order_matches_vec_of_string_slices() -> TestResult<()> {
     verify_that!(
         vec!["String 1", "String 2", "String 3"],
         contains_exactly![
@@ -92,7 +92,7 @@ fn contains_exactly_in_order_matches_vec_of_string_slices() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_in_order_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+fn contains_exactly_in_order_matches_vec_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
     let string_1 = String::from("String 1");
     let string_2 = String::from("String 2");
     let string_3 = String::from("String 3");
@@ -108,7 +108,7 @@ fn contains_exactly_in_order_matches_vec_of_string_slices_with_non_static_lifeti
 }
 
 #[test]
-fn contains_exactly_in_order_matches_slice_of_string_slices() -> Result<()> {
+fn contains_exactly_in_order_matches_slice_of_string_slices() -> TestResult<()> {
     let value = vec!["String 1", "String 2", "String 3"];
     verify_that!(
         value.as_slice(),
@@ -124,7 +124,7 @@ fn contains_exactly_in_order_matches_slice_of_string_slices() -> Result<()> {
 }
 
 #[test]
-fn contains_exactly_in_order_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()>
+fn contains_exactly_in_order_matches_slice_of_string_slices_with_non_static_lifetime() -> TestResult<()>
 {
     let string_1 = String::from("String 1");
     let string_2 = String::from("String 2");
@@ -144,12 +144,12 @@ fn contains_exactly_in_order_matches_slice_of_string_slices_with_non_static_life
 }
 
 #[test]
-fn matches_with_square_bracket_notation() -> Result<()> {
+fn matches_with_square_bracket_notation() -> TestResult<()> {
     verify_that!(vec![1, 2, 3], [eq(1), eq(2), eq(3)])
 }
 
 #[test]
-fn contains_exactly_in_order_admits_matchers_without_static_lifetime() -> Result<()> {
+fn contains_exactly_in_order_admits_matchers_without_static_lifetime() -> TestResult<()> {
     #[derive(Debug, PartialEq)]
     struct AStruct(i32);
     let expected_value = AStruct(123);
@@ -157,7 +157,7 @@ fn contains_exactly_in_order_admits_matchers_without_static_lifetime() -> Result
 }
 
 #[test]
-fn contains_exactly_in_order_produces_correct_failure_message() -> Result<()> {
+fn contains_exactly_in_order_produces_correct_failure_message() -> TestResult<()> {
     let result = verify_that!([1, 4, 3], contains_exactly![eq(1), eq(2), eq(3)].in_order());
     verify_that!(
         result,
@@ -176,7 +176,7 @@ fn contains_exactly_in_order_produces_correct_failure_message() -> Result<()> {
 
 #[test]
 fn contains_exactly_in_order_produces_correct_failure_message_when_matchers_are_nested()
--> Result<()> {
+-> TestResult<()> {
     let result = verify_that!(
         [[0, 1], [1, 2]],
         contains_exactly![
@@ -209,13 +209,13 @@ fn contains_exactly_in_order_produces_correct_failure_message_when_matchers_are_
 }
 
 #[test]
-fn contains_exactly_in_order_explains_mismatch_due_to_wrong_size() -> Result<()> {
+fn contains_exactly_in_order_explains_mismatch_due_to_wrong_size() -> TestResult<()> {
     let result = verify_that!([2, 3], contains_exactly![eq(2), eq(3), eq(4)].in_order());
     verify_that!(result, err(displays_as(contains_substring("whose size is 2"))))
 }
 
 #[test]
-fn contains_exactly_in_order_works_when_matcher_is_created_in_subroutine() -> Result<()> {
+fn contains_exactly_in_order_works_when_matcher_is_created_in_subroutine() -> TestResult<()> {
     fn create_matcher() -> impl Matcher<Vec<i32>> {
         contains_exactly![eq(1)].in_order()
     }
@@ -234,7 +234,7 @@ impl<'a> IntoIterator for &'a OwnedItemContainer {
 }
 
 #[test]
-fn contains_exactly_in_order_matches_container_a_ref_of_which_produces_owned_items() -> Result<()> {
+fn contains_exactly_in_order_matches_container_a_ref_of_which_produces_owned_items() -> TestResult<()> {
     verify_that!(
         OwnedItemContainer(vec![1, 2, 3]),
         contains_exactly![eq(1), eq(2), eq(3)].in_order()

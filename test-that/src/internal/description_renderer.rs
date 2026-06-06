@@ -270,7 +270,7 @@ mod tests {
     use indoc::indoc;
 
     #[test]
-    fn renders_fragment() -> Result<()> {
+    fn renders_fragment() -> TestResult<()> {
         let fragment = Fragment("A fragment".into());
         let mut result = String::new();
 
@@ -280,7 +280,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_empty_block() -> Result<()> {
+    fn renders_empty_block() -> TestResult<()> {
         let block = Block::Literal(vec![]);
         let mut result = String::new();
 
@@ -290,7 +290,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_block_with_one_fragment() -> Result<()> {
+    fn renders_block_with_one_fragment() -> TestResult<()> {
         let block: Block = "A fragment".into();
         let mut result = String::new();
 
@@ -300,7 +300,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_block_with_two_fragments() -> Result<()> {
+    fn renders_block_with_two_fragments() -> TestResult<()> {
         let block: Block = "A fragment\nAnother fragment".into();
         let mut result = String::new();
 
@@ -310,7 +310,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_indented_block() -> Result<()> {
+    fn renders_indented_block() -> TestResult<()> {
         let block: Block = "A fragment\nAnother fragment".into();
         let mut result = String::new();
 
@@ -320,7 +320,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_block_with_prefix() -> Result<()> {
+    fn renders_block_with_prefix() -> TestResult<()> {
         let block: Block = "A fragment\nAnother fragment".into();
         let mut result = String::new();
 
@@ -330,7 +330,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_indented_block_with_prefix() -> Result<()> {
+    fn renders_indented_block_with_prefix() -> TestResult<()> {
         let block: Block = "A fragment\nAnother fragment".into();
         let mut result = String::new();
 
@@ -340,7 +340,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_empty_list() -> Result<()> {
+    fn renders_empty_list() -> TestResult<()> {
         let list = list(vec![]);
         let mut result = String::new();
 
@@ -350,7 +350,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_plain_list_with_one_block() -> Result<()> {
+    fn renders_plain_list_with_one_block() -> TestResult<()> {
         let list = list(vec!["A fragment".into()]);
         let mut result = String::new();
 
@@ -360,7 +360,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_plain_list_with_two_blocks() -> Result<()> {
+    fn renders_plain_list_with_two_blocks() -> TestResult<()> {
         let list = list(vec!["A fragment".into(), "A fragment in a second block".into()]);
         let mut result = String::new();
 
@@ -370,7 +370,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_plain_list_with_one_block_with_two_fragments() -> Result<()> {
+    fn renders_plain_list_with_one_block_with_two_fragments() -> TestResult<()> {
         let list = list(vec!["A fragment\nA second fragment".into()]);
         let mut result = String::new();
 
@@ -380,7 +380,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_plain_list_with_one_block() -> Result<()> {
+    fn renders_nested_plain_list_with_one_block() -> TestResult<()> {
         let list = list(vec![Block::nested(list(vec!["A fragment".into()]))]);
         let mut result = String::new();
 
@@ -390,7 +390,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_plain_list_with_two_blocks() -> Result<()> {
+    fn renders_nested_plain_list_with_two_blocks() -> TestResult<()> {
         let list = list(vec![Block::nested(list(vec![
             "A fragment".into(),
             "A fragment in a second block".into(),
@@ -403,7 +403,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_plain_list_with_one_block_with_two_fragments() -> Result<()> {
+    fn renders_nested_plain_list_with_one_block_with_two_fragments() -> TestResult<()> {
         let list = list(vec![Block::nested(list(vec!["A fragment\nA second fragment".into()]))]);
         let mut result = String::new();
 
@@ -413,7 +413,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_bulleted_list_with_one_block() -> Result<()> {
+    fn renders_bulleted_list_with_one_block() -> TestResult<()> {
         let list = list(vec!["A fragment".into()]).bullet_list();
         let mut result = String::new();
 
@@ -423,7 +423,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_bulleted_list_with_two_blocks() -> Result<()> {
+    fn renders_bulleted_list_with_two_blocks() -> TestResult<()> {
         let list =
             list(vec!["A fragment".into(), "A fragment in a second block".into()]).bullet_list();
         let mut result = String::new();
@@ -434,7 +434,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_bulleted_list_with_one_block_with_two_fragments() -> Result<()> {
+    fn renders_bulleted_list_with_one_block_with_two_fragments() -> TestResult<()> {
         let list = list(vec!["A fragment\nA second fragment".into()]).bullet_list();
         let mut result = String::new();
 
@@ -444,7 +444,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_bulleted_list_with_one_block() -> Result<()> {
+    fn renders_nested_bulleted_list_with_one_block() -> TestResult<()> {
         let list = list(vec![Block::nested(list(vec!["A fragment".into()]).bullet_list())]);
         let mut result = String::new();
 
@@ -454,7 +454,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_bulleted_list_with_two_blocks() -> Result<()> {
+    fn renders_nested_bulleted_list_with_two_blocks() -> TestResult<()> {
         let list = list(vec![Block::nested(
             list(vec!["A fragment".into(), "A fragment in a second block".into()]).bullet_list(),
         )]);
@@ -466,7 +466,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_bulleted_list_with_one_block_with_two_fragments() -> Result<()> {
+    fn renders_nested_bulleted_list_with_one_block_with_two_fragments() -> TestResult<()> {
         let list = list(vec![Block::nested(
             list(vec!["A fragment\nA second fragment".into()]).bullet_list(),
         )]);
@@ -478,7 +478,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_enumerated_list_with_one_block() -> Result<()> {
+    fn renders_enumerated_list_with_one_block() -> TestResult<()> {
         let list = list(vec!["A fragment".into()]).enumerate();
         let mut result = String::new();
 
@@ -488,7 +488,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_enumerated_list_with_two_blocks() -> Result<()> {
+    fn renders_enumerated_list_with_two_blocks() -> TestResult<()> {
         let list =
             list(vec!["A fragment".into(), "A fragment in a second block".into()]).enumerate();
         let mut result = String::new();
@@ -499,7 +499,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_enumerated_list_with_one_block_with_two_fragments() -> Result<()> {
+    fn renders_enumerated_list_with_one_block_with_two_fragments() -> TestResult<()> {
         let list = list(vec!["A fragment\nA second fragment".into()]).enumerate();
         let mut result = String::new();
 
@@ -509,7 +509,7 @@ mod tests {
     }
 
     #[test]
-    fn aligns_renders_enumerated_list_with_more_than_ten_blocks() -> Result<()> {
+    fn aligns_renders_enumerated_list_with_more_than_ten_blocks() -> TestResult<()> {
         let list =
             (0..11).map(|i| Block::from(format!("Fragment {i}"))).collect::<List>().enumerate();
         let mut result = String::new();
@@ -534,7 +534,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_fragment_plus_nested_plain_list_with_one_block() -> Result<()> {
+    fn renders_fragment_plus_nested_plain_list_with_one_block() -> TestResult<()> {
         let list =
             list(vec!["A fragment".into(), Block::nested(list(vec!["Another fragment".into()]))]);
         let mut result = String::new();
@@ -545,7 +545,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_double_nested_plain_list_with_one_block() -> Result<()> {
+    fn renders_double_nested_plain_list_with_one_block() -> TestResult<()> {
         let list =
             list(vec![Block::nested(list(vec![Block::nested(list(vec!["A fragment".into()]))]))]);
         let mut result = String::new();
@@ -556,7 +556,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_headers_plus_double_nested_plain_list() -> Result<()> {
+    fn renders_headers_plus_double_nested_plain_list() -> TestResult<()> {
         let list = list(vec![
             "First header".into(),
             Block::nested(list(vec![
@@ -572,7 +572,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_double_nested_bulleted_list() -> Result<()> {
+    fn renders_double_nested_bulleted_list() -> TestResult<()> {
         let list =
             list(vec![Block::nested(list(vec!["A fragment".into()]).bullet_list())]).bullet_list();
         let mut result = String::new();
@@ -583,7 +583,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_enumeration_with_two_blocks_inside_bulleted_list() -> Result<()> {
+    fn renders_nested_enumeration_with_two_blocks_inside_bulleted_list() -> TestResult<()> {
         let list =
             list(vec![Block::nested(list(vec!["Block 1".into(), "Block 2".into()]).enumerate())])
                 .bullet_list();
@@ -595,7 +595,7 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_enumeration_with_block_with_two_fragments_inside_bulleted_list() -> Result<()>
+    fn renders_nested_enumeration_with_block_with_two_fragments_inside_bulleted_list() -> TestResult<()>
     {
         let list = list(vec![Block::nested(
             list(vec!["A fragment\nAnother fragment".into()]).enumerate(),

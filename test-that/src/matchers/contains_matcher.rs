@@ -28,16 +28,16 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # fn should_pass() -> Result<()> {
+/// # fn should_pass() -> TestResult<()> {
 /// verify_that!(["Some value"], contains(eq("Some value")))?;  // Passes
 /// verify_that!(vec!["Some value"], contains(eq("Some value")))?;  // Passes
 /// #     Ok(())
 /// # }
-/// # fn should_fail_1() -> Result<()> {
+/// # fn should_fail_1() -> TestResult<()> {
 /// verify_that!([] as [String; 0], contains(eq("Some value")))?;   // Fails
 /// #     Ok(())
 /// # }
-/// # fn should_fail_2() -> Result<()> {
+/// # fn should_fail_2() -> TestResult<()> {
 /// verify_that!(["Some value"], contains(eq("Some other value")))?;   // Fails
 /// #     Ok(())
 /// # }
@@ -213,7 +213,7 @@ mod tests {
     use crate::prelude::*;
 
     #[test]
-    fn contains_matches_singleton_slice_with_value() -> Result<()> {
+    fn contains_matches_singleton_slice_with_value() -> TestResult<()> {
         let matcher = contains(eq(1));
 
         let result = matcher.matches(&vec![1]);
@@ -222,7 +222,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_matches_singleton_vec_with_value() -> Result<()> {
+    fn contains_matches_singleton_vec_with_value() -> TestResult<()> {
         let matcher = contains(eq(1));
 
         let result = matcher.matches(&vec![1]);
@@ -231,7 +231,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_matches_two_element_slice_with_value() -> Result<()> {
+    fn contains_matches_two_element_slice_with_value() -> TestResult<()> {
         let matcher = contains(eq(1));
 
         let result = matcher.matches(&[0, 1]);
@@ -240,7 +240,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_does_not_match_singleton_slice_with_wrong_value() -> Result<()> {
+    fn contains_does_not_match_singleton_slice_with_wrong_value() -> TestResult<()> {
         let matcher = contains(eq(1));
 
         let result = matcher.matches(&[0]);
@@ -249,13 +249,13 @@ mod tests {
     }
 
     #[test]
-    fn contains_does_not_match_empty_slice() -> Result<()> {
+    fn contains_does_not_match_empty_slice() -> TestResult<()> {
         let value = Vec::<i32>::new();
         verify_that!(value.as_slice(), not(points_to(contains(eq(1)))))
     }
 
     #[test]
-    fn contains_matches_slice_with_repeated_value() -> Result<()> {
+    fn contains_matches_slice_with_repeated_value() -> TestResult<()> {
         let matcher = contains(eq(1)).times(eq(2));
 
         let result = matcher.matches(&[1, 1]);
@@ -264,7 +264,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_does_not_match_slice_with_too_few_of_value() -> Result<()> {
+    fn contains_does_not_match_slice_with_too_few_of_value() -> TestResult<()> {
         let matcher = contains(eq(1)).times(eq(2));
 
         let result = matcher.matches(&[0, 1]);
@@ -273,7 +273,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_does_not_match_slice_with_too_many_of_value() -> Result<()> {
+    fn contains_does_not_match_slice_with_too_many_of_value() -> TestResult<()> {
         let matcher = contains(eq(1)).times(eq(1));
 
         let result = matcher.matches(&[1, 1]);
@@ -282,22 +282,22 @@ mod tests {
     }
 
     #[test]
-    fn contains_matches_on_vec_of_values() -> Result<()> {
+    fn contains_matches_on_vec_of_values() -> TestResult<()> {
         verify_that!(vec![1, 2, 3], contains(eq(1)))
     }
 
     #[test]
-    fn contains_matches_on_array_of_values() -> Result<()> {
+    fn contains_matches_on_array_of_values() -> TestResult<()> {
         verify_that!([1, 2, 3], contains(eq(1)))
     }
 
     #[test]
-    fn contains_matches_on_slice_of_values_with_points_to_slice() -> Result<()> {
+    fn contains_matches_on_slice_of_values_with_points_to_slice() -> TestResult<()> {
         verify_that!(&[1, 2, 3], points_to(contains(eq(1))))
     }
 
     #[test]
-    fn contains_matches_on_slice_of_values_with_deref_notation_on_macro() -> Result<()> {
+    fn contains_matches_on_slice_of_values_with_deref_notation_on_macro() -> TestResult<()> {
         let slice = &[1, 2, 3];
         verify_that!(*slice, contains(eq(1)))
     }
@@ -315,17 +315,17 @@ mod tests {
 
     #[test]
     fn contains_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
-    -> Result<()> {
+    -> TestResult<()> {
         verify_that!(OwnedItemContainer(vec![1, 2, 3]), contains(eq(1)))
     }
 
     #[test]
-    fn contains_matches_vec_of_string_slices() -> Result<()> {
+    fn contains_matches_vec_of_string_slices() -> TestResult<()> {
         verify_that!(vec!["String 1", "String 2", "String 3"], contains(contains_substring("1")))
     }
 
     #[test]
-    fn contains_matches_vec_of_string_slices_with_non_static_lifetime() -> Result<()> {
+    fn contains_matches_vec_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
         let string_1 = String::from("String 1");
         let string_2 = String::from("String 2");
         let string_3 = String::from("String 3");
@@ -336,13 +336,13 @@ mod tests {
     }
 
     #[test]
-    fn contains_matches_slice_of_string_slices() -> Result<()> {
+    fn contains_matches_slice_of_string_slices() -> TestResult<()> {
         let value = vec!["String 1", "String 2", "String 3"];
         verify_that!(value.as_slice(), points_to(contains(contains_substring("1"))))
     }
 
     #[test]
-    fn contains_matches_slice_of_string_slices_with_non_static_lifetime() -> Result<()> {
+    fn contains_matches_slice_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
         let string_1 = String::from("String 1");
         let string_2 = String::from("String 2");
         let string_3 = String::from("String 3");
@@ -351,7 +351,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_formats_without_multiplicity_by_default() -> Result<()> {
+    fn contains_formats_without_multiplicity_by_default() -> TestResult<()> {
         let matcher: ContainsMatcher<_, RefItems> = contains(eq(1));
 
         verify_that!(
@@ -361,7 +361,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_formats_with_multiplicity_when_specified() -> Result<()> {
+    fn contains_formats_with_multiplicity_when_specified() -> TestResult<()> {
         let matcher: ContainsMatcher<_, RefItems> = contains(eq(1)).times(eq(2));
 
         verify_that!(
@@ -371,7 +371,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_mismatch_shows_number_of_times_element_was_found() -> Result<()> {
+    fn contains_mismatch_shows_number_of_times_element_was_found() -> TestResult<()> {
         verify_that!(
             contains(eq(3)).times(eq(1)).explain_match(&vec![1, 2, 3, 3]),
             displays_as(eq("which contains 2 matching elements"))
@@ -379,7 +379,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_mismatch_shows_when_matches() -> Result<()> {
+    fn contains_mismatch_shows_when_matches() -> TestResult<()> {
         verify_that!(
             contains(eq(3)).explain_match(&vec![1, 2, 3, 3]),
             displays_as(eq("which contains a matching element"))
@@ -387,7 +387,7 @@ mod tests {
     }
 
     #[test]
-    fn contains_mismatch_shows_when_no_matches() -> Result<()> {
+    fn contains_mismatch_shows_when_no_matches() -> TestResult<()> {
         verify_that!(
             contains(eq(3)).explain_match(&vec![1, 2]),
             displays_as(eq("which does not contain a matching element"))

@@ -20,11 +20,11 @@ mod tests {
     use test_that::prelude::*;
 
     #[test]
-    fn should_fail_in_subroutine() -> Result<()> {
+    fn should_fail_in_subroutine() -> TestResult<()> {
         assert_that_things_are_okay(2)
     }
 
-    fn assert_that_things_are_okay(value: i32) -> Result<()> {
+    fn assert_that_things_are_okay(value: i32) -> TestResult<()> {
         verify_that!(value, eq(3))
     }
 }

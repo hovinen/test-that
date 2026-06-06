@@ -31,7 +31,7 @@ fn build_text<T: Display>(mut collection: impl Iterator<Item = T>) -> String {
 
 #[test]
 #[serial]
-fn colors_suppressed_when_both_no_color_and_force_color_are_set() -> Result<()> {
+fn colors_suppressed_when_both_no_color_and_force_color_are_set() -> TestResult<()> {
     temp_env::with_vars([("NO_COLOR", Some("1")), ("FORCE_COLOR", Some("1"))], || {
         let result = verify_that!(build_text(1..50), eq(build_text(1..51)));
 

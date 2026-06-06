@@ -22,34 +22,34 @@ mod tests {
     use test_that::prelude::*;
 
     #[test]
-    fn should_pass() -> Result<()> {
+    fn should_pass() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(2))
     }
 
     #[test]
-    fn verify_that_supports_trailing_comma() -> Result<()> {
+    fn verify_that_supports_trailing_comma() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(2),)
     }
 
     #[test]
-    fn should_pass_with_omitted_elements_are() -> Result<()> {
+    fn should_pass_with_omitted_elements_are() -> TestResult<()> {
         verify_that!(vec![1, 2], [eq(1), eq(2)])
     }
 
     #[test]
-    fn should_pass_with_omitted_contains_exactly() -> Result<()> {
+    fn should_pass_with_omitted_contains_exactly() -> TestResult<()> {
         verify_that!(vec![1, 2], {eq(2), eq(1)})
     }
 
     #[test]
-    fn verify_that_with_short_elements_are_syntax_supports_trailing_comma() -> Result<()> {
+    fn verify_that_with_short_elements_are_syntax_supports_trailing_comma() -> TestResult<()> {
         verify_that!(vec![1, 2], [eq(1), eq(2),])
     }
 
     #[test]
-    fn verify_that_with_short_contains_exactly_syntax_supports_trailing_comma() -> Result<()> {
+    fn verify_that_with_short_contains_exactly_syntax_supports_trailing_comma() -> TestResult<()> {
         verify_that!(vec![1, 2], {eq(2), eq(1),})
     }
 
@@ -72,7 +72,7 @@ mod tests {
     }
 
     #[test_that::test]
-    fn should_pass_with_expect_that() -> Result<()> {
+    fn should_pass_with_expect_that() -> TestResult<()> {
         let value = 2;
         expect_that!(value, eq(2));
         Ok(())
@@ -97,28 +97,28 @@ mod tests {
     }
 
     #[test]
-    fn should_fail_on_assertion_failure() -> Result<()> {
+    fn should_fail_on_assertion_failure() -> TestResult<()> {
         let status = run_external_process("simple_assertion_failure").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn should_fail_on_assertion_failure_with_assert_that() -> Result<()> {
+    fn should_fail_on_assertion_failure_with_assert_that() -> TestResult<()> {
         let status = run_external_process("simple_assertion_failure_with_assert_that").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn should_fail_on_assertion_failure_with_expect_that() -> Result<()> {
+    fn should_fail_on_assertion_failure_with_expect_that() -> TestResult<()> {
         let status = run_external_process("expect_that_failure").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn should_output_failure_message_on_assertion_failure() -> Result<()> {
+    fn should_output_failure_message_on_assertion_failure() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("simple_assertion_failure")?;
 
         verify_that!(
@@ -133,7 +133,7 @@ mod tests {
     }
 
     #[test]
-    fn should_output_failure_message_on_assertion_failure_with_assert_that() -> Result<()> {
+    fn should_output_failure_message_on_assertion_failure_with_assert_that() -> TestResult<()> {
         let output =
             run_external_process_in_tests_directory("simple_assertion_failure_with_assert_that")?;
 
@@ -150,7 +150,7 @@ mod tests {
     }
 
     #[test]
-    fn should_output_failure_message_on_assertion_failure_with_expect_that() -> Result<()> {
+    fn should_output_failure_message_on_assertion_failure_with_expect_that() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("expect_that_failure")?;
 
         verify_that!(
@@ -166,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    fn should_output_both_failure_messages_when_two_expect_that_assertions_fail() -> Result<()> {
+    fn should_output_both_failure_messages_when_two_expect_that_assertions_fail() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("two_expect_that_failures")?;
 
         verify_that!(
@@ -188,7 +188,7 @@ mod tests {
     }
 
     #[test_that::test]
-    fn should_output_failure_message_with_simple_structured_value() -> Result<()> {
+    fn should_output_failure_message_with_simple_structured_value() -> TestResult<()> {
         let output = run_external_process_in_tests_directory(
             "assertion_failures_with_short_structured_actual_values",
         )?;
@@ -227,28 +227,28 @@ mod tests {
     }
 
     #[test]
-    fn should_fail_due_to_assertion_failure_in_subroutine() -> Result<()> {
+    fn should_fail_due_to_assertion_failure_in_subroutine() -> TestResult<()> {
         let status = run_external_process("simple_assertion_failure").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn should_fail_due_to_returned_error_in_subroutine() -> Result<()> {
+    fn should_fail_due_to_returned_error_in_subroutine() -> TestResult<()> {
         let status = run_external_process("failure_due_to_returned_error").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn should_fail_test_on_and_log_failure() -> Result<()> {
+    fn should_fail_test_on_and_log_failure() -> TestResult<()> {
         let status = run_external_process("non_fatal_failure_in_subroutine").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn should_log_test_failures_to_stdout() -> Result<()> {
+    fn should_log_test_failures_to_stdout() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("two_non_fatal_failures")?;
 
         verify_that!(
@@ -269,7 +269,7 @@ mod tests {
     }
 
     #[test]
-    fn should_log_fatal_and_non_fatal_errors_to_stdout() -> Result<()> {
+    fn should_log_fatal_and_non_fatal_errors_to_stdout() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("fatal_and_non_fatal_failure")?;
 
         verify_that!(
@@ -290,7 +290,7 @@ mod tests {
     }
 
     #[test]
-    fn should_abort_after_first_failure() -> Result<()> {
+    fn should_abort_after_first_failure() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("first_failure_aborts")?;
 
         verify_that!(
@@ -304,7 +304,7 @@ mod tests {
     }
 
     #[test]
-    fn should_fail_with_assertion_in_a_subroutine() -> Result<()> {
+    fn should_fail_with_assertion_in_a_subroutine() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("non_fatal_failure_in_subroutine")?;
 
         verify_that!(
@@ -318,7 +318,7 @@ mod tests {
     }
 
     #[test]
-    fn should_include_custom_error_message_in_failure() -> Result<()> {
+    fn should_include_custom_error_message_in_failure() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("custom_error_message")?;
 
         verify_that!(output, contains_substring("A custom error message"))?;
@@ -351,19 +351,19 @@ mod tests {
     }
 
     #[test]
-    fn should_not_run_closure_with_custom_error_message_if_test_passes() -> Result<()> {
+    fn should_not_run_closure_with_custom_error_message_if_test_passes() -> TestResult<()> {
         let value = 2;
         verify_that!(value, eq(2))
             .with_failure_message(|| panic!("This should not execute, since the assertion passes."))
     }
 
     #[test]
-    fn should_verify_predicate_with_success() -> Result<()> {
+    fn should_verify_predicate_with_success() -> TestResult<()> {
         verify_pred!(eq_predicate(1, 1))
     }
 
     #[test]
-    fn should_verify_predicate_with_trailing_comma() -> Result<()> {
+    fn should_verify_predicate_with_trailing_comma() -> TestResult<()> {
         verify_pred!(eq_predicate(1, 1,))
     }
 
@@ -372,20 +372,20 @@ mod tests {
     }
 
     #[test_that::test]
-    fn should_verify_predicate_with_success_using_expect_pred() -> Result<()> {
+    fn should_verify_predicate_with_success_using_expect_pred() -> TestResult<()> {
         expect_pred!(eq_predicate(1, 1));
         Ok(())
     }
 
     #[test]
-    fn verify_pred_should_fail_test_on_failure() -> Result<()> {
+    fn verify_pred_should_fail_test_on_failure() -> TestResult<()> {
         let status = run_external_process("verify_predicate_with_failure").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn verify_pred_should_output_correct_failure_message() -> Result<()> {
+    fn verify_pred_should_output_correct_failure_message() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("verify_predicate_with_failure")?;
 
         verify_that!(
@@ -399,21 +399,21 @@ mod tests {
     }
 
     #[test]
-    fn assert_pred_should_fail_test_on_failure() -> Result<()> {
+    fn assert_pred_should_fail_test_on_failure() -> TestResult<()> {
         let status = run_external_process("assert_predicate_with_failure").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn expect_pred_should_fail_test_on_failure() -> Result<()> {
+    fn expect_pred_should_fail_test_on_failure() -> TestResult<()> {
         let status = run_external_process("expect_pred_failure").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn assert_pred_should_output_correct_failure_message() -> Result<()> {
+    fn assert_pred_should_output_correct_failure_message() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("assert_predicate_with_failure")?;
 
         verify_that!(
@@ -427,7 +427,7 @@ mod tests {
     }
 
     #[test]
-    fn expect_pred_should_output_correct_failure_message() -> Result<()> {
+    fn expect_pred_should_output_correct_failure_message() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("expect_pred_failure")?;
 
         verify_that!(
@@ -441,7 +441,7 @@ mod tests {
     }
 
     #[test]
-    fn expect_pred_should_output_failure_message_for_second_failure() -> Result<()> {
+    fn expect_pred_should_output_failure_message_for_second_failure() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("two_expect_pred_failures")?;
 
         verify_that!(
@@ -455,7 +455,7 @@ mod tests {
     }
 
     #[test]
-    fn should_verify_predicate_in_a_submodule() -> Result<()> {
+    fn should_verify_predicate_in_a_submodule() -> TestResult<()> {
         verify_pred!(submodule::eq_predicate_in_submodule(1, 1))
     }
 
@@ -466,14 +466,14 @@ mod tests {
     }
 
     #[test]
-    fn should_verify_predicate_as_a_method() -> Result<()> {
+    fn should_verify_predicate_as_a_method() -> TestResult<()> {
         let a_struct = AStruct {};
 
         verify_pred!(a_struct.eq_predicate_as_method(1, 1))
     }
 
     #[test]
-    fn should_verify_predicate_as_a_method_on_an_expresion_result() -> Result<()> {
+    fn should_verify_predicate_as_a_method_on_an_expresion_result() -> TestResult<()> {
         verify_pred!((AStruct {}).eq_predicate_as_method(1, 1))
     }
 
@@ -486,7 +486,7 @@ mod tests {
     }
 
     #[test]
-    fn should_verify_predicate_as_a_method_in_submodule() -> Result<()> {
+    fn should_verify_predicate_as_a_method_in_submodule() -> TestResult<()> {
         verify_pred!(another_submodule::A_STRUCT_IN_SUBMODULE.eq_predicate_as_method(1, 1))
     }
 
@@ -495,7 +495,7 @@ mod tests {
     }
 
     #[test]
-    fn should_verify_predicate_as_a_method_on_a_field() -> Result<()> {
+    fn should_verify_predicate_as_a_method_on_a_field() -> TestResult<()> {
         let another_struct = AnotherStruct { a_struct: AStruct {} };
 
         verify_pred!(another_struct.a_struct.eq_predicate_as_method(1, 1))
@@ -507,7 +507,7 @@ mod tests {
 
     #[test]
     #[rustversion::before(1.76)]
-    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output() -> Result<()>
+    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output() -> TestResult<()>
     {
         let output = run_external_process_in_tests_directory(
             "verify_predicate_with_failure_as_method_in_submodule",
@@ -525,7 +525,7 @@ mod tests {
 
     #[test]
     #[rustversion::since(1.76)]
-    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output() -> Result<()>
+    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output() -> TestResult<()>
     {
         let output = run_external_process_in_tests_directory(
             "verify_predicate_with_failure_as_method_in_submodule",
@@ -542,14 +542,14 @@ mod tests {
     }
 
     #[test]
-    fn fail_macro_causes_test_failure() -> Result<()> {
+    fn fail_macro_causes_test_failure() -> TestResult<()> {
         let status = run_external_process("failure_due_to_fail_macro").status()?;
 
         verify_that!(status.success(), eq(false))
     }
 
     #[test]
-    fn fail_macro_outputs_message() -> Result<()> {
+    fn fail_macro_outputs_message() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("failure_due_to_fail_macro")?;
 
         verify_that!(
@@ -562,7 +562,7 @@ mod tests {
     }
 
     #[test]
-    fn fail_macro_allows_empty_message() -> Result<()> {
+    fn fail_macro_allows_empty_message() -> TestResult<()> {
         let output = run_external_process_in_tests_directory(
             "failure_due_to_fail_macro_with_empty_message",
         )?;
@@ -571,7 +571,7 @@ mod tests {
     }
 
     #[test]
-    fn fail_macro_allows_message_with_format_arguments() -> Result<()> {
+    fn fail_macro_allows_message_with_format_arguments() -> TestResult<()> {
         let output = run_external_process_in_tests_directory(
             "failure_due_to_fail_macro_with_format_arguments",
         )?;
@@ -580,7 +580,7 @@ mod tests {
     }
 
     #[test]
-    fn test_using_normal_test_attribute_macro_formats_failure_message_correctly() -> Result<()> {
+    fn test_using_normal_test_attribute_macro_formats_failure_message_correctly() -> TestResult<()> {
         let result = should_display_error_correctly_without_google_test_macro();
 
         verify_that!(
@@ -597,12 +597,12 @@ mod tests {
     }
 
     // This is not marked as a test since it deliberately fails.
-    fn should_display_error_correctly_without_google_test_macro() -> Result<()> {
+    fn should_display_error_correctly_without_google_test_macro() -> TestResult<()> {
         verify_that!(1, eq(2))
     }
 
     #[test]
-    fn failure_message_uses_pretty_print_for_actual_value_when_long_enough() -> Result<()> {
+    fn failure_message_uses_pretty_print_for_actual_value_when_long_enough() -> TestResult<()> {
         #[derive(Debug)]
         #[allow(unused)]
         struct NontrivialStruct {
@@ -623,7 +623,7 @@ mod tests {
     }
 
     #[test_that::test]
-    fn test_with_google_test_and_rstest_runs_only_once() -> Result<()> {
+    fn test_with_google_test_and_rstest_runs_only_once() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("google_test_with_rstest")?;
 
         expect_that!(
@@ -654,7 +654,7 @@ mod tests {
     }
 
     #[test_that::test]
-    fn async_test_with_google_test_runs_correctly() -> Result<()> {
+    fn async_test_with_google_test_runs_correctly() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("async_test_with_expect_that")?;
 
         expect_that!(
@@ -672,7 +672,7 @@ mod tests {
     }
 
     #[test]
-    fn test_can_return_anyhow_generated_error() -> Result<()> {
+    fn test_can_return_anyhow_generated_error() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("test_returning_anyhow_error")?;
 
         verify_that!(output, contains_substring("Error from Anyhow"))
@@ -691,7 +691,7 @@ mod tests {
     }
 
     #[test_that::test]
-    fn should_just_pass() -> Result<()> {
+    fn should_just_pass() -> TestResult<()> {
         Ok(())
     }
 
@@ -715,13 +715,13 @@ mod tests {
 
     #[test_that::test]
     #[should_panic]
-    fn should_pass_with_should_panic_and_verify_that() -> Result<()> {
+    fn should_pass_with_should_panic_and_verify_that() -> TestResult<()> {
         verify_that!(2, eq(4))?;
         verify_that!(3, eq(3))
     }
 
     #[test]
-    fn should_fail_when_should_panic_is_present_and_no_panic_occurs() -> Result<()> {
+    fn should_fail_when_should_panic_is_present_and_no_panic_occurs() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("passing_test_with_should_panic")?;
 
         verify_that!(output, contains_substring("should panic"))
@@ -738,7 +738,7 @@ mod tests {
         expect_that!(123, eq(123));
     }
 
-    fn run_external_process_in_tests_directory(name: &'static str) -> Result<String> {
+    fn run_external_process_in_tests_directory(name: &'static str) -> TestResult<String> {
         let mut command = run_external_process(name);
         let std::process::Output { stdout, .. } = command.output()?;
         Ok(String::from_utf8(stdout)?)

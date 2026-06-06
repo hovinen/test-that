@@ -428,13 +428,13 @@ mod tests {
 
     #[test]
     #[parallel]
-    fn create_diff_smaller_than_one_line() -> Result<()> {
+    fn create_diff_smaller_than_one_line() -> TestResult<()> {
         verify_that!(create_diff("One", "Two", Mode::Exact), eq(""))
     }
 
     #[test]
     #[parallel]
-    fn create_diff_exact_same() -> Result<()> {
+    fn create_diff_exact_same() -> TestResult<()> {
         let expected = indoc! {"
             One
             Two
@@ -451,7 +451,7 @@ mod tests {
 
     #[test]
     #[parallel]
-    fn create_diff_multiline_diff() -> Result<()> {
+    fn create_diff_multiline_diff() -> TestResult<()> {
         let expected = indoc! {"
             prefix
             Actual#1
@@ -484,13 +484,13 @@ mod tests {
 
     #[test]
     #[parallel]
-    fn create_diff_exact_unrelated() -> Result<()> {
+    fn create_diff_exact_unrelated() -> TestResult<()> {
         verify_that!(create_diff(&build_text(1..500), &build_text(501..1000), Mode::Exact), eq(""))
     }
 
     #[test]
     #[parallel]
-    fn create_diff_exact_small_difference() -> Result<()> {
+    fn create_diff_exact_small_difference() -> TestResult<()> {
         verify_that!(
             create_diff(&build_text(1..50), &build_text(1..51), Mode::Exact),
             eq(indoc! {
@@ -526,7 +526,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn create_diff_exact_small_difference_with_color() -> Result<()> {
+    fn create_diff_exact_small_difference_with_color() -> TestResult<()> {
         let _keep = force_color();
 
         verify_that!(
@@ -547,7 +547,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn create_diff_exact_difference_with_inline_color() -> Result<()> {
+    fn create_diff_exact_difference_with_inline_color() -> TestResult<()> {
         let _keep = force_color();
         let actual = indoc!(
             "There is a home in Nouvelle Orleans
