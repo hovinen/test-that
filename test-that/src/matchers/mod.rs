@@ -52,7 +52,6 @@ mod ok_matcher;
 mod points_to_matcher;
 mod pointwise_matcher;
 mod predicate_matcher;
-mod property_matcher;
 mod result_of_matcher;
 mod some_matcher;
 mod str_matcher;
@@ -99,7 +98,7 @@ pub use crate::{
     __all as all, __any as any, __contains_each as contains_each,
     __contains_exactly as contains_exactly, __elements_are as elements_are, __field as field,
     __is_contained_in as is_contained_in, __matches_pattern as matches_pattern, __pat as pat,
-    __pointwise as pointwise, __property as property, __result_of as result_of,
+    __pointwise as pointwise, __result_of as result_of,
 };
 
 // Types and functions used by macros matchers.
@@ -120,6 +119,5 @@ pub mod __internal_unstable_do_not_depend_on_these {
     pub use super::field_matcher::internal::field_matcher;
     pub use super::is_matcher::is;
     pub use super::pointwise_matcher::internal::PointwiseMatcher;
-    pub use super::property_matcher::internal::property_matcher;
     pub use super::result_of_matcher::internal::result_of;
 }
