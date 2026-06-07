@@ -92,7 +92,8 @@ fn contains_exactly_in_order_matches_vec_of_string_slices() -> TestResult<()> {
 }
 
 #[test]
-fn contains_exactly_in_order_matches_vec_of_string_slices_with_non_static_lifetime() -> TestResult<()> {
+fn contains_exactly_in_order_matches_vec_of_string_slices_with_non_static_lifetime()
+-> TestResult<()> {
     let string_1 = String::from("String 1");
     let string_2 = String::from("String 2");
     let string_3 = String::from("String 3");
@@ -124,8 +125,8 @@ fn contains_exactly_in_order_matches_slice_of_string_slices() -> TestResult<()> 
 }
 
 #[test]
-fn contains_exactly_in_order_matches_slice_of_string_slices_with_non_static_lifetime() -> TestResult<()>
-{
+fn contains_exactly_in_order_matches_slice_of_string_slices_with_non_static_lifetime()
+-> TestResult<()> {
     let string_1 = String::from("String 1");
     let string_2 = String::from("String 2");
     let string_3 = String::from("String 3");
@@ -234,9 +235,97 @@ impl<'a> IntoIterator for &'a OwnedItemContainer {
 }
 
 #[test]
-fn contains_exactly_in_order_matches_container_a_ref_of_which_produces_owned_items() -> TestResult<()> {
+fn contains_exactly_in_order_matches_container_a_ref_of_which_produces_owned_items()
+-> TestResult<()> {
     verify_that!(
         OwnedItemContainer(vec![1, 2, 3]),
         contains_exactly![eq(1), eq(2), eq(3)].in_order()
     )
+}
+
+#[test]
+fn contains_each_in_order_matches_when_all_elements_present() -> TestResult<()> {
+    verify_that!(vec![2, 3, 4], contains_each!(eq(2), eq(3), eq(4)).in_order())
+}
+
+#[test]
+fn contains_each_in_order_matches_when_first_element_has_no_corresponding_matcher() -> TestResult<()>
+{
+    verify_that!(vec![2, 3, 4], contains_each!(eq(3), eq(4)).in_order())
+}
+
+#[test]
+fn contains_each_in_order_matches_when_second_element_has_no_corresponding_matcher()
+-> TestResult<()> {
+    verify_that!(vec![2, 3, 4], contains_each!(eq(2), eq(4)).in_order())
+}
+
+#[test]
+fn contains_each_in_order_matches_when_third_element_has_no_corresponding_matcher() -> TestResult<()>
+{
+    verify_that!(vec![2, 3, 4], contains_each!(eq(2), eq(3)).in_order())
+}
+
+#[test]
+fn contains_each_in_order_matches_when_first_and_third_elements_have_no_corresponding_matchers()
+-> TestResult<()> {
+    verify_that!(vec![2, 3, 4], contains_each!(eq(2)).in_order())
+}
+
+#[test]
+fn contains_each_in_order_matches_when_two_matchers_in_sequence_are_missing() -> TestResult<()> {
+    verify_that!(vec![2, 3, 4, 5], contains_each!(eq(2), eq(5)).in_order())
+}
+
+#[test]
+fn contains_each_in_order_does_not_match_when_extra_matcher_is_present() -> TestResult<()> {
+    verify_that!(vec![2, 3, 4], not(contains_each!(eq(2), eq(3), eq(4), eq(5)).in_order()))
+}
+
+#[test]
+fn contains_each_in_order_does_not_match_when_matchers_are_out_of_order() -> TestResult<()> {
+    verify_that!(vec![2, 3, 4], not(contains_each!(eq(4), eq(3), eq(2)).in_order()))
+}
+#[test]
+fn is_contained_in_in_order_matches_when_all_elements_present() -> TestResult<()> {
+    verify_that!(vec![2, 3, 4], is_contained_in!(eq(2), eq(3), eq(4)).in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_matches_when_first_element_has_no_corresponding_matcher()
+-> TestResult<()> {
+    verify_that!(vec![3, 4], is_contained_in!(eq(2), eq(3), eq(4)).in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_matches_when_second_matcher_has_no_corresponding_element()
+-> TestResult<()> {
+    verify_that!(vec![2, 4], is_contained_in!(eq(2), eq(3), eq(4)).in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_matches_when_third_matcher_has_no_corresponding_element()
+-> TestResult<()> {
+    verify_that!(vec![2, 3], is_contained_in!(eq(2), eq(3), eq(4)).in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_matches_when_first_and_third_matchers_have_no_corresponding_elements()
+-> TestResult<()> {
+    verify_that!(vec![3], is_contained_in!(eq(2), eq(3), eq(4)).in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_matches_when_two_elements_in_sequence_are_missing() -> TestResult<()> {
+    verify_that!(vec![2, 5], is_contained_in!(eq(2), eq(3), eq(4), eq(5)).in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_does_not_match_when_extra_element_is_present() -> TestResult<()> {
+    verify_that!(vec![2, 3, 4, 5], not(is_contained_in!(eq(2), eq(3), eq(4)).in_order()))
+}
+
+#[test]
+fn is_contained_in_in_order_does_not_match_when_matchers_are_out_of_order() -> TestResult<()> {
+    verify_that!(vec![2, 3, 4], not(is_contained_in!(eq(4), eq(3), eq(2)).in_order()))
 }

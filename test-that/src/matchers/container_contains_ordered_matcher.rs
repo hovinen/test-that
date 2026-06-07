@@ -84,7 +84,10 @@
 macro_rules! __elements_are {
     ($($matcher:expr),* $(,)?) => {{
         use $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
-        ContainerContainsOrderedMatcher::new([$(Box::new($matcher)),*])
+        ContainerContainsOrderedMatcher::new(
+            [$(Box::new($matcher)),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch,
+        )
     }}
 }
 
@@ -96,7 +99,7 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
-    use crate::matchers::container_contains::{OwnedItems, RefItems};
+    use crate::matchers::container_contains::{OwnedItems, RefItems, Requirements};
     use std::borrow::Borrow;
     use std::{fmt::Debug, marker::PhantomData};
 
@@ -112,6 +115,7 @@ pub mod internal {
         const N: usize,
     > {
         elements: [Box<dyn Matcher<T> + 'matchers>; N],
+        requirements: Requirements,
         _phantom: PhantomData<(*const ContainerT, ModeT)>,
     }
 
@@ -122,24 +126,51 @@ pub mod internal {
         ///
         /// **For internal use only. API stablility is not guaranteed!**
         #[doc(hidden)]
-        pub fn new(elements: [Box<dyn Matcher<T> + 'matchers>; N]) -> Self {
-            Self { elements, _phantom: PhantomData }
+        pub fn new(
+            elements: [Box<dyn Matcher<T> + 'matchers>; N],
+            requirements: Requirements,
+        ) -> Self {
+            Self { elements, requirements, _phantom: PhantomData }
         }
 
         fn matches_with_iter<ItemT: Borrow<T>>(
             &self,
-            actual: impl Iterator<Item = ItemT>,
+            mut actual_iter: impl Iterator<Item = ItemT>,
         ) -> MatcherResult {
-            let mut zipped_iterator = zip(actual, self.elements.iter());
-            for (a, e) in zipped_iterator.by_ref() {
-                if e.matches(a.borrow()).is_no_match() {
-                    return MatcherResult::NoMatch;
+            let mut expected_iter = self.elements.iter();
+            let mut maybe_actual = actual_iter.next();
+            let mut maybe_expected = expected_iter.next();
+            loop {
+                let Some(actual) = maybe_actual.as_ref() else {
+                    match self.requirements {
+                        Requirements::PerfectMatch | Requirements::Superset => {
+                            return maybe_expected.is_none().into();
+                        }
+                        Requirements::Subset => return MatcherResult::Match,
+                    }
+                };
+                let Some(expected) = maybe_expected else {
+                    match self.requirements {
+                        Requirements::PerfectMatch | Requirements::Subset => {
+                            return MatcherResult::NoMatch;
+                        }
+                        Requirements::Superset => return MatcherResult::Match,
+                    }
+                };
+                if expected.matches(actual.borrow()).is_match() {
+                    maybe_actual = actual_iter.next();
+                    maybe_expected = expected_iter.next();
+                } else {
+                    match self.requirements {
+                        Requirements::PerfectMatch => return MatcherResult::NoMatch,
+                        Requirements::Superset => {
+                            maybe_actual = actual_iter.next();
+                        }
+                        Requirements::Subset => {
+                            maybe_expected = expected_iter.next();
+                        }
+                    }
                 }
-            }
-            if !zipped_iterator.has_size_mismatch() {
-                MatcherResult::Match
-            } else {
-                MatcherResult::NoMatch
             }
         }
 

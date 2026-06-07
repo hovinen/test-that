@@ -403,7 +403,7 @@ pub mod internal {
         pub fn in_order(
             self,
         ) -> ContainerContainsOrderedMatcher<'matchers, ContainerT, T, ModeT, N> {
-            ContainerContainsOrderedMatcher::new(self.elements)
+            ContainerContainsOrderedMatcher::new(self.elements, self.requirements)
         }
 
         fn matches_with_iter<ItemT: Borrow<T>>(
