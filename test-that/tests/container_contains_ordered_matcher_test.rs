@@ -286,6 +286,25 @@ fn contains_each_in_order_does_not_match_when_extra_matcher_is_present() -> Test
 fn contains_each_in_order_does_not_match_when_matchers_are_out_of_order() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], not(contains_each!(eq(4), eq(3), eq(2)).in_order()))
 }
+
+#[test]
+fn contains_each_in_order_produces_correct_failure_message() -> TestResult<()> {
+    let result = verify_that!([1, 2, 3], contains_each![eq(4), eq(2), eq(3)].in_order());
+    verify_that!(
+        result,
+        err(displays_as(contains_substring(indoc!(
+            "
+                Value of: [1, 2, 3]
+                Expected: has elements:
+                  0. is equal to 4
+                  1. is equal to 2
+                  2. is equal to 3
+                Actual: [1, 2, 3],
+                  where matcher #0 does not match any following elements"
+        ))))
+    )
+}
+
 #[test]
 fn is_contained_in_in_order_matches_when_all_elements_present() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], is_contained_in!(eq(2), eq(3), eq(4)).in_order())
@@ -328,4 +347,22 @@ fn is_contained_in_in_order_does_not_match_when_extra_element_is_present() -> Te
 #[test]
 fn is_contained_in_in_order_does_not_match_when_matchers_are_out_of_order() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], not(is_contained_in!(eq(4), eq(3), eq(2)).in_order()))
+}
+
+#[test]
+fn is_contained_in_in_order_produces_correct_failure_message() -> TestResult<()> {
+    let result = verify_that!([1, 2, 3], is_contained_in![eq(4), eq(2), eq(3)].in_order());
+    verify_that!(
+        result,
+        err(displays_as(contains_substring(indoc!(
+            "
+                Value of: [1, 2, 3]
+                Expected: has elements:
+                  0. is equal to 4
+                  1. is equal to 2
+                  2. is equal to 3
+                Actual: [1, 2, 3],
+                  where element #0 is not matched by any following matcher"
+        ))))
+    )
 }

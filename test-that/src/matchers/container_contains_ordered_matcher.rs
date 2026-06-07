@@ -176,31 +176,86 @@ pub mod internal {
 
         fn explain_match_with_iter<ItemT: Borrow<T>>(
             &self,
-            actual: impl Iterator<Item = ItemT>,
+            mut actual_iter: impl Iterator<Item = ItemT>,
         ) -> Description {
-            let mut zipped_iterator = zip(actual, self.elements.iter());
-            let mut mismatches = Vec::new();
-            for (idx, (a, e)) in zipped_iterator.by_ref().enumerate() {
-                if e.matches(a.borrow()).is_no_match() {
-                    mismatches.push(format!(
-                        "element #{idx} is {:?}, {}",
-                        a.borrow(),
-                        e.explain_match(a.borrow())
-                    ));
+            match self.requirements {
+                Requirements::PerfectMatch => {
+                    let mut zipped_iterator = zip(actual_iter, self.elements.iter());
+                    let mut mismatches = Vec::new();
+                    for (idx, (a, e)) in zipped_iterator.by_ref().enumerate() {
+                        if e.matches(a.borrow()).is_no_match() {
+                            mismatches.push(format!(
+                                "element #{idx} is {:?}, {}",
+                                a.borrow(),
+                                e.explain_match(a.borrow())
+                            ));
+                        }
+                    }
+                    if mismatches.is_empty() {
+                        if !zipped_iterator.has_size_mismatch() {
+                            "whose elements all match".into()
+                        } else {
+                            format!("whose size is {}", zipped_iterator.left_size()).into()
+                        }
+                    } else if mismatches.len() == 1 {
+                        let mismatches = mismatches.into_iter().collect::<Description>();
+                        format!("where {mismatches}").into()
+                    } else {
+                        let mismatches = mismatches.into_iter().collect::<Description>();
+                        format!("where:\n{}", mismatches.bullet_list().indent()).into()
+                    }
                 }
-            }
-            if mismatches.is_empty() {
-                if !zipped_iterator.has_size_mismatch() {
-                    "whose elements all match".into()
-                } else {
-                    format!("whose size is {}", zipped_iterator.left_size()).into()
+                Requirements::Superset => {
+                    let mut expected_iter = self.elements.iter().enumerate();
+                    let mut maybe_actual = actual_iter.next();
+                    let mut maybe_expected = expected_iter.next();
+                    let matcher = loop {
+                        let Some(actual) = maybe_actual.as_ref() else {
+                            break maybe_expected;
+                        };
+                        let Some((_, expected)) = maybe_expected else {
+                            break None;
+                        };
+                        if expected.matches(actual.borrow()).is_match() {
+                            maybe_actual = actual_iter.next();
+                            maybe_expected = expected_iter.next();
+                        } else {
+                            maybe_actual = actual_iter.next();
+                        }
+                    };
+                    if let Some((index, _)) = matcher {
+                        format!("where matcher #{index} does not match any following elements")
+                            .into()
+                    } else {
+                        "where all elements are present".into()
+                    }
                 }
-            } else if mismatches.len() == 1 {
-                let mismatches = mismatches.into_iter().collect::<Description>();
-                format!("where {mismatches}").into()
-            } else {
-                let mismatches = mismatches.into_iter().collect::<Description>();
-                format!("where:\n{}", mismatches.bullet_list().indent()).into()
+                Requirements::Subset => {
+                    let mut actual_index_iter = actual_iter.enumerate();
+                    let mut expected_iter = self.elements.iter();
+                    let mut maybe_actual = actual_index_iter.next();
+                    let mut maybe_expected = expected_iter.next();
+                    let item = loop {
+                        let Some((_, actual)) = maybe_actual.as_ref() else {
+                            break None;
+                        };
+                        let Some(expected) = maybe_expected else {
+                            break maybe_actual;
+                        };
+                        if expected.matches(actual.borrow()).is_match() {
+                            maybe_actual = actual_index_iter.next();
+                            maybe_expected = expected_iter.next();
+                        } else {
+                            maybe_expected = expected_iter.next();
+                        }
+                    };
+                    if let Some((index, _)) = item {
+                        format!("where element #{index} is not matched by any following matcher")
+                            .into()
+                    } else {
+                        "where all elements are matched".into()
+                    }
+                }
             }
         }
     }
