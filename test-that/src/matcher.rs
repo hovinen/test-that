@@ -60,9 +60,9 @@ pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
     ///
     /// Override the default implementation to provide additional context on why
     /// a particular value matched or did not match. For example, the
-    /// [`container_eq`][crate::matchers::container_eq] matcher displays
-    /// information on which elements of the actual value were not present in
-    /// the expected value and vice versa.
+    /// [`container_eq`][crate::matchers::containers::container_eq] matcher
+    /// displays information on which elements of the actual value were not
+    /// present in the expected value and vice versa.
     ///
     /// This implementation should be overridden in any matcher which contains
     /// one or more inner matchers. The implementation should invoke

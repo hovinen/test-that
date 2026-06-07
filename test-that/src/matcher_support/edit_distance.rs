@@ -309,7 +309,7 @@ mod tests {
         let result = edit_list(["A string"], [], Mode::Exact);
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![matches_pattern!(
+            matches_pattern!(Difference::Editable(contains_exactly![matches_pattern!(
                 Edit::ExtraActual(eq("A string"))
             )]))
         )
@@ -320,7 +320,7 @@ mod tests {
         let result = edit_list([], ["A string"], Mode::Exact);
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![matches_pattern!(
+            matches_pattern!(Difference::Editable(contains_exactly![matches_pattern!(
                 Edit::ExtraExpected(eq("A string"))
             )]))
         )
@@ -331,10 +331,13 @@ mod tests {
         let result = edit_list(["A string"], ["Another string"], Mode::Exact);
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::ExtraActual(eq("A string"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Another string"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::ExtraActual(eq("A string"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Another string"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -344,12 +347,15 @@ mod tests {
             edit_list(["A string", "A string"], ["Another string", "Another string"], Mode::Exact);
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::ExtraActual(eq("A string"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Another string"))),
-                matches_pattern!(Edit::ExtraActual(eq("A string"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Another string"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::ExtraActual(eq("A string"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Another string"))),
+                    matches_pattern!(Edit::ExtraActual(eq("A string"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Another string"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -362,11 +368,14 @@ mod tests {
         );
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::Both(eq("Common part"))),
-                matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::Both(eq("Common part"))),
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -375,10 +384,13 @@ mod tests {
         let result = edit_list(["Common part", "Actual only"], ["Common part"], Mode::Exact);
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::Both(eq("Common part"))),
-                matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::Both(eq("Common part"))),
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -387,10 +399,13 @@ mod tests {
         let result = edit_list(["Common part"], ["Common part", "Expected only"], Mode::Exact);
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::Both(eq("Common part"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::Both(eq("Common part"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -403,11 +418,14 @@ mod tests {
         );
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
-                matches_pattern!(Edit::Both(eq("Common part"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
+                    matches_pattern!(Edit::Both(eq("Common part"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -421,13 +439,16 @@ mod tests {
         );
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::ExtraActual(eq("Actual only (1)"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only (1)"))),
-                matches_pattern!(Edit::Both(eq("Common part"))),
-                matches_pattern!(Edit::ExtraActual(eq("Actual only (2)"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only (2)"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only (1)"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only (1)"))),
+                    matches_pattern!(Edit::Both(eq("Common part"))),
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only (2)"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only (2)"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -441,12 +462,15 @@ mod tests {
         );
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::Both(eq("Common part (1)"))),
-                matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
-                matches_pattern!(Edit::Both(eq("Common part (2)"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::Both(eq("Common part (1)"))),
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
+                    matches_pattern!(Edit::Both(eq("Common part (2)"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -460,11 +484,14 @@ mod tests {
         );
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::Both(eq("Common part (1)"))),
-                matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
-                matches_pattern!(Edit::Both(eq("Common part (2)"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::Both(eq("Common part (1)"))),
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
+                    matches_pattern!(Edit::Both(eq("Common part (2)"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -478,11 +505,14 @@ mod tests {
         );
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::Both(eq("Common part (1)"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
-                matches_pattern!(Edit::Both(eq("Common part (2)"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::Both(eq("Common part (1)"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
+                    matches_pattern!(Edit::Both(eq("Common part (2)"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -511,11 +541,14 @@ mod tests {
         );
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
-                matches_pattern!(Edit::Both(eq("Common part"))),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
+                    matches_pattern!(Edit::Both(eq("Common part"))),
+                ]
+                .in_order()
+            ))
         )
     }
 
@@ -525,11 +558,14 @@ mod tests {
         let result = edit_list(["Actual only"], ["Expected only"], Mode::Prefix);
         verify_that!(
             result,
-            matches_pattern!(Difference::Editable(elements_are![
-                matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
-                matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
-                matches_pattern!(Edit::AdditionalActual),
-            ]))
+            matches_pattern!(Difference::Editable(
+                contains_exactly![
+                    matches_pattern!(Edit::ExtraActual(eq("Actual only"))),
+                    matches_pattern!(Edit::ExtraExpected(eq("Expected only"))),
+                    matches_pattern!(Edit::AdditionalActual),
+                ]
+                .in_order()
+            ))
         )
     }
 

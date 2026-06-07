@@ -99,7 +99,7 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
-    use crate::matchers::container_contains::{OwnedItems, RefItems, Requirements};
+    use crate::matchers::containers::container_contains::{OwnedItems, RefItems, Requirements};
     use std::borrow::Borrow;
     use std::{fmt::Debug, marker::PhantomData};
 

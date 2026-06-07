@@ -20,16 +20,10 @@ mod any_matcher;
 mod anything_matcher;
 mod char_count_matcher;
 mod conjunction_matcher;
-mod container_contains;
-mod container_contains_ordered_matcher;
-mod container_contains_unordered_matcher;
-mod container_eq_matcher;
-mod contains_matcher;
+pub mod containers;
 mod contains_regex_matcher;
 mod disjunction_matcher;
 mod display_matcher;
-mod each_matcher;
-mod empty_matcher;
 mod eq_deref_of_matcher;
 mod eq_matcher;
 mod err_matcher;
@@ -41,7 +35,6 @@ mod is_encoded_string_matcher;
 mod is_matcher;
 mod is_nan_matcher;
 mod le_matcher;
-mod len_matcher;
 mod lt_matcher;
 mod matches_pattern;
 mod matches_regex_matcher;
@@ -50,23 +43,16 @@ mod none_matcher;
 mod not_matcher;
 mod ok_matcher;
 mod points_to_matcher;
-mod pointwise_matcher;
 mod predicate_matcher;
 mod result_of_matcher;
 mod some_matcher;
 mod str_matcher;
-mod subset_of_matcher;
-mod superset_of_matcher;
 mod tuple_matcher;
 
 pub use anything_matcher::anything;
 pub use char_count_matcher::char_count;
-pub use container_eq_matcher::container_eq;
-pub use contains_matcher::{ContainsMatcher, contains};
 pub use contains_regex_matcher::contains_regex;
 pub use display_matcher::displays_as;
-pub use each_matcher::each;
-pub use empty_matcher::empty;
 pub use eq_deref_of_matcher::eq_deref_of;
 pub use eq_matcher::{EqMatcher, eq};
 pub use err_matcher::err;
@@ -76,7 +62,6 @@ pub use has_entry_matcher::has_entry;
 pub use is_encoded_string_matcher::is_utf8_string;
 pub use is_nan_matcher::is_nan;
 pub use le_matcher::le;
-pub use len_matcher::len;
 pub use lt_matcher::lt;
 pub use matches_regex_matcher::matches_regex;
 pub use near_matcher::{NearMatcher, approx_eq, near};
@@ -89,16 +74,12 @@ pub use some_matcher::some;
 pub use str_matcher::{
     StrMatcher, StrMatcherConfigurator, contains_substring, ends_with, starts_with,
 };
-pub use subset_of_matcher::subset_of;
-pub use superset_of_matcher::superset_of;
 
 // Reexport and unmangle the macros.
 #[doc(inline)]
 pub use crate::{
-    __all as all, __any as any, __contains_each as contains_each,
-    __contains_exactly as contains_exactly, __elements_are as elements_are, __field as field,
-    __is_contained_in as is_contained_in, __matches_pattern as matches_pattern, __pat as pat,
-    __pointwise as pointwise, __result_of as result_of,
+    __all as all, __any as any, __field as field, __matches_pattern as matches_pattern,
+    __pat as pat, __result_of as result_of,
 };
 
 // Types and functions used by macros matchers.
@@ -110,14 +91,14 @@ pub mod __internal_unstable_do_not_depend_on_these {
     pub use super::all_matcher::internal::AllMatcher;
     pub use super::any_matcher::internal::AnyMatcher;
     pub use super::conjunction_matcher::ConjunctionMatcher;
-    pub use super::container_contains::Requirements;
-    pub use super::container_contains_ordered_matcher::internal::ContainerContainsOrderedMatcher;
-    pub use super::container_contains_unordered_matcher::internal::{
+    pub use super::containers::container_contains::Requirements;
+    pub use super::containers::container_contains_ordered_matcher::internal::ContainerContainsOrderedMatcher;
+    pub use super::containers::container_contains_unordered_matcher::internal::{
         ContainerContainsUnorderedMatcher, MapContainsMatcher,
     };
+    pub use super::containers::pointwise_matcher::internal::PointwiseMatcher;
     pub use super::disjunction_matcher::DisjunctionMatcher;
     pub use super::field_matcher::internal::field_matcher;
     pub use super::is_matcher::is;
-    pub use super::pointwise_matcher::internal::PointwiseMatcher;
     pub use super::result_of_matcher::internal::result_of;
 }

@@ -124,7 +124,7 @@ macro_rules! verify_that {
     ($actual:expr, [$($expecteds:expr),+ $(,)?]) => {
         $crate::assertions::internal::check_matcher(
             &$actual,
-            $crate::matchers::contains_exactly![$($expecteds),+].in_order(),
+            $crate::matchers::containers::contains_exactly![$($expecteds),+].in_order(),
             stringify!($actual),
             $crate::internal::source_location::SourceLocation::new(file!(), line!(), column!()),
         )
@@ -132,7 +132,7 @@ macro_rules! verify_that {
     ($actual:expr, {$($expecteds:expr),+ $(,)?}) => {
         $crate::assertions::internal::check_matcher(
             &$actual,
-            $crate::matchers::contains_exactly![$($expecteds),+],
+            $crate::matchers::containers::contains_exactly![$($expecteds),+],
             stringify!($actual),
             $crate::internal::source_location::SourceLocation::new(file!(), line!(), column!()),
         )

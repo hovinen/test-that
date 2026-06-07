@@ -16,7 +16,7 @@
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
-    matchers::container_contains::{OwnedItems, RefItems},
+    matchers::containers::container_contains::{OwnedItems, RefItems},
 };
 use std::{fmt::Debug, marker::PhantomData};
 
@@ -209,7 +209,7 @@ impl<InnerMatcherT, ModeT> ContainsMatcher<InnerMatcherT, ModeT> {
 mod tests {
     use super::{ContainsMatcher, contains};
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
-    use crate::matchers::container_contains::RefItems;
+    use crate::matchers::containers::container_contains::RefItems;
     use crate::prelude::*;
 
     #[test]

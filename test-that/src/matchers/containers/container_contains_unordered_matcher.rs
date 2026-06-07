@@ -74,7 +74,7 @@
 ///
 /// Note: This behavior is only possible in [`verify_that!`] macros. In any
 /// other cases, it is still necessary to use the
-/// [`contains_exactly!`][crate::matchers::contains_exactly] macro.
+/// [`contains_exactly!`][crate::matchers::containers::contains_exactly] macro.
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;
@@ -119,27 +119,24 @@
 #[doc(hidden)]
 macro_rules! __contains_exactly {
     ($(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            ContainerContainsUnorderedMatcher, Requirements
-        };
-        ContainerContainsUnorderedMatcher::new([], Requirements::PerfectMatch)
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
     }};
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            MapContainsMatcher, Requirements
-        };
-        MapContainsMatcher::new(
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
-            Requirements::PerfectMatch
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            ContainerContainsUnorderedMatcher, Requirements
-        };
-        ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::PerfectMatch)
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [$(Box::new($matcher)),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
     }};
 }
 
@@ -152,7 +149,7 @@ macro_rules! __contains_exactly {
 ///
 /// Put another way, `contains_each!` matches if there is a subset of the actual
 /// container which
-/// [`contains_exactly`][crate::matchers::contains_exactly] would
+/// [`contains_exactly`][crate::matchers::containers::contains_exactly] would
 /// match.
 ///
 /// ```
@@ -222,27 +219,24 @@ macro_rules! __contains_exactly {
 #[doc(hidden)]
 macro_rules! __contains_each {
     ($(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            ContainerContainsUnorderedMatcher, Requirements
-        };
-        ContainerContainsUnorderedMatcher::new([], Requirements::Superset)
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+        )
     }};
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            MapContainsMatcher, Requirements
-        };
-        MapContainsMatcher::new(
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
-            Requirements::Superset
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
-            ContainerContainsUnorderedMatcher, Requirements
-        };
-        ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::Superset)
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [$(Box::new($matcher)),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+        )
     }}
 }
 
@@ -257,7 +251,7 @@ macro_rules! __contains_each {
 ///
 /// Put another way, `is_contained_in!` matches if there is a subset of the
 /// matchers which would match with
-/// [`contains_exactly`][crate::matchers::contains_exactly].
+/// [`contains_exactly`][crate::matchers::containers::contains_exactly].
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -361,7 +355,9 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
-    use crate::matchers::container_contains::{OwnedItems, PairBorrow, RefItems, Requirements};
+    use crate::matchers::containers::container_contains::{
+        OwnedItems, PairBorrow, RefItems, Requirements,
+    };
     use crate::prelude::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
     use std::borrow::Borrow;
     use std::collections::HashSet;
@@ -1093,7 +1089,7 @@ pub mod internal {
 mod tests {
     use super::internal::MapContainsMatcher;
     use crate::matcher::Matcher;
-    use crate::matchers::container_contains::RefItems;
+    use crate::matchers::containers::container_contains::RefItems;
     use crate::prelude::*;
     use indoc::indoc;
     use std::collections::HashMap;
