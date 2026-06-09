@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::OrFailExt;
+
 /// Alias for [`contains_exactly!`] with [`in_order()`].
 ///
 /// This exists for compatibility with [googletest].
@@ -64,6 +66,20 @@ macro_rules! __unordered_elements_are {
     }};
 }
 
+#[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use OrFailExt instead"))]
+pub trait IntoTestResult<T> {
+    /// Alias for [`or_fail`][crate::OrFailExt::or_fail].
+    #[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use or_fail() instead"))]
+    fn into_test_result(self) -> crate::TestResult<T>;
+}
+
+#[allow(deprecated)]
+impl<S: OrFailExt<T>, T> IntoTestResult<T> for S {
+    fn into_test_result(self) -> crate::TestResult<T> {
+        self.or_fail()
+    }
+}
+
 #[cfg(test)]
 #[allow(deprecated)]
 mod tests {
@@ -85,5 +101,12 @@ mod tests {
     #[test]
     fn unordered_elements_are_uses_map_matcher_when_matching_pairs() -> TestResult<()> {
         verify_that!(HashMap::from([(1, 1)]), unordered_elements_are![(eq(1), eq(1))])
+    }
+
+    #[test]
+    #[cfg(feature = "anyhow")]
+    fn into_test_result_works() -> TestResult<()> {
+        let _ = Err::<(), anyhow::Error>(anyhow::anyhow!("Expected failure")).into_test_result();
+        Ok(())
     }
 }

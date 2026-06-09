@@ -52,6 +52,9 @@ pub mod prelude {
     pub use super::Result;
     pub use super::TestResult;
     pub use super::TestResultExt;
+    #[cfg(feature = "googletest-compat")]
+    #[allow(deprecated)]
+    pub use super::compat::IntoTestResult;
     pub use super::matcher::Matcher;
     pub use super::matcher::MatcherExt;
     pub use super::matchers::containers::*;
