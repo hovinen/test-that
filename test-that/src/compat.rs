@@ -42,15 +42,33 @@ macro_rules! __elements_are {
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __unordered_elements_are {
-    ($($content:tt)*) => {{
-        $crate::matchers::containers::contains_exactly![$($content)*]
-    }}
+    ($(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
+    }};
+
+    ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
+            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
+    }};
+
+    ($($matcher:expr),* $(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [$(Box::new($matcher)),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
+    }};
 }
 
 #[cfg(test)]
 #[allow(deprecated)]
 mod tests {
     use crate::prelude::*;
+    use std::collections::HashMap;
 
     #[test]
     fn elements_are_maps_to_contains_exactly_in_order() -> TestResult<()> {
@@ -62,5 +80,10 @@ mod tests {
     fn unordered_elements_are_maps_to_contains_exactly() -> TestResult<()> {
         verify_that!(vec![1, 2, 3], unordered_elements_are![eq(1), eq(2), eq(3)])?;
         verify_that!(vec![1, 2, 3], unordered_elements_are![eq(3), eq(2), eq(1)])
+    }
+
+    #[test]
+    fn unordered_elements_are_uses_map_matcher_when_matching_pairs() -> TestResult<()> {
+        verify_that!(HashMap::from([(1, 1)]), unordered_elements_are![(eq(1), eq(1))])
     }
 }
