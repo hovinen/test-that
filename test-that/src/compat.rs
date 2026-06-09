@@ -66,7 +66,7 @@ macro_rules! __unordered_elements_are {
     }};
 }
 
-/// Alias for [OrFailExt][crate::OrFailExt].
+/// Alias for [OrFailExt].
 #[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use OrFailExt instead"))]
 pub trait IntoTestResult<T> {
     /// Alias for [`or_fail`][crate::OrFailExt::or_fail].
