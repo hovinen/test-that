@@ -87,7 +87,7 @@ use internal::test_outcome::{TestAssertionFailure, TestOutcome};
 /// failed but allow it to continue running, are not encoded in this type.
 pub type TestResult<T> = std::result::Result<T, TestAssertionFailure>;
 
-/// Alias for [TestResult] for compatibility with [googletest][https://docs.rs/googletest].
+/// Alias for [TestResult] for compatibility with [googletest](https://docs.rs/googletest).
 #[cfg(feature = "googletest-compat")]
 #[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use TestResult instead"))]
 pub type Result<T> = TestResult<T>;
