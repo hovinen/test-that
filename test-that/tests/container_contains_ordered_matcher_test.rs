@@ -244,6 +244,17 @@ fn contains_exactly_in_order_matches_container_a_ref_of_which_produces_owned_ite
 }
 
 #[test]
+fn contains_each_in_order_matches_when_list_is_empty() -> TestResult<()> {
+    verify_that!(Vec::<i32>::new(), contains_each!().in_order())
+}
+
+#[test]
+fn contains_each_in_order_does_not_match_when_container_is_empty_and_at_least_one_matcher_present()
+-> TestResult<()> {
+    verify_that!(Vec::<i32>::new(), not(contains_each!(eq(1)).in_order()))
+}
+
+#[test]
 fn contains_each_in_order_matches_when_all_elements_present() -> TestResult<()> {
     verify_that!(vec![2, 3, 4], contains_each!(eq(2), eq(3), eq(4)).in_order())
 }
@@ -303,6 +314,17 @@ fn contains_each_in_order_produces_correct_failure_message() -> TestResult<()> {
                   where matcher #0 does not match any following elements"
         ))))
     )
+}
+
+#[test]
+fn is_contained_in_in_order_matches_when_list_is_empty() -> TestResult<()> {
+    verify_that!(Vec::<i32>::new(), is_contained_in!().in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_matches_when_container_is_empty_and_at_least_one_matcher_present()
+-> TestResult<()> {
+    verify_that!(Vec::<i32>::new(), is_contained_in!(eq(1)).in_order())
 }
 
 #[test]
