@@ -48,10 +48,10 @@ fn vec_of_options_of_enum_ref_contains_specific_variant() -> TestResult<()> {
 fn struct_method_returning_vec_ref_contains_single_ok_string() -> TestResult<()> {
     #[derive(Debug)]
     struct MyStruct {
-        items: Vec<Result<String, i32>>,
+        items: Vec<std::result::Result<String, i32>>,
     }
     impl MyStruct {
-        fn get_items(&self) -> &Vec<Result<String, i32>> {
+        fn get_items(&self) -> &Vec<std::result::Result<String, i32>> {
             &self.items
         }
     }
@@ -79,7 +79,7 @@ fn option_of_vec_of_strings_some_with_exact_elements() -> TestResult<()> {
 
 #[test]
 fn result_ok_of_vec_of_options_each_some_positive() -> TestResult<()> {
-    let value: Result<Vec<Option<i32>>, String> = Ok(vec![Some(10), Some(20)]);
+    let value: std::result::Result<Vec<Option<i32>>, String> = Ok(vec![Some(10), Some(20)]);
     verify_that!(value, ok(each(some(gt(0)))))
 }
 
@@ -90,16 +90,10 @@ fn matches_pattern_on_struct_with_vec_field() -> TestResult<()> {
         name: String,
         tags: Vec<String>,
     }
-    let value = Config {
-        name: "foo".to_string(),
-        tags: vec!["a".to_string(), "b".to_string()],
-    };
+    let value = Config { name: "foo".to_string(), tags: vec!["a".to_string(), "b".to_string()] };
     verify_that!(
         value,
-        matches_pattern!(Config {
-            name: eq("foo"),
-            tags: contains_each![eq("a"), eq("b")],
-        })
+        matches_pattern!(Config { name: eq("foo"), tags: contains_each![eq("a"), eq("b")] })
     )
 }
 
@@ -129,9 +123,7 @@ fn matches_pattern_on_doubly_nested_struct_with_option_and_vec() -> TestResult<(
     verify_that!(
         value,
         matches_pattern!(Outer {
-            inner: some(matches_pattern!(Inner {
-                values: contains_each![eq(10), eq(20)],
-            })),
+            inner: some(matches_pattern!(Inner { values: contains_each![eq(10), eq(20)] })),
         })
     )
 }
@@ -146,12 +138,9 @@ fn has_entry_with_vec_of_options_value() -> TestResult<()> {
 
 #[test]
 fn contains_each_with_ok_starts_with_matchers() -> TestResult<()> {
-    let value: Vec<Result<String, i32>> =
+    let value: Vec<std::result::Result<String, i32>> =
         vec![Ok("hello world".to_string()), Ok("goodbye".to_string())];
-    verify_that!(
-        value,
-        contains_each![ok(starts_with("hello")), ok(starts_with("good"))]
-    )
+    verify_that!(value, contains_each![ok(starts_with("hello")), ok(starts_with("good"))])
 }
 
 #[test]
@@ -166,10 +155,7 @@ fn result_of_slice_of_options_each_some_positive() -> TestResult<()> {
         }
     }
     let value = Holder { data: vec![Some(5), Some(10)] };
-    verify_that!(
-        value,
-        result_of!(|h: &Holder| h.as_slice(), points_to(each(some(gt(0)))))
-    )
+    verify_that!(value, result_of!(|h: &Holder| h.as_slice(), points_to(each(some(gt(0))))))
 }
 
 #[test]
@@ -180,22 +166,17 @@ fn vec_of_options_each_none_or_negative() -> TestResult<()> {
 
 #[test]
 fn contains_each_with_tuple_and_option_string() -> TestResult<()> {
-    let value: Vec<(i32, Option<String>)> = vec![
-        (1, Some("apple".to_string())),
-        (2, Some("banana".to_string())),
-    ];
+    let value: Vec<(i32, Option<String>)> =
+        vec![(1, Some("apple".to_string())), (2, Some("banana".to_string()))];
     verify_that!(
         value,
-        contains_each![
-            (eq(1), some(starts_with("app"))),
-            (eq(2), some(starts_with("ban"))),
-        ]
+        contains_each![(eq(1), some(starts_with("app"))), (eq(2), some(starts_with("ban"))),]
     )
 }
 
 #[test]
 fn ok_with_displays_as_matcher() -> TestResult<()> {
-    let value: Result<i32, String> = Ok(42);
+    let value: std::result::Result<i32, String> = Ok(42);
     verify_that!(value, ok(displays_as(eq("42"))))
 }
 
@@ -207,7 +188,7 @@ fn some_of_vec_with_len_and_each_constraints() -> TestResult<()> {
 
 #[test]
 fn ok_of_vec_is_subset_of_set() -> TestResult<()> {
-    let value: Result<Vec<i32>, String> = Ok(vec![1, 3]);
+    let value: std::result::Result<Vec<i32>, String> = Ok(vec![1, 3]);
     verify_that!(value, ok(subset_of([1, 2, 3, 4, 5])))
 }
 
@@ -215,7 +196,7 @@ fn ok_of_vec_is_subset_of_set() -> TestResult<()> {
 fn matches_pattern_on_enum_with_result_option_payload() -> TestResult<()> {
     #[derive(Debug)]
     enum Event {
-        Data(Result<Option<String>, i32>),
+        Data(std::result::Result<Option<String>, i32>),
     }
     let value = Event::Data(Ok(Some("payload".to_string())));
     verify_that!(value, matches_pattern!(Event::Data(ok(some(eq("payload"))))))
@@ -241,10 +222,8 @@ fn result_of_returning_option_str_ref_with_some_contains_substring() -> TestResu
 
 #[test]
 fn each_ok_not_contains_substring() -> TestResult<()> {
-    let value: Vec<Result<String, i32>> = vec![
-        Ok("hello".to_string()),
-        Ok("world".to_string()),
-    ];
+    let value: Vec<std::result::Result<String, i32>> =
+        vec![Ok("hello".to_string()), Ok("world".to_string())];
     verify_that!(value, each(ok(not(contains_substring("bad")))))
 }
 
@@ -262,8 +241,8 @@ fn all_contains_and_not_contains_on_vec() -> TestResult<()> {
 
 #[test]
 fn any_ok_positive_or_err_negative_on_result() -> TestResult<()> {
-    let ok_value: Result<i32, i32> = Ok(5);
-    let err_value: Result<i32, i32> = Err(-3);
+    let ok_value: std::result::Result<i32, i32> = Ok(5);
+    let err_value: std::result::Result<i32, i32> = Err(-3);
     verify_that!(ok_value, any!(ok(gt(0)), err(lt(0))))?;
     verify_that!(err_value, any!(ok(gt(0)), err(lt(0))))
 }
@@ -301,7 +280,7 @@ fn not_matches_pattern_on_struct() -> TestResult<()> {
 
 #[test]
 fn ok_all_starts_with_and_ends_with() -> TestResult<()> {
-    let value: Result<String, i32> = Ok("foobar".to_string());
+    let value: std::result::Result<String, i32> = Ok("foobar".to_string());
     verify_that!(value, ok(all!(starts_with("foo"), ends_with("bar"))))
 }
 
@@ -321,15 +300,12 @@ fn any_of_multiple_enum_patterns() -> TestResult<()> {
         Blue,
     }
     let value = Color::Green;
-    verify_that!(
-        value,
-        any!(matches_pattern!(Color::Red), matches_pattern!(Color::Green))
-    )
+    verify_that!(value, any!(matches_pattern!(Color::Red), matches_pattern!(Color::Green)))
 }
 
 #[test]
 fn all_not_err_and_ok_in_range() -> TestResult<()> {
-    let value: Result<i32, String> = Ok(7);
+    let value: std::result::Result<i32, String> = Ok(7);
     verify_that!(value, all!(not(err(anything())), ok(all!(gt(0), lt(10)))))
 }
 
@@ -351,10 +327,7 @@ fn result_of_option_vec_points_to_some_not_empty() -> TestResult<()> {
         }
     }
     let value = Wrapper { data: Some(vec![1, 2]) };
-    verify_that!(
-        value,
-        result_of!(|w: &Wrapper| w.data_ref(), points_to(some(not(empty()))))
-    )
+    verify_that!(value, result_of!(|w: &Wrapper| w.data_ref(), points_to(some(not(empty())))))
 }
 
 #[test]
@@ -367,7 +340,7 @@ fn some_eq_on_option_of_non_static_str_ref() -> TestResult<()> {
 #[test]
 fn ok_eq_on_result_of_non_static_str_ref() -> TestResult<()> {
     let s = String::from("hello");
-    let value: Result<&str, i32> = Ok(&s);
+    let value: std::result::Result<&str, i32> = Ok(&s);
     verify_that!(value, ok(eq("hello")))
 }
 
@@ -398,10 +371,7 @@ fn matches_pattern_on_struct_with_lifetime_parameter_and_ref_field() -> TestResu
     let s = String::from("answer");
     let n = 42i32;
     let w = Wrapper { label: &s, value: &n };
-    verify_that!(
-        w,
-        matches_pattern!(Wrapper { label: eq("answer"), value: points_to(eq(42)) })
-    )
+    verify_that!(w, matches_pattern!(Wrapper { label: eq("answer"), value: points_to(eq(42)) }))
 }
 
 #[test]
@@ -448,7 +418,7 @@ fn points_to_some_eq_on_ref_to_option_of_non_static_str_ref() -> TestResult<()> 
 fn each_ok_eq_on_vec_of_results_with_non_static_str_refs() -> TestResult<()> {
     let a = String::from("foo");
     let b = String::from("bar");
-    let value: Vec<Result<&str, i32>> = vec![Ok(&a), Ok(&b)];
+    let value: Vec<std::result::Result<&str, i32>> = vec![Ok(&a), Ok(&b)];
     verify_that!(value, each(ok(any!(eq("foo"), eq("bar")))))
 }
 
@@ -461,14 +431,8 @@ fn each_matches_pattern_on_vec_of_structs_with_lifetime_parameter() -> TestResul
     }
     let s1 = String::from("alice");
     let s2 = String::from("bob");
-    let value = vec![
-        Item { name: &s1, score: 10 },
-        Item { name: &s2, score: 20 },
-    ];
-    verify_that!(
-        value,
-        each(matches_pattern!(Item { name: anything(), score: gt(0) }))
-    )
+    let value = vec![Item { name: &s1, score: 10 }, Item { name: &s2, score: 20 }];
+    verify_that!(value, each(matches_pattern!(Item { name: anything(), score: gt(0) })))
 }
 
 #[test]
@@ -481,10 +445,7 @@ fn matches_pattern_on_struct_with_two_distinct_lifetime_parameters() -> TestResu
     let s = String::from("key");
     let n = 99i32;
     let value = Pair { first: &s, second: &n };
-    verify_that!(
-        value,
-        matches_pattern!(Pair { first: eq("key"), second: points_to(eq(99)) })
-    )
+    verify_that!(value, matches_pattern!(Pair { first: eq("key"), second: points_to(eq(99)) }))
 }
 
 #[test]
@@ -503,10 +464,7 @@ fn result_of_method_returning_vec_of_refs_with_field_lifetime() -> TestResult<()
     let value = Registry { names: vec![&s1, &s2] };
     verify_that!(
         value,
-        result_of!(
-            |r: &Registry| r.names(),
-            points_to(contains_each![eq("alice"), eq("bob")])
-        )
+        result_of!(|r: &Registry| r.names(), points_to(contains_each![eq("alice"), eq("bob")]))
     )
 }
 
@@ -555,10 +513,7 @@ fn matches_pattern_on_struct_with_slice_field() -> TestResult<()> {
     }
     let data = [10, 20, 30];
     let value = Window { data: &data };
-    verify_that!(
-        value,
-        matches_pattern!(Window { data: points_to(each(gt(0))) })
-    )
+    verify_that!(value, matches_pattern!(Window { data: points_to(each(gt(0))) }))
 }
 
 #[test]
@@ -573,10 +528,7 @@ fn result_of_method_returning_slice_with_each_and_gt() -> TestResult<()> {
         }
     }
     let value = Buffer { data: vec![5, 10, 15] };
-    verify_that!(
-        value,
-        result_of!(|b: &Buffer| b.as_slice(), points_to(each(gt(0))))
-    )
+    verify_that!(value, result_of!(|b: &Buffer| b.as_slice(), points_to(each(gt(0)))))
 }
 
 #[test]
@@ -603,11 +555,8 @@ fn pointwise_on_slice_ref_via_points_to() -> TestResult<()> {
 #[test]
 fn ok_points_to_contains_exactly_on_result_of_slice() -> TestResult<()> {
     let data = [1, 2, 3];
-    let value: Result<&[i32], String> = Ok(&data);
-    verify_that!(
-        value,
-        ok(points_to(contains_exactly![eq(1), eq(2), eq(3)].in_order()))
-    )
+    let value: std::result::Result<&[i32], String> = Ok(&data);
+    verify_that!(value, ok(points_to(contains_exactly![eq(1), eq(2), eq(3)].in_order())))
 }
 
 #[test]
@@ -644,13 +593,8 @@ fn result_of_method_returning_string_slice_with_each_all_string_matchers() -> Te
             &self.items
         }
     }
-    let value = Catalog {
-        items: vec!["apple".to_string(), "apricot".to_string()],
-    };
-    verify_that!(
-        value,
-        result_of!(|c: &Catalog| c.items(), points_to(each(starts_with("ap"))))
-    )
+    let value = Catalog { items: vec!["apple".to_string(), "apricot".to_string()] };
+    verify_that!(value, result_of!(|c: &Catalog| c.items(), points_to(each(starts_with("ap")))))
 }
 
 #[test]
@@ -703,7 +647,10 @@ fn result_of_method_returning_sub_slice_narrowed_to_self_lifetime() -> TestResul
     let value = View { data: &data };
     verify_that!(
         value,
-        result_of!(|v: &View| v.first_two(), points_to(contains_exactly![eq(10), eq(20)].in_order()))
+        result_of!(
+            |v: &View| v.first_two(),
+            points_to(contains_exactly![eq(10), eq(20)].in_order())
+        )
     )
 }
 
@@ -745,7 +692,7 @@ fn result_of_option_str_with_field_lifetime_combined_with_string_matchers() -> T
 
 #[test]
 fn ok_contains_each_in_order_on_result_of_vec() -> TestResult<()> {
-    let value: Result<Vec<i32>, String> = Ok(vec![1, 2, 3, 4, 5]);
+    let value: std::result::Result<Vec<i32>, String> = Ok(vec![1, 2, 3, 4, 5]);
     verify_that!(value, ok(contains_each![eq(1), eq(3), eq(5)].in_order()))
 }
 
@@ -775,8 +722,7 @@ fn contains_exactly_in_order_with_some_and_none_inner_matchers() -> TestResult<(
 
 #[test]
 fn contains_each_in_order_with_ok_inner_matchers() -> TestResult<()> {
-    let value: Vec<Result<i32, String>> =
-        vec![Ok(1), Err("bad".into()), Ok(2), Ok(3)];
+    let value: Vec<std::result::Result<i32, String>> = vec![Ok(1), Err("bad".into()), Ok(2), Ok(3)];
     verify_that!(value, contains_each![ok(eq(1)), ok(eq(3))].in_order())
 }
 
@@ -786,13 +732,7 @@ fn matches_pattern_with_vec_field_using_contains_each_in_order() -> TestResult<(
     struct Log {
         entries: Vec<String>,
     }
-    let value = Log {
-        entries: vec![
-            "start".into(),
-            "processing".into(),
-            "done".into(),
-        ],
-    };
+    let value = Log { entries: vec!["start".into(), "processing".into(), "done".into()] };
     verify_that!(
         value,
         matches_pattern!(Log {
@@ -819,18 +759,19 @@ fn result_of_method_matched_with_contains_exactly_in_order_with_complex_inner_ma
             &self.stages
         }
     }
-    let value = Pipeline {
-        stages: vec!["build".into(), "test".into(), "deploy".into()],
-    };
+    let value = Pipeline { stages: vec!["build".into(), "test".into(), "deploy".into()] };
     verify_that!(
         value,
         result_of!(
             |p: &Pipeline| p.stages(),
-            points_to(contains_exactly![
-                eq("build"),
-                all!(not(eq("build")), not(eq("deploy"))),
-                eq("deploy"),
-            ].in_order())
+            points_to(
+                contains_exactly![
+                    eq("build"),
+                    all!(not(eq("build")), not(eq("deploy"))),
+                    eq("deploy"),
+                ]
+                .in_order()
+            )
         )
     )
 }
@@ -845,8 +786,7 @@ fn points_to_contains_each_in_order_on_ref_to_vec_of_str_slices() -> TestResult<
 }
 
 #[test]
-fn contains_exactly_in_order_with_string_matchers_on_non_static_str_slice_vec()
--> TestResult<()> {
+fn contains_exactly_in_order_with_string_matchers_on_non_static_str_slice_vec() -> TestResult<()> {
     let a = String::from("foobar");
     let b = String::from("bazqux");
     let value: Vec<&str> = vec![&a, &b];
@@ -855,7 +795,8 @@ fn contains_exactly_in_order_with_string_matchers_on_non_static_str_slice_vec()
         contains_exactly![
             all!(starts_with("foo"), ends_with("bar")),
             all!(starts_with("baz"), ends_with("qux")),
-        ].in_order()
+        ]
+        .in_order()
     )
 }
 

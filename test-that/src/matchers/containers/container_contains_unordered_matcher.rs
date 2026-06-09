@@ -125,6 +125,17 @@
 /// # should_fail().unwrap_err();
 /// ```
 ///
+/// As a shorthand, one can use array notation when the matcher is to be used
+/// directly in [`verify_that!`] and related macros:
+///
+/// ```
+/// # use test_that::prelude::*;
+///  verify_that!(vec![1, 2], [eq(1), eq(2)])
+/// #     .unwrap();
+/// ```
+///
+/// The same caveat applies as with the set notation above.
+///
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect

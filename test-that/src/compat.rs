@@ -1,0 +1,66 @@
+// Copyright 2022 Google LLC
+// Copyright 2026 Bradford Hovinen <bradford@hovinen.me>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/// Alias for [`contains_exactly!`] with [`in_order()`].
+///
+/// This exists for compatibility with [googletest].
+///
+/// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
+/// [`in_order()`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
+/// [googletest]: https://docs.rs/googletest
+#[cfg_attr(
+    feature = "googletest-migrate",
+    deprecated(note = "Use contains_exactly![...].in_order() instead")
+)]
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __elements_are {
+    ($($content:tt)*) => {{
+        $crate::matchers::containers::contains_exactly![$($content)*].in_order()
+    }}
+}
+
+/// Alias for [`contains_exactly!`].
+///
+/// This exists for compatibility with [googletest].
+///
+/// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
+/// [googletest]: https://docs.rs/googletest
+#[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use contains_exactly![...] instead"))]
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __unordered_elements_are {
+    ($($content:tt)*) => {{
+        $crate::matchers::containers::contains_exactly![$($content)*]
+    }}
+}
+
+#[cfg(test)]
+#[allow(deprecated)]
+mod tests {
+    use crate::prelude::*;
+
+    #[test]
+    fn elements_are_maps_to_contains_exactly_in_order() -> TestResult<()> {
+        verify_that!(vec![1, 2, 3], elements_are![eq(1), eq(2), eq(3)])?;
+        verify_that!(vec![1, 2, 3], not(elements_are![eq(3), eq(2), eq(1)]))
+    }
+
+    #[test]
+    fn unordered_elements_are_maps_to_contains_exactly() -> TestResult<()> {
+        verify_that!(vec![1, 2, 3], unordered_elements_are![eq(1), eq(2), eq(3)])?;
+        verify_that!(vec![1, 2, 3], unordered_elements_are![eq(3), eq(2), eq(1)])
+    }
+}

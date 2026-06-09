@@ -40,3 +40,10 @@ pub use crate::{
     __contains_each as contains_each, __contains_exactly as contains_exactly,
     __is_contained_in as is_contained_in, __pointwise as pointwise,
 };
+
+#[cfg(feature = "googletest-compat")]
+#[doc(inline)]
+#[allow(deprecated)]
+pub use crate::{
+    __elements_are as elements_are, __unordered_elements_are as unordered_elements_are,
+};

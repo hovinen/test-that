@@ -31,6 +31,11 @@ authors = [
   "Martin Geisler <mgeisler@google.com>",
 ]
 
+[features]
+default = []
+googletest-compat = []
+googletest-migrate = ["googletest-compat"]
+
 [dependencies]
 test-that-macro = { path = "../test-that-macro", version = "0.1.0" }
 anyhow = { version = "1", optional = true }

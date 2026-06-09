@@ -28,6 +28,9 @@ pub mod matcher;
 pub mod matcher_support;
 pub mod matchers;
 
+#[cfg(feature = "googletest-compat")]
+pub mod compat;
+
 /// Re-exports of the symbols in this crate which are most likely to be used.
 ///
 /// This includes:
@@ -44,6 +47,9 @@ pub mod matchers;
 /// ```
 pub mod prelude {
     pub use super::OrFailExt;
+    #[cfg(feature = "googletest-compat")]
+    #[allow(deprecated)]
+    pub use super::Result;
     pub use super::TestResult;
     pub use super::TestResultExt;
     pub use super::matcher::Matcher;
@@ -51,7 +57,6 @@ pub mod prelude {
     pub use super::matchers::containers::*;
     pub use super::matchers::*;
     pub use super::verify_current_test_outcome;
-    // Assert macros
     pub use super::{assert_that, expect_pred, expect_that, fail, verify_pred, verify_that};
 }
 
@@ -81,6 +86,11 @@ use internal::test_outcome::{TestAssertionFailure, TestOutcome};
 /// assertion failures, which log the failure and report the test as having
 /// failed but allow it to continue running, are not encoded in this type.
 pub type TestResult<T> = std::result::Result<T, TestAssertionFailure>;
+
+/// Alias for [TestResult] for compatibility with [googletest][https://docs.rs/googletest].
+#[cfg(feature = "googletest-compat")]
+#[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use TestResult instead"))]
+pub type Result<T> = TestResult<T>;
 
 /// Returns a [`Result`] corresponding to the outcome of the currently running
 /// test.
