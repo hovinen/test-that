@@ -20,6 +20,8 @@
 /// Matches a container whose elements in any order have a 1:1 correspondence
 /// with the provided element matchers.
 ///
+/// By default, the elements and matchers can be in any order.
+///
 /// ```
 /// # use test_that::prelude::*;
 /// # fn should_pass() -> TestResult<()> {
@@ -63,8 +65,8 @@
 /// #     .unwrap();
 /// ```
 ///
-/// This can also be omitted in [`verify_that!`] macros and replaced with curly
-/// brackets.
+/// As a shorthand, one can use set notation when the matcher is to be used
+/// directly in [`verify_that!`] and related macros:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -72,21 +74,14 @@
 /// #     .unwrap();
 /// ```
 ///
-/// Note: This behavior is only possible in [`verify_that!`] macros. In any
-/// other cases, it is still necessary to use the
-/// [`contains_exactly!`][crate::matchers::containers::contains_exactly] macro.
+/// **Note:** This only works as a top-level matcher in [`verify_that!`] and
+/// related macros. When nested inside other matchers, it is still necessary to
+/// use the [`contains_exactly!`][crate::matchers::containers::contains_exactly]
+/// macro.
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;
 /// verify_that!(vec![vec![1,2], vec![3]], {{eq(2), eq(1)}, {eq(3)}})
-/// # .unwrap();
-/// ```
-///
-/// Use this instead:
-/// ```
-/// # use test_that::prelude::*;
-/// verify_that!(vec![vec![1,2], vec![3]],
-///   {contains_exactly![eq(2), eq(1)], contains_exactly![eq(3)]})
 /// # .unwrap();
 /// ```
 ///
@@ -110,6 +105,25 @@
 ///    case. The failure message then shows the best matching it could find,
 ///    including which matchers did not have corresponding unique elements in
 ///    the container and which container elements had no corresponding matchers.
+///
+/// ## Enforcing the order of elements
+///
+/// To enforce that the elements appear in the same order as the matchers, use
+/// [`in_order`][internal::ContainerContainsUnorderedMatcher::in_order]:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![1, 2, 3], contains_exactly![eq(1), ge(2), anything()].in_order())?;   // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(2), anything()].in_order())?;   // Fails: wrong order
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail().unwrap_err();
+/// ```
 ///
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
