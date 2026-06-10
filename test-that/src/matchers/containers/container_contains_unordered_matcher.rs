@@ -389,9 +389,11 @@ pub mod internal {
     use std::fmt::Debug;
     use std::marker::PhantomData;
 
-    /// Matches elements of an iterable collection with a sequence of matchers, in any order.
+    /// Matches elements of an iterable collection with a sequence of matchers,
+    /// in any order.
     ///
-    /// This struct is meant to be used only through the `contains_exactly![...]` macro.
+    /// This struct is meant to be used only through the
+    /// `contains_exactly![...]` macro.
     pub struct ContainerContainsUnorderedMatcher<
         'matchers,
         ContainerT: ?Sized,
@@ -407,10 +409,12 @@ pub mod internal {
     impl<'matchers, ContainerT: ?Sized, T: Debug, ModeT, const N: usize>
         ContainerContainsUnorderedMatcher<'matchers, ContainerT, T, ModeT, N>
     {
-        /// Constructs a [ContainerContainsUnorderedMatcher] with the given matchers.
+        /// Constructs a [ContainerContainsUnorderedMatcher] with the given
+        /// matchers.
         ///
-        /// This is not intended to be invoked directly, but rather through the macros
-        /// [contains_exactly], [contains_each] and [is_contained_in].
+        /// This is not intended to be invoked directly, but rather through the
+        /// macros [contains_exactly], [contains_each] and
+        /// [is_contained_in].
         #[doc(hidden)]
         pub fn new(
             elements: [Box<dyn Matcher<T> + 'matchers>; N],
@@ -419,8 +423,8 @@ pub mod internal {
             Self { elements, requirements, _phantom: PhantomData }
         }
 
-        /// Asserts that the matchers must match the elements of the collection in the same order
-        /// as they appear when iterating.
+        /// Asserts that the matchers must match the elements of the collection
+        /// in the same order as they appear when iterating.
         pub fn in_order(
             self,
         ) -> ContainerContainsOrderedMatcher<'matchers, ContainerT, T, ModeT, N> {
@@ -438,9 +442,10 @@ pub mod internal {
 
         // This performs the checks in three different steps. This is useful for
         // performance but also to produce an actionable error message.
-        // 1. Verifies that both collections have the same size (via size_mismatch param)
-        // 2. Verifies that each actual element matches at least one expected element and
-        //    vice versa.
+        // 1. Verifies that both collections have the same size (via size_mismatch
+        //    param)
+        // 2. Verifies that each actual element matches at least one expected element
+        //    and vice versa.
         // 3. Verifies that a perfect matching exists using Ford-Fulkerson.
         fn explain_match_with_iters<ItemT1: Borrow<T>, ItemT2: Borrow<T>>(
             &self,
@@ -1121,11 +1126,11 @@ mod tests {
 
     #[test]
     fn has_correct_description_for_map() -> TestResult<()> {
-        // ContainerContainsUnorderedMatcher maintains references to the matchers, so the
-        // constituent matchers must live longer. Inside a verify_that! macro, the
-        // compiler takes care of that, but when the matcher is created separately,
-        // we must create the constitute matchers separately so that they
-        // aren't dropped too early.
+        // ContainerContainsUnorderedMatcher maintains references to the matchers, so
+        // the constituent matchers must live longer. Inside a verify_that!
+        // macro, the compiler takes care of that, but when the matcher is
+        // created separately, we must create the constitute matchers separately
+        // so that they aren't dropped too early.
         let matchers = ((eq(2), eq("Two")), (eq(1), eq("One")), (eq(3), eq("Three")));
         let result = verify_that!(
             HashMap::from([(1, "one")]),
@@ -1149,11 +1154,11 @@ mod tests {
 
     #[test]
     fn contains_exactly_description_no_full_match_with_map() -> TestResult<()> {
-        // ContainerContainsUnorderedMatcher maintains references to the matchers, so the
-        // constituent matchers must live longer. Inside a verify_that! macro, the
-        // compiler takes care of that, but when the matcher is created separately,
-        // we must create the constitute matchers separately so that they
-        // aren't dropped too early.
+        // ContainerContainsUnorderedMatcher maintains references to the matchers, so
+        // the constituent matchers must live longer. Inside a verify_that!
+        // macro, the compiler takes care of that, but when the matcher is
+        // created separately, we must create the constitute matchers separately
+        // so that they aren't dropped too early.
         let matchers = ((anything(), eq(1)), (anything(), eq(2)), (anything(), eq(2)));
         let matcher: MapContainsMatcher<HashMap<u32, u32>, _, _, RefItems, 3> = contains_exactly![
             (matchers.0.0 => matchers.0.1),

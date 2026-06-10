@@ -102,8 +102,9 @@
 /// #    .unwrap();
 /// ```
 ///
-/// In both cases, since the closure is returning a reference, one must "dereference"
-/// the output using the matcher [`points_to`][crate::matchers::points_to].
+/// In both cases, since the closure is returning a reference, one must
+/// "dereference" the output using the matcher
+/// [`points_to`][crate::matchers::points_to].
 ///
 /// When the method returns a _string slice_, one does _not_ add `*`:
 ///
@@ -122,13 +123,13 @@
 /// #    .unwrap();
 /// ```
 ///
-/// This is because the value against which one is matching is _already_ a `&str`,
-/// so the types match.
+/// This is because the value against which one is matching is _already_ a
+/// `&str`, so the types match.
 ///
 /// ## Closures moving data out of the struct are allowed
 ///
-/// Normally one cannot create a closure which takes a shared reference to a struct
-/// and moves data out of that struct.
+/// Normally one cannot create a closure which takes a shared reference to a
+/// struct and moves data out of that struct.
 ///
 /// ```compile_fail
 /// pub struct MyStruct {
@@ -151,11 +152,11 @@
 /// #    .unwrap();
 /// ```
 ///
-/// This is because the closure is rewritten by the macro so that it no longer moves
-/// data.
+/// This is because the closure is rewritten by the macro so that it no longer
+/// moves data.
 ///
-/// Any methods the closure invokes must, however, still take a shared reference as
-/// their `self` parameter. So the following does not compile:
+/// Any methods the closure invokes must, however, still take a shared reference
+/// as their `self` parameter. So the following does not compile:
 ///
 /// ```compile_fail
 /// # use test_that::prelude::*;

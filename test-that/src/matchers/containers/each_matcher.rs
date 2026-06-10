@@ -53,7 +53,8 @@ use std::marker::PhantomData;
 /// # should_pass_2().unwrap();
 /// ```
 ///
-/// One can also verify the contents of a slice using [points_to][crate::matchers::points_to]:
+/// One can also verify the contents of a slice using
+/// [points_to][crate::matchers::points_to]:
 ///
 /// ```
 /// # use test_that::prelude::*;

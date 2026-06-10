@@ -164,7 +164,8 @@
 /// #     .unwrap();
 /// ```
 ///
-/// If the method returns a reference, you must "dereference" it. Either preceed it with `*`:
+/// If the method returns a reference, you must "dereference" it. Either preceed
+/// it with `*`:
 ///
 /// ```
 /// # use test_that::prelude::*;

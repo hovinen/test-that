@@ -71,8 +71,8 @@ use internal::test_outcome::{TestAssertionFailure, TestOutcome};
 ///
 /// The assertions [`verify_that!`][crate::verify_that],
 /// [`verify_pred!`][crate::verify_pred], and [`fail!`][crate::fail] evaluate
-/// to `TestResult<()>`. A test function may return `TestResult<()>` in combination
-/// with those macros to abort immediately on assertion failure.
+/// to `TestResult<()>`. A test function may return `TestResult<()>` in
+/// combination with those macros to abort immediately on assertion failure.
 ///
 /// This can be used with subroutines which may cause the test to fatally fail
 /// and which return some value needed by the caller. For example:

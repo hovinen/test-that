@@ -54,9 +54,10 @@ pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
     ///                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     ///
-    /// The default implementation relies on [`describe`][Describable::describe].
-    /// Thus it does not make any use of the actual value itself, but rather only
-    /// whether the value is matched.
+    /// The default implementation relies on
+    /// [`describe`][Describable::describe]. Thus it does not make any use
+    /// of the actual value itself, but rather only whether the value is
+    /// matched.
     ///
     /// Override the default implementation to provide additional context on why
     /// a particular value matched or did not match. For example, the

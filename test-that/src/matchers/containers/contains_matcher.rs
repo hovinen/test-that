@@ -78,9 +78,10 @@ impl<InnerMatcherT, ModeT> ContainsMatcher<InnerMatcherT, ModeT> {
     }
 }
 
-// Case 4: `&Container: IntoIterator<Item = T>` (owned items from a borrowed container).
-// Used when the container yields owned T (not &T) when iterated via reference, e.g. a custom
-// container that copies or clones its elements on iteration.
+// Case 4: `&Container: IntoIterator<Item = T>` (owned items from a borrowed
+// container). Used when the container yields owned T (not &T) when iterated via
+// reference, e.g. a custom container that copies or clones its elements on
+// iteration.
 impl<T: Debug, InnerMatcherT: Matcher<T>, ContainerT: Debug + ?Sized> Matcher<ContainerT>
     for ContainsMatcher<InnerMatcherT, OwnedItems>
 where
