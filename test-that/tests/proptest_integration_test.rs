@@ -15,8 +15,8 @@
 
 #![cfg(feature = "proptest")]
 
-use test_that::prelude::*;
 use proptest::test_runner::{Config, TestRunner};
+use test_that::prelude::*;
 
 #[test]
 fn numbers_are_greater_than_zero() -> TestResult<()> {

@@ -595,8 +595,8 @@ mod tests {
     }
 
     #[test]
-    fn renders_nested_enumeration_with_block_with_two_fragments_inside_bulleted_list() -> TestResult<()>
-    {
+    fn renders_nested_enumeration_with_block_with_two_fragments_inside_bulleted_list()
+    -> TestResult<()> {
         let list = list(vec![Block::nested(
             list(vec!["A fragment\nAnother fragment".into()]).enumerate(),
         )])

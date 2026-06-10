@@ -410,8 +410,8 @@ fn contains_exactly_in_order_matches_adjacent_duplicate_values() -> TestResult<(
 }
 
 #[test]
-fn contains_exactly_in_order_does_not_match_when_duplicates_are_in_wrong_position()
--> TestResult<()> {
+fn contains_exactly_in_order_does_not_match_when_duplicates_are_in_wrong_position() -> TestResult<()>
+{
     verify_that!(vec![1, 2, 2], not(contains_exactly![eq(1), eq(1), eq(2)].in_order()))
 }
 
@@ -433,8 +433,8 @@ fn contains_each_in_order_matches_when_duplicate_actual_elements_and_first_is_co
 }
 
 #[test]
-fn contains_each_in_order_does_not_match_when_more_copies_required_than_present()
--> TestResult<()> {
+fn contains_each_in_order_does_not_match_when_more_copies_required_than_present() -> TestResult<()>
+{
     verify_that!(vec![1, 2], not(contains_each![eq(1), eq(1), eq(2)].in_order()))
 }
 
@@ -445,8 +445,8 @@ fn contains_each_in_order_does_not_match_when_required_element_comes_before_its_
 }
 
 #[test]
-fn contains_each_in_order_matches_duplicate_matchers_using_non_adjacent_elements()
--> TestResult<()> {
+fn contains_each_in_order_matches_duplicate_matchers_using_non_adjacent_elements() -> TestResult<()>
+{
     verify_that!(vec![1, 2, 1], contains_each![eq(1), eq(1)].in_order())
 }
 

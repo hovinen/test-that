@@ -166,7 +166,8 @@ mod tests {
     }
 
     #[test]
-    fn should_output_both_failure_messages_when_two_expect_that_assertions_fail() -> TestResult<()> {
+    fn should_output_both_failure_messages_when_two_expect_that_assertions_fail() -> TestResult<()>
+    {
         let output = run_external_process_in_tests_directory("two_expect_that_failures")?;
 
         verify_that!(
@@ -507,8 +508,8 @@ mod tests {
 
     #[test]
     #[rustversion::before(1.76)]
-    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output() -> TestResult<()>
-    {
+    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output()
+    -> TestResult<()> {
         let output = run_external_process_in_tests_directory(
             "verify_predicate_with_failure_as_method_in_submodule",
         )?;
@@ -525,8 +526,8 @@ mod tests {
 
     #[test]
     #[rustversion::since(1.76)]
-    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output() -> TestResult<()>
-    {
+    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output()
+    -> TestResult<()> {
         let output = run_external_process_in_tests_directory(
             "verify_predicate_with_failure_as_method_in_submodule",
         )?;
@@ -580,7 +581,8 @@ mod tests {
     }
 
     #[test]
-    fn test_using_normal_test_attribute_macro_formats_failure_message_correctly() -> TestResult<()> {
+    fn test_using_normal_test_attribute_macro_formats_failure_message_correctly() -> TestResult<()>
+    {
         let result = should_display_error_correctly_without_google_test_macro();
 
         verify_that!(

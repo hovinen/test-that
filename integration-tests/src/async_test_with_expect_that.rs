@@ -18,8 +18,8 @@ fn main() {}
 #[deny(warnings)]
 #[cfg(test)]
 mod tests {
-    use test_that::prelude::*;
     use std::time::Duration;
+    use test_that::prelude::*;
     use tokio::time::sleep;
 
     #[test_that::test]

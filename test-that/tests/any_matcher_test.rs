@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use indoc::indoc;
 use test_that::matcher::Matcher;
 use test_that::prelude::*;
-use indoc::indoc;
 
 #[test]
 fn does_not_match_value_when_list_is_empty() -> TestResult<()> {

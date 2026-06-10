@@ -13,9 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use test_that::prelude::*;
 use serial_test::serial;
 use std::fmt::{Display, Write};
+use test_that::prelude::*;
 
 // Make a long text with each element of the iterator on one line.
 // `collection` must contains at least one element.

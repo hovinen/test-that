@@ -20,8 +20,8 @@ fn main() {}
 #[deny(warnings)]
 #[cfg(test)]
 mod tests {
-    use test_that::prelude::*;
     use rstest::rstest;
+    use test_that::prelude::*;
 
     #[rstest]
     #[test_that::test]
