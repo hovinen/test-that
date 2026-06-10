@@ -81,7 +81,7 @@ I started Test That! as a fork of the crate
 while working at Google. The goal of the fork is to provide a more ergonomic
 developer experience than GoogleTest Rust does.
 
-The googletest crate was in turned inspired by Google's C++ testing library
+The GoogleTest Rust was in turned inspired by Google's C++ testing library
 [GoogleTest](https://github.com/google/googletest). Its goal was to bring the
 powerful assertions and matchers of GoogleTest to the Rust world.
 
