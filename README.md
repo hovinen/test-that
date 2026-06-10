@@ -465,6 +465,13 @@ The key differences include:
 * The `matches_pattern!` matcher in Test That! does not support exhaustive
   matching. The `..` syntax used in GoogleTest is neither necessary nor allowed.
 
+* Test That! has no `verify_eq!` or similar. Use `verify_that!(.., eq())`.
+
+* Test That! also has no matcher `ne`. Use `not(eq(..))`.
+
+* There is no support for fixtures. Such functionality is available in the crate
+  [rstest](https://crates.io/crates/rstest).
+
 * As with GoogleTest 0.11, the equivalent alias to `Result` is `TestResult`.
 
 * As with GoogleTest 0.11, there is no macro `property!`.
