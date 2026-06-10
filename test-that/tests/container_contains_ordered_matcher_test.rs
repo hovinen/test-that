@@ -388,3 +388,92 @@ fn is_contained_in_in_order_produces_correct_failure_message() -> TestResult<()>
         ))))
     )
 }
+
+#[test]
+fn contains_exactly_in_order_matches_single_element() -> TestResult<()> {
+    verify_that!(vec![5], contains_exactly![eq(5)].in_order())
+}
+
+#[test]
+fn contains_exactly_in_order_does_not_match_single_wrong_element() -> TestResult<()> {
+    verify_that!(vec![5], not(contains_exactly![eq(6)].in_order()))
+}
+
+#[test]
+fn contains_exactly_in_order_does_not_match_when_last_element_differs() -> TestResult<()> {
+    verify_that!(vec![1, 2, 4], not(contains_exactly![eq(1), eq(2), eq(3)].in_order()))
+}
+
+#[test]
+fn contains_exactly_in_order_matches_adjacent_duplicate_values() -> TestResult<()> {
+    verify_that!(vec![1, 1, 2], contains_exactly![eq(1), eq(1), eq(2)].in_order())
+}
+
+#[test]
+fn contains_exactly_in_order_does_not_match_when_duplicates_are_in_wrong_position()
+-> TestResult<()> {
+    verify_that!(vec![1, 2, 2], not(contains_exactly![eq(1), eq(1), eq(2)].in_order()))
+}
+
+#[test]
+fn contains_each_in_order_matches_single_element_against_single_matcher() -> TestResult<()> {
+    verify_that!(vec![7], contains_each![eq(7)].in_order())
+}
+
+#[test]
+fn contains_each_in_order_does_not_match_when_no_actual_element_satisfies_any_matcher()
+-> TestResult<()> {
+    verify_that!(vec![5, 6], not(contains_each![eq(1), eq(2)].in_order()))
+}
+
+#[test]
+fn contains_each_in_order_matches_when_duplicate_actual_elements_and_first_is_consumed()
+-> TestResult<()> {
+    verify_that!(vec![1, 1, 2], contains_each![eq(1), eq(2)].in_order())
+}
+
+#[test]
+fn contains_each_in_order_does_not_match_when_more_copies_required_than_present()
+-> TestResult<()> {
+    verify_that!(vec![1, 2], not(contains_each![eq(1), eq(1), eq(2)].in_order()))
+}
+
+#[test]
+fn contains_each_in_order_does_not_match_when_required_element_comes_before_its_predecessor()
+-> TestResult<()> {
+    verify_that!(vec![1, 3, 2], not(contains_each![eq(1), eq(2), eq(3)].in_order()))
+}
+
+#[test]
+fn contains_each_in_order_matches_duplicate_matchers_using_non_adjacent_elements()
+-> TestResult<()> {
+    verify_that!(vec![1, 2, 1], contains_each![eq(1), eq(1)].in_order())
+}
+
+#[test]
+fn contains_each_in_order_matches_when_only_last_actual_element_satisfies_single_matcher()
+-> TestResult<()> {
+    verify_that!(vec![3, 4, 5], contains_each![eq(5)].in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_matches_single_element_against_non_first_matcher() -> TestResult<()> {
+    verify_that!(vec![2], is_contained_in![eq(1), eq(2), eq(3)].in_order())
+}
+
+#[test]
+fn is_contained_in_in_order_does_not_match_when_element_satisfies_no_matcher() -> TestResult<()> {
+    verify_that!(vec![5], not(is_contained_in![eq(1), eq(2)].in_order()))
+}
+
+#[test]
+fn is_contained_in_in_order_does_not_match_when_second_element_satisfies_no_remaining_matcher()
+-> TestResult<()> {
+    verify_that!(vec![1, 5], not(is_contained_in![eq(1), eq(2)].in_order()))
+}
+
+#[test]
+fn is_contained_in_in_order_matches_duplicate_actual_elements_consuming_two_matchers()
+-> TestResult<()> {
+    verify_that!(vec![1, 1], is_contained_in![eq(1), eq(1), eq(2)].in_order())
+}
