@@ -18,6 +18,361 @@
 use crate::{description::Description, matcher_support::count_elements::count_elements};
 use std::fmt::Display;
 
+/// Matches a container whose elements in any order have a 1:1 correspondence
+/// with the provided element matchers.
+///
+/// By default, the elements and matchers can be in any order.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(2), anything()])?;   // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail_1() -> TestResult<()> {
+/// verify_that!(vec![1], contains_exactly![eq(1), ge(2)])?;              // Fails: container has wrong size
+/// #     Ok(())
+/// # }
+/// # fn should_fail_2() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(4), eq(2)])?; // Fails: second matcher not matched
+/// #     Ok(())
+/// # }
+/// # fn should_fail_3() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_exactly![ge(3), ge(3), ge(3)])?; // Fails: no 1:1 correspondence
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail_1().unwrap_err();
+/// # should_fail_2().unwrap_err();
+/// # should_fail_3().unwrap_err();
+/// ```
+///
+/// The actual value must be a container such as a `Vec`, an array, or a
+/// dereferenced slice. More precisely, a shared borrow of the actual value must
+/// implement [`IntoIterator`].
+///
+/// This can also match against [`HashMap`][std::collections::HashMap] and
+/// similar collections. The arguments are a sequence of mappings of matchers
+/// corresponding to the keys and their respective values.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # use std::collections::HashMap;
+/// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
+/// verify_that!(
+///     value,
+///     contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
+/// )
+/// #     .unwrap();
+/// ```
+///
+/// As a shorthand, one can use set notation when the matcher is to be used
+/// directly in [`verify_that!`] and related macros:
+///
+/// ```
+/// # use test_that::prelude::*;
+///  verify_that!(vec![1, 2], {eq(2), eq(1)})
+/// #     .unwrap();
+/// ```
+///
+/// **Note:** This only works as a top-level matcher in [`verify_that!`] and
+/// related macros. When nested inside other matchers, it is still necessary to
+/// use the [`contains_exactly!`][crate::matchers::containers::contains_exactly]
+/// macro.
+///
+/// ```compile_fail
+/// # use test_that::prelude::*;
+/// verify_that!(vec![vec![1,2], vec![3]], {{eq(2), eq(1)}, {eq(3)}})
+/// # .unwrap();
+/// ```
+///
+/// This matcher does not support matching directly against an [`Iterator`]. To
+/// match against an iterator, use [`Iterator::collect`] to build a [`Vec`].
+///
+/// The matcher proceeds in three stages:
+///
+/// 1. It first checks whether the actual value is of the right size to possibly
+///    be matched by each of the given matchers. If not, then it immediately
+///    fails explaining that the size is incorrect.
+///
+/// 2. It then checks whether each matcher matches at least one corresponding
+///    element in the actual container and each element in the actual container
+///    is matched by at least one matcher. If not, it fails with a message
+///    indicating which matcher respectively container elements had no
+///    counterparts.
+///
+/// 3. Finally, it checks whether the mapping of matchers to corresponding
+///    actual elements is a 1-1 correspondence and fails if that is not the
+///    case. The failure message then shows the best matching it could find,
+///    including which matchers did not have corresponding unique elements in
+///    the container and which container elements had no corresponding matchers.
+///
+/// ## Enforcing the order of elements
+///
+/// To enforce that the elements appear in the same order as the matchers, use
+/// [`in_order`][crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order]:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![1, 2, 3], contains_exactly![eq(1), ge(2), anything()].in_order())?;   // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_exactly![eq(1), ge(2), anything()].in_order())?;   // Fails: wrong order
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail().unwrap_err();
+/// ```
+///
+/// As a shorthand, one can use array notation when the matcher is to be used
+/// directly in [`verify_that!`] and related macros:
+///
+/// ```
+/// # use test_that::prelude::*;
+///  verify_that!(vec![1, 2], [eq(1), eq(2)])
+/// #     .unwrap();
+/// ```
+///
+/// The same caveat applies as with the set notation above.
+///
+/// [`IntoIterator`]: std::iter::IntoIterator
+/// [`Iterator`]: std::iter::Iterator
+/// [`Iterator::collect`]: std::iter::Iterator::collect
+/// [`Vec`]: std::vec::Vec
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __contains_exactly {
+    ($(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
+    }};
+
+    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
+            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
+    }};
+
+    ($($matcher:expr),* $(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [$(Box::new($matcher)),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+        )
+    }};
+}
+
+/// Matches a container containing elements matched by the given matchers.
+///
+/// To match, each given matcher must have a corresponding element in the
+/// container which it matches. There must be a mapping uniquely matching each
+/// matcher to a container element. The container can, however, contain
+/// additional elements that don't correspond to any matcher.
+///
+/// Put another way, `contains_each!` matches if there is a subset of the actual
+/// container which
+/// [`contains_exactly`][crate::matchers::containers::contains_exactly] would
+/// match.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_each![eq(2), ge(3)])?;   // Passes
+/// verify_that!(vec![3, 2, 1], contains_each![ge(2), ge(2)])?;   // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail_1() -> TestResult<()> {
+/// verify_that!(vec![1], contains_each![eq(1), ge(2)])?;         // Fails: container too small
+/// #     Ok(())
+/// # }
+/// # fn should_fail_2() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_each![eq(1), ge(4)])?;   // Fails: second matcher unmatched
+/// #     Ok(())
+/// # }
+/// # fn should_fail_3() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_each![ge(3), ge(3), ge(3)])?; // Fails: no matching
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail_1().unwrap_err();
+/// # should_fail_2().unwrap_err();
+/// # should_fail_3().unwrap_err();
+/// ```
+///
+/// The actual value must be a container such as a `Vec`, an array, or a
+/// dereferenced slice. More precisely, a shared borrow of the actual value must
+/// implement [`IntoIterator`].
+///
+/// This can also match against [`HashMap`][std::collections::HashMap] and
+/// similar collections. The arguments are a sequence of mappings of matchers
+/// corresponding to the keys and their respective values.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # use std::collections::HashMap;
+/// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
+/// verify_that!(value, contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One"))])
+/// #     .unwrap();
+/// ```
+///
+/// This matcher does not support matching directly against an [`Iterator`]. To
+/// match against an iterator, use [`Iterator::collect`] to build a [`Vec`].
+///
+/// The matcher proceeds in three stages:
+///
+/// 1. It first checks whether the actual value is large enough to possibly be
+///    matched by each of the given matchers. If not, then it immediately fails
+///    explaining that the size is too small.
+///
+/// 2. It then checks whether each matcher matches at least one corresponding
+///    element in the actual container and fails if that is not the case. The
+///    failure message indicates which matcher had no corresponding element.
+///
+/// 3. Finally, it checks whether the mapping of matchers to corresponding
+///    actual elements is 1-1 and fails if that is not the case. The failure
+///    message then shows the best matching it could find, including which
+///    matchers did not have corresponding unique elements in the container.
+///
+/// [`IntoIterator`]: std::iter::IntoIterator
+/// [`Iterator`]: std::iter::Iterator
+/// [`Iterator::collect`]: std::iter::Iterator::collect
+/// [`Vec`]: std::vec::Vec
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __contains_each {
+    ($(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+        )
+    }};
+
+    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
+            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+        )
+    }};
+
+    ($($matcher:expr),* $(,)?) => {{
+        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+            [$(Box::new($matcher)),*],
+            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+        )
+    }}
+}
+
+/// Matches a container all of whose elements are matched by the given matchers.
+///
+/// To match, each element in the container must have a corresponding matcher
+/// which matches it. There must be a 1-1 mapping from container elements to
+/// matchers, so that no matcher has more than one corresponding element.
+///
+/// There may, however, be matchers not corresponding to any elements in the
+/// container.
+///
+/// Put another way, `is_contained_in!` matches if there is a subset of the
+/// matchers which would match with
+/// [`contains_exactly`][crate::matchers::containers::contains_exactly].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![2, 1], is_contained_in![eq(1), ge(2)])?;   // Passes
+/// verify_that!(vec![2, 1], is_contained_in![ge(1), ge(1)])?;   // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail_1() -> TestResult<()> {
+/// verify_that!(vec![1, 2, 3], is_contained_in![eq(1), ge(2)])?; // Fails: container too large
+/// #     Ok(())
+/// # }
+/// # fn should_fail_2() -> TestResult<()> {
+/// verify_that!(vec![2, 1], is_contained_in![eq(1), ge(4)])?;    // Fails: second matcher unmatched
+/// #     Ok(())
+/// # }
+/// # fn should_fail_3() -> TestResult<()> {
+/// verify_that!(vec![3, 1], is_contained_in![ge(3), ge(3), ge(3)])?; // Fails: no matching
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail_1().unwrap_err();
+/// # should_fail_2().unwrap_err();
+/// # should_fail_3().unwrap_err();
+/// ```
+///
+/// The actual value must be a container such as a `Vec`, an array, or a
+/// dereferenced slice. More precisely, a shared borrow of the actual value must
+/// implement [`IntoIterator`].
+///
+/// This can also match against [`HashMap`][std::collections::HashMap] and
+/// similar collections. The arguments are a sequence of mappings of matchers
+/// corresponding to the keys and their respective values.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # use std::collections::HashMap;
+/// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two")].into();
+/// verify_that!(
+///     value,
+///     is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
+/// )
+/// #     .unwrap();
+/// ```
+///
+/// This matcher does not support matching directly against an [`Iterator`]. To
+/// match against an iterator, use [`Iterator::collect`] to build a [`Vec`].
+///
+/// The matcher proceeds in three stages:
+///
+/// 1. It first checks whether the actual value is too large to possibly be
+///    matched by each of the given matchers. If so, it immediately fails
+///    explaining that the size is too large.
+///
+/// 2. It then checks whether each actual container element is matched by at
+///    least one matcher and fails if that is not the case. The failure message
+///    indicates which element had no corresponding matcher.
+///
+/// 3. Finally, it checks whether the mapping of elements to corresponding
+///    matchers is 1-1 and fails if that is not the case. The failure message
+///    then shows the best matching it could find, including which container
+///    elements did not have corresponding matchers.
+///
+/// [`IntoIterator`]: std::iter::IntoIterator
+/// [`Iterator`]: std::iter::Iterator
+/// [`Iterator::collect`]: std::iter::Iterator::collect
+/// [`Vec`]: std::vec::Vec
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __is_contained_in {
+    ($(,)?) => {{
+        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
+            ContainerContainsUnorderedMatcher, Requirements
+        };
+        ContainerContainsUnorderedMatcher::new([], Requirements::Subset)
+    }};
+
+    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
+        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
+            MapContainsMatcher, Requirements
+        };
+        MapContainsMatcher::new(
+            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            Requirements::Subset
+        )
+    }};
+
+    ($($matcher:expr),* $(,)?) => {{
+        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
+            ContainerContainsUnorderedMatcher, Requirements
+        };
+        ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::Subset)
+    }}
+}
+
 /// Abstracts over map iterator items, allowing both reference pairs `(&K, &V)`
 /// and owned pairs `(K, V)` to be matched uniformly.
 ///
