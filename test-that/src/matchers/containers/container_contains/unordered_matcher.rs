@@ -29,7 +29,7 @@ pub mod internal {
         OwnedItems, RefItems,
         container_contains::{PairBorrow, Requirements},
     };
-    use crate::prelude::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
+    use crate::prelude::__internal::ContainerContainsOrderedMatcher;
     use std::borrow::Borrow;
     use std::collections::HashSet;
     use std::fmt::Debug;

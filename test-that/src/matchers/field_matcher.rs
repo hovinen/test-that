@@ -120,7 +120,7 @@ macro_rules! __field {
 #[macro_export]
 macro_rules! field_internal {
     ($($t:ident)::+.$field:tt, $m:expr) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::field_matcher;
+        use $crate::matchers::__internal::field_matcher;
         field_matcher(
             |o| {
                 match o {

@@ -55,7 +55,7 @@
 #[doc(hidden)]
 macro_rules! __all {
     ($($matcher:expr),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::AllMatcher;
+        use $crate::matchers::__internal::AllMatcher;
         AllMatcher::new([$(Box::new($matcher)),*])
     }}
 }

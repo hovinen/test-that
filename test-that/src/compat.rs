@@ -45,23 +45,23 @@ macro_rules! __elements_are {
 #[doc(hidden)]
 macro_rules! __unordered_elements_are {
     ($(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+        $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
             [],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+            $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 
     ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
+        $crate::matchers::__internal::MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+            $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+        $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
             [$(Box::new($matcher)),*],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+            $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 }

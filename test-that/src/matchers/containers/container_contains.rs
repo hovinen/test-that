@@ -150,21 +150,21 @@ macro_rules! __contains_exactly {
     ($(,)?) => {{
         $crate::matchers::containers::ContainerContainsUnorderedMatcher::new(
             [],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+            $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
+        $crate::matchers::__internal::MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+            $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+        $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
             [$(Box::new($matcher)),*],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
+            $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 }
@@ -248,23 +248,23 @@ macro_rules! __contains_exactly {
 #[doc(hidden)]
 macro_rules! __contains_each {
     ($(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+        $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
             [],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+            $crate::matchers::__internal::Requirements::Superset
         )
     }};
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::MapContainsMatcher::new(
+        $crate::matchers::__internal::MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+            $crate::matchers::__internal::Requirements::Superset
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+        $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
             [$(Box::new($matcher)),*],
-            $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::Superset
+            $crate::matchers::__internal::Requirements::Superset
         )
     }}
 }
@@ -352,14 +352,14 @@ macro_rules! __contains_each {
 #[doc(hidden)]
 macro_rules! __is_contained_in {
     ($(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
+        use $crate::matchers::__internal::{
             ContainerContainsUnorderedMatcher, Requirements
         };
         ContainerContainsUnorderedMatcher::new([], Requirements::Subset)
     }};
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
+        use $crate::matchers::__internal::{
             MapContainsMatcher, Requirements
         };
         MapContainsMatcher::new(
@@ -369,7 +369,7 @@ macro_rules! __is_contained_in {
     }};
 
     ($($matcher:expr),* $(,)?) => {{
-        use $crate::matchers::__internal_unstable_do_not_depend_on_these::{
+        use $crate::matchers::__internal::{
             ContainerContainsUnorderedMatcher, Requirements
         };
         ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::Subset)

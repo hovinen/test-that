@@ -87,7 +87,7 @@ pub use crate::{
 // We may perform incompatible changes without major release. These elements
 // should only be used through their respective macros.
 #[doc(hidden)]
-pub mod __internal_unstable_do_not_depend_on_these {
+pub mod __internal {
     pub use super::all_matcher::internal::AllMatcher;
     pub use super::any_matcher::internal::AnyMatcher;
     pub use super::conjunction_matcher::ConjunctionMatcher;
