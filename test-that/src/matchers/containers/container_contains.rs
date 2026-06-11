@@ -15,6 +15,9 @@
 
 #![doc(hidden)]
 
+pub(crate) mod ordered_matcher;
+pub(crate) mod unordered_matcher;
+
 use crate::{description::Description, matcher_support::count_elements::count_elements};
 use std::fmt::Display;
 
@@ -145,7 +148,7 @@ use std::fmt::Display;
 #[doc(hidden)]
 macro_rules! __contains_exactly {
     ($(,)?) => {{
-        $crate::matchers::__internal_unstable_do_not_depend_on_these::ContainerContainsUnorderedMatcher::new(
+        $crate::matchers::containers::ContainerContainsUnorderedMatcher::new(
             [],
             $crate::matchers::__internal_unstable_do_not_depend_on_these::Requirements::PerfectMatch
         )

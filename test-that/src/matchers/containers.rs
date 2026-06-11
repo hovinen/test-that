@@ -39,8 +39,6 @@
 //! [`points_to`]: crate::matchers::points_to
 
 pub(super) mod container_contains;
-pub(super) mod container_contains_ordered_matcher;
-pub(super) mod container_contains_unordered_matcher;
 pub(super) mod container_eq_matcher;
 pub(super) mod contains_matcher;
 pub(super) mod each_matcher;
@@ -50,7 +48,7 @@ pub(super) mod pointwise_matcher;
 pub(super) mod subset_of_matcher;
 pub(super) mod superset_of_matcher;
 
-pub use container_contains_unordered_matcher::internal::ContainerContainsUnorderedMatcher;
+pub use container_contains::unordered_matcher::internal::ContainerContainsUnorderedMatcher;
 pub use container_eq_matcher::container_eq;
 pub use contains_matcher::{ContainsMatcher, contains};
 pub use each_matcher::each;

@@ -92,8 +92,8 @@ pub mod __internal_unstable_do_not_depend_on_these {
     pub use super::any_matcher::internal::AnyMatcher;
     pub use super::conjunction_matcher::ConjunctionMatcher;
     pub use super::containers::container_contains::Requirements;
-    pub use super::containers::container_contains_ordered_matcher::internal::ContainerContainsOrderedMatcher;
-    pub use super::containers::container_contains_unordered_matcher::internal::{
+    pub use super::containers::container_contains::ordered_matcher::internal::ContainerContainsOrderedMatcher;
+    pub use super::containers::container_contains::unordered_matcher::internal::{
         ContainerContainsUnorderedMatcher, MapContainsMatcher,
     };
     pub use super::containers::pointwise_matcher::internal::PointwiseMatcher;
