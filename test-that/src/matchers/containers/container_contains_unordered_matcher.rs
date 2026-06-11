@@ -380,8 +380,9 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
-    use crate::matchers::containers::container_contains::{
-        OwnedItems, PairBorrow, RefItems, Requirements,
+    use crate::matchers::containers::{
+        OwnedItems, RefItems,
+        container_contains::{PairBorrow, Requirements},
     };
     use crate::prelude::__internal_unstable_do_not_depend_on_these::ContainerContainsOrderedMatcher;
     use std::borrow::Borrow;
@@ -1119,7 +1120,7 @@ pub mod internal {
 mod tests {
     use super::internal::MapContainsMatcher;
     use crate::matcher::Matcher;
-    use crate::matchers::containers::container_contains::RefItems;
+    use crate::matchers::containers::RefItems;
     use crate::prelude::*;
     use indoc::indoc;
     use std::collections::HashMap;

@@ -155,7 +155,7 @@ pub mod internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
-    use crate::matchers::containers::container_contains::{OwnedItems, RefItems};
+    use crate::matchers::containers::{OwnedItems, RefItems};
     use std::{fmt::Debug, marker::PhantomData};
 
     /// This struct is meant to be used only through the `pointwise` macro.

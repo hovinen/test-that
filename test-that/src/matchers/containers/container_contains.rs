@@ -111,16 +111,3 @@ impl Display for Requirements {
         }
     }
 }
-
-/// Marker for containers whose iterator over `&ContainerT` yields `&T` items.
-///
-/// **For internal use only. API stability is not guaranteed!**
-#[doc(hidden)]
-pub struct RefItems;
-
-/// Marker for containers whose iterator over `&ContainerT` yields owned `T`
-/// items.
-///
-/// **For internal use only. API stability is not guaranteed!**
-#[doc(hidden)]
-pub struct OwnedItems;

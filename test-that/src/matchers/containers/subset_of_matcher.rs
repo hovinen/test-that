@@ -16,7 +16,7 @@
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
-    matchers::containers::container_contains::{OwnedItems, RefItems},
+    matchers::containers::{OwnedItems, RefItems},
 };
 use std::{fmt::Debug, marker::PhantomData};
 

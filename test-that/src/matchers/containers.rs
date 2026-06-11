@@ -48,3 +48,16 @@ pub use crate::{
 pub use crate::{
     __elements_are as elements_are, __unordered_elements_are as unordered_elements_are,
 };
+
+/// Marker for containers whose iterator over `&ContainerT` yields `&T` items.
+///
+/// **For internal use only. API stability is not guaranteed!**
+#[doc(hidden)]
+pub struct RefItems;
+
+/// Marker for containers whose iterator over `&ContainerT` yields owned `T`
+/// items.
+///
+/// **For internal use only. API stability is not guaranteed!**
+#[doc(hidden)]
+pub struct OwnedItems;
