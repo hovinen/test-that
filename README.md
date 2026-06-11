@@ -204,7 +204,7 @@ matcher's data and have it implement the traits [`Matcher`] and
 ['Describable']:
 
 ```rust
-struct MyEqMatcher<T> {
+pub struct MyEqMatcher<T> {
     expected: T,
 }
 

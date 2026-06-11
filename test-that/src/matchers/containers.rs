@@ -12,7 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//! All built-in matchers of this crate are in submodules of this module.
+//! Matchers against types implementing [`IntoIterator`].
+//!
+//! All matchers in this package can be used with containers `C` such
+//! that:
+//!
+//! - `&C: IntoIterator<Item = &T>`,
+//! - `&C: IntoIterator<Item = T>`.
+//!
+//! The former includes standard Rust containers such as arrays `[T; N]`,
+//! unsized arrays `[T]`, `Vec<T>`, `HashSet<T>`, `HashMap<K, V>`, and so on.
+//! The latter is a special case which may appear in some custom containers.
+//!
+//! One can match against slices `&[T]` by first "dereferencing" with them
+//! with the [`points_to`] matcher. For example:
+//!
+//! ```
+//! # use test_that::prelude::*;
+//! let value = vec![1, 2, 3];
+//! assert_that!(value.as_slice(), points_to(contains(eq(1))));
+//! ```
+//!
+//! The case that `C` implements `IntoIterator` but `&C` does not is not
+//! supported in general.
+//!
+//! [`points_to`]: crate::matchers::points_to
 
 pub(super) mod container_contains;
 pub(super) mod container_contains_ordered_matcher;
