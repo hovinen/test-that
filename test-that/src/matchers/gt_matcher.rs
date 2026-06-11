@@ -17,13 +17,14 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a value greater (in the sense of `>`) than `expected`.
 ///
-/// The types of `ActualT` of `actual` and `ExpectedT` of `expected` must be
-/// comparable via the `PartialOrd` trait. Namely, `ActualT` must implement
-/// `PartialOrd<ExpectedT>`.
+/// The types of the actual and expected values must be comparable via the
+/// `PartialOrd` trait. Namely, type of the actual value must implement
+/// `PartialOrd<Expected>`, where `Expected` is the type of the expected
+/// value passed as an argument to `gt`.
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -75,26 +76,23 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// You can find the standard library `PartialOrd` implementation in
 /// <https://doc.rust-lang.org/core/cmp/trait.PartialOrd.html#implementors>
-pub fn gt<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug>(
-    expected: ExpectedT,
-) -> impl Matcher<ActualT> {
-    GtMatcher::<ActualT, _> { expected, phantom: Default::default() }
+pub fn gt<ExpectedT>(expected: ExpectedT) -> GtMatcher<ExpectedT> {
+    GtMatcher { expected }
 }
 
-struct GtMatcher<ActualT, ExpectedT> {
+pub struct GtMatcher<ExpectedT> {
     expected: ExpectedT,
-    phantom: PhantomData<ActualT>,
 }
 
 impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
-    for GtMatcher<ActualT, ExpectedT>
+    for GtMatcher<ExpectedT>
 {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         (*actual > self.expected).into()
     }
 }
 
-impl<ActualT, ExpectedT: Debug> Describable for GtMatcher<ActualT, ExpectedT> {
+impl<ExpectedT: Debug> Describable for GtMatcher<ExpectedT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is greater than {:?}", self.expected).into(),
@@ -181,16 +179,13 @@ mod tests {
 
     #[test]
     fn gt_describe_matches() -> TestResult<()> {
-        verify_that!(
-            gt::<i32, i32>(232).describe(MatcherResult::Match),
-            displays_as(eq("is greater than 232"))
-        )
+        verify_that!(gt(232).describe(MatcherResult::Match), displays_as(eq("is greater than 232")))
     }
 
     #[test]
     fn gt_describe_does_not_match() -> TestResult<()> {
         verify_that!(
-            gt::<i32, i32>(232).describe(MatcherResult::NoMatch),
+            gt(232).describe(MatcherResult::NoMatch),
             displays_as(eq("is less than or equal to 232"))
         )
     }

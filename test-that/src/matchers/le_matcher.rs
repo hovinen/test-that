@@ -17,13 +17,14 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a value less than or equal to (in the sense of `<=`) `expected`.
 ///
-/// The types of `ActualT` of `actual` and `ExpectedT` of `expected` must be
-/// comparable via the `PartialOrd` trait. Namely, `ActualT` must implement
-/// `PartialOrd<ExpectedT>`.
+/// The types of the actual and expected values must be comparable via the
+/// `PartialOrd` trait. Namely, type of the actual value must implement
+/// `PartialOrd<Expected>`, where `Expected` is the type of the expected
+/// value passed as an argument to `le`.
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -75,26 +76,23 @@ use std::{fmt::Debug, marker::PhantomData};
 ///
 /// You can find the standard library `PartialOrd` implementation in
 /// <https://doc.rust-lang.org/core/cmp/trait.PartialOrd.html#implementors>
-pub fn le<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug>(
-    expected: ExpectedT,
-) -> impl Matcher<ActualT> {
-    LeMatcher::<ActualT, _> { expected, phantom: Default::default() }
+pub fn le<ExpectedT>(expected: ExpectedT) -> LeMatcher<ExpectedT> {
+    LeMatcher { expected }
 }
 
-struct LeMatcher<ActualT, ExpectedT> {
+pub struct LeMatcher<ExpectedT> {
     expected: ExpectedT,
-    phantom: PhantomData<ActualT>,
 }
 
 impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
-    for LeMatcher<ActualT, ExpectedT>
+    for LeMatcher<ExpectedT>
 {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         (*actual <= self.expected).into()
     }
 }
 
-impl<ActualT, ExpectedT: Debug> Describable for LeMatcher<ActualT, ExpectedT> {
+impl<ExpectedT: Debug> Describable for LeMatcher<ExpectedT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!("is less than or equal to {:?}", self.expected).into(),

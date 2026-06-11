@@ -19,9 +19,10 @@ use std::fmt::{Debug, Display};
 
 /// Matches the string representation of types that implement `Display`.
 ///
-/// ```ignore
-/// let result: impl Display = ...;
-/// verify_that!(result, displays_as(eq(format!("{}", result))))?;
+/// ```
+/// # use test_that::prelude::*;
+/// let result = "Hello, world!";
+/// assert_that!(result, displays_as(eq("Hello, world!")));
 /// ```
 pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> DisplayMatcher<InnerMatcher> {
     DisplayMatcher { inner }
