@@ -16,7 +16,7 @@
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use crate::matcher_support::count_elements::count_elements;
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches a container whose number of elements matches `expected`.
 ///
@@ -50,19 +50,15 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn len<T: Debug + ?Sized, E: Matcher<usize>>(expected: E) -> impl Matcher<T>
-where
-    for<'a> &'a T: IntoIterator,
-{
-    LenMatcher { expected, phantom: Default::default() }
+pub fn len<E: Matcher<usize>>(expected: E) -> LenMatcher<E> {
+    LenMatcher { expected }
 }
 
-struct LenMatcher<T: ?Sized, E> {
+pub struct LenMatcher<E> {
     expected: E,
-    phantom: PhantomData<T>,
 }
 
-impl<T: Debug + ?Sized, E: Matcher<usize>> Matcher<T> for LenMatcher<T, E>
+impl<T: Debug + ?Sized, E: Matcher<usize>> Matcher<T> for LenMatcher<E>
 where
     for<'a> &'a T: IntoIterator,
 {
@@ -77,7 +73,7 @@ where
     }
 }
 
-impl<T: ?Sized, E: Describable> Describable for LenMatcher<T, E> {
+impl<E: Describable> Describable for LenMatcher<E> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => {
