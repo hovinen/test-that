@@ -507,6 +507,6 @@ to this project.
 [`verify_that!`]: https://docs.rs/test_that/*/test_that/macro.verify_that.html
 [`Describable`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describable.html
 [`Describe`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describe.html
-[`Matcher`]: https://docs.rs/test-that/*/test_that/type.TestResult.html
+[`Matcher`]: https://docs.rs/test_that/*/test_that/matcher/trait.Matcher.html
 [`Result`]: https://docs.rs/test_that/*/test_that/type.Result.html
-[`TestResult`]: https://docs.rs/test_that/*/test_that/type.Result.html
+[`TestResult`]: https://docs.rs/test-that/0.1.0/test_that/type.TestResult.html
