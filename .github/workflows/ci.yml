@@ -143,4 +143,4 @@ jobs:
       - name: cargo doc
         run: cargo doc --no-deps --all-features
         env:
-          RUSTDOCFLAGS: -D warnings
+          RUSTDOCFLAGS: "-D warnings --cfg docsrs"

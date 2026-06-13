@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #![doc = include_str!("../crate_docs.md")]
+#![cfg_attr(docsrs, feature(doc_cfg), doc(auto_cfg))]
 
 #[cfg(feature = "test-that-macro")]
 extern crate test_that_macro;
