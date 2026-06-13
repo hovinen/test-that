@@ -70,8 +70,9 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// }
 /// ```
 ///
-/// This integrates with other common test attribute macros such as [`tokio::test`]
-/// and [`rstest`]. Just apply both attribute macros to your test.
+/// This integrates with other common test attribute macros such as
+/// [`tokio::test`] and [`rstest`]. Just apply both attribute macros to your
+/// test.
 ///
 /// ```ignore
 /// #[test_that::test]
@@ -92,7 +93,8 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 ///
 /// > **Note:**
 /// > In the case of rstest, make sure to put `#[test_that::test]` *before*
-/// > `#[rstest]`. Otherwise the annotated test will run twice, since both macros will
+/// > `#[rstest]`. Otherwise the annotated test will run twice, since both
+/// > macros will
 /// > attempt to register a test with the Rust test harness.
 ///
 /// [`test_that::Result`]: type.Result.html

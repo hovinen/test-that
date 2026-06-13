@@ -44,11 +44,8 @@ pub mod __internal {
         }
 
         fn explain_match(&self, actual: &T) -> Description {
-            format!(
-                "which displays as a string {}",
-                self.inner.explain_match(&format!("{actual}"))
-            )
-            .into()
+            format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
+                .into()
         }
     }
 

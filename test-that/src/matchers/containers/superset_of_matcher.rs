@@ -26,9 +26,9 @@ use std::{fmt::Debug, marker::PhantomData};
 /// The element type `ElementT` must implement `PartialEq` to allow element
 /// comparison.
 ///
-/// See [module documentation][crate::matchers::containers] for information about
-/// what types this matcher can match. The actual and expected values need not
-/// have the same container type, only compatible element types.
+/// See [module documentation][crate::matchers::containers] for information
+/// about what types this matcher can match. The actual and expected values need
+/// not have the same container type, only compatible element types.
 ///
 /// ```
 /// # use test_that::prelude::*;

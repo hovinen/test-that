@@ -72,7 +72,8 @@ pub mod __internal {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             match matcher_result {
                 MatcherResult::Match => {
-                    format!("is an error which {}", self.inner.describe(MatcherResult::Match)).into()
+                    format!("is an error which {}", self.inner.describe(MatcherResult::Match))
+                        .into()
                 }
                 MatcherResult::NoMatch => format!(
                     "is a success or is an error containing a value which {}",

@@ -61,8 +61,8 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail().unwrap_err();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information about
-/// what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information
+/// about what types this matcher can match.
 pub fn contains<InnerMatcherT, ModeT>(
     inner: InnerMatcherT,
 ) -> ContainsMatcher<InnerMatcherT, ModeT> {

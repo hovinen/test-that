@@ -84,8 +84,8 @@
 /// that all of the containers have the same size. This matcher does not check
 /// whether the sizes match.
 ///
-/// See [module documentation][crate::matchers::containers] for information about
-/// what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information
+/// about what types this matcher can match.
 ///
 /// The second argument can be any value implementing `IntoIterator`, such as a
 /// `Vec` or an array. The container does not have to have the same type as the
