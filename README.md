@@ -285,7 +285,7 @@ fn three_non_fatal_assertions() {
 ```
 
 This can be used in the same tests as `verify_that!`, in which case the test
-function must also return [`Result<()>`]:
+function must also return [`Result`]:
 
 ```rust
 use test_that::prelude::*;
