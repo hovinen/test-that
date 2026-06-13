@@ -50,9 +50,8 @@ use std::fmt::Display;
 /// # should_fail_3().unwrap_err();
 /// ```
 ///
-/// The actual value must be a container such as a `Vec`, an array, or a
-/// dereferenced slice. More precisely, a shared borrow of the actual value must
-/// implement [`IntoIterator`].
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
 /// similar collections. The arguments are a sequence of mappings of matchers
@@ -206,9 +205,8 @@ macro_rules! __contains_exactly {
 /// # should_fail_3().unwrap_err();
 /// ```
 ///
-/// The actual value must be a container such as a `Vec`, an array, or a
-/// dereferenced slice. More precisely, a shared borrow of the actual value must
-/// implement [`IntoIterator`].
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
 /// similar collections. The arguments are a sequence of mappings of matchers
@@ -326,9 +324,8 @@ macro_rules! __contains_each {
 /// # should_fail_3().unwrap_err();
 /// ```
 ///
-/// The actual value must be a container such as a `Vec`, an array, or a
-/// dereferenced slice. More precisely, a shared borrow of the actual value must
-/// implement [`IntoIterator`].
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
 /// similar collections. The arguments are a sequence of mappings of matchers

@@ -36,6 +36,10 @@
 //! The case that `C` implements `IntoIterator` but `&C` does not is not
 //! supported in general.
 //!
+//! These matchers do not support matching directly against an [`Iterator`]. To
+//! match against an iterator, use [`Iterator::collect`] to build a [`Vec`]
+//! first.
+//!
 //! [`points_to`]: crate::matchers::points_to
 
 pub(super) mod container_contains;

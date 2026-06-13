@@ -20,11 +20,6 @@ use std::fmt::Debug;
 
 /// Matches a container whose number of elements matches `expected`.
 ///
-/// This matches against a container over which one can iterate. This includes
-/// the standard Rust containers, arrays, and (when dereferenced) slices. More
-/// precisely, a shared borrow of the actual type must implement
-/// [`IntoIterator`].
-///
 /// ```
 /// # use test_that::prelude::*;
 /// # fn should_pass() -> TestResult<()> {
@@ -38,6 +33,9 @@ use std::fmt::Debug;
 /// # }
 /// # should_pass().unwrap();
 /// ```
+///
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// The parameter `expected` can be any integer numeric matcher.
 ///

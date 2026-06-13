@@ -22,9 +22,6 @@ use std::marker::PhantomData;
 /// Matches a container all of whose elements are matched by the matcher
 /// `inner`.
 ///
-/// `T` can be any container such that `&T` implements `IntoIterator`. This
-/// includes `Vec`, arrays, and (dereferenced) slices.
-///
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
@@ -52,6 +49,9 @@ use std::marker::PhantomData;
 /// # should_fail().unwrap_err();
 /// # should_pass_2().unwrap();
 /// ```
+///
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// One can also verify the contents of a slice using
 /// [points_to][crate::matchers::points_to]:

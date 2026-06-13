@@ -80,24 +80,8 @@
 /// that all of the containers have the same size. This matcher does not check
 /// whether the sizes match.
 ///
-/// The actual value must be a container such as a `Vec`, an array, or a
-/// dereferenced slice. More precisely, a shared borrow of the actual value must
-/// implement [`IntoIterator`].
-///
-/// ```
-/// # use test_that::prelude::*;
-/// # fn should_pass() -> TestResult<()> {
-/// let value = vec![1, 2, 3];
-/// verify_that!(*value.as_slice(), pointwise!(le, [1, 3, 3]))?; // Passes
-/// verify_that!([1, 2, 3], pointwise!(le, [1, 3, 3]))?; // Passes
-/// #     Ok(())
-/// # }
-/// # should_pass().unwrap();
-/// ```
-///
-/// This matcher does not support matching directly against an [`Iterator`]. To
-/// match against an iterator, use [`Iterator::collect`] to build a [`Vec`]
-/// first.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// The second argument can be any value implementing `IntoIterator`, such as a
 /// `Vec` or an array. The container does not have to have the same type as the

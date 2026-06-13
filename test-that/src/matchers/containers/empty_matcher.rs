@@ -21,16 +21,13 @@ use std::fmt::Debug;
 
 /// Matches an empty container.
 ///
-/// `T` can be any container such that `&T` implements `IntoIterator`. For
-/// instance, `T` can be a common container like `Vec` and
-/// [`HashSet`][std::collections::HashSet].
-///
 /// ```
 /// # use test_that::prelude::*;
 /// # use std::collections::HashSet;
 /// # fn should_pass() -> TestResult<()> {
 /// let value: Vec<i32> = vec![];
 /// verify_that!(value, empty())?;
+/// verify_that!(*value.as_slice(), empty())?;
 /// let value: HashSet<i32> = HashSet::new();
 /// verify_that!(value, empty())?;
 /// #     Ok(())
@@ -38,18 +35,8 @@ use std::fmt::Debug;
 /// # should_pass().unwrap();
 /// ```
 ///
-/// One can also check whether a slice is empty by dereferencing it:
-///
-/// ```
-/// # use test_that::prelude::*;
-/// # use std::collections::HashSet;
-/// # fn should_pass() -> TestResult<()> {
-/// let value: &[u32] = &[];
-/// verify_that!(*value, empty())?;
-/// #     Ok(())
-/// # }
-/// # should_pass().unwrap();
-/// ```
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 
 pub fn empty() -> EmptyMatcher {
     EmptyMatcher

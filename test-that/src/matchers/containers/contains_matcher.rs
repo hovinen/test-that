@@ -22,10 +22,6 @@ use std::{fmt::Debug, marker::PhantomData};
 
 /// Matches an iterable type whose elements contain a value matched by `inner`.
 ///
-/// By default, this matches a container with any number of elements matched
-/// by `inner`. Use the method [`ContainsMatcher::times`] to constrain the
-/// matched containers to a specific number of matching elements.
-///
 /// ```
 /// # use test_that::prelude::*;
 /// # fn should_pass() -> TestResult<()> {
@@ -45,6 +41,28 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
+///
+/// By default, this matches a container with any number of elements matched
+/// by `inner`. Use the method [`ContainsMatcher::times`] to constrain the
+/// matched containers to a specific number of matching elements.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!([1, 1, 1], contains(eq(1)))?;              // Passes
+/// verify_that!([1, 1, 1], contains(eq(1)).times(eq(3)))?; // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail() -> TestResult<()> {
+/// verify_that!([1, 1, 1], contains(eq(1)).times(eq(2)))?; // Fails: wrong count
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail().unwrap_err();
+/// ```
+///
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 pub fn contains<InnerMatcherT, ModeT>(
     inner: InnerMatcherT,
 ) -> ContainsMatcher<InnerMatcherT, ModeT> {

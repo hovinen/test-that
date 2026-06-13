@@ -26,10 +26,9 @@ use std::{fmt::Debug, marker::PhantomData};
 /// The element type `ElementT` must implement `PartialEq` to allow element
 /// comparison.
 ///
-/// `ActualT` and `ExpectedT` can each be any container a reference to which
-/// implements `IntoIterator`. For instance, `ActualT` and `ExpectedT` can be a
-/// common container like `Vec` or arrays. They need not be the same container
-/// type.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match. The actual and expected values need not
+/// have the same container type, only compatible element types.
 ///
 /// ```
 /// # use test_that::prelude::*;
