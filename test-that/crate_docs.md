@@ -636,6 +636,17 @@ can automatically be converted into Proptest
 [`TestCaseError`](https://docs.rs/proptest/latest/proptest/test_runner/enum.TestCaseError.html)
 through the `?` operator as the example above shows.
 
+## Note on API stability
+
+This crate generally follows semantic versioning conventions. However, there are
+several symbols which must be part of the public API surface for technical
+reasons, but which downstream crates _are not intended to use directly_. It may
+be necessary to make incompatible changes to those APIs to fix defects in the
+future.
+
+All such symbols are placed in submodules named `__internal`. Please _do not
+use such symbols directly_ but instead stick to the official API surface.
+
 [`and_log_failure()`]: TestResultExt::and_log_failure
 [`or_fail()`]: OrFailExt::or_fail
 [`Matcher`]: matcher::Matcher
