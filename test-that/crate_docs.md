@@ -313,14 +313,27 @@ assert_that!(value, matches_pattern!(StructWithBox {
 
 ## Matching on tuples
 
-One can match on a plain tuple of up to twelve items by constructing a tuple
-of matchers.
+One can match on a plain tuple of items by constructing a tuple of matchers.
 
 ```rust
 # use test_that::prelude::*;
 let value = (1, "Hello, world");
 assert_that!(value, (eq(1), ends_with("world")));
 ```
+
+All fields must be covered by matchers. Use
+[`anything`][crate::matchers::anything] for fields which are not relevant
+for the test.
+
+```rust
+# use test_that::prelude::*;
+verify_that!((123, 456), (eq(123), anything()))
+#     .unwrap();
+```
+
+This supports tuples of up to 12 elements. Tuples longer than that do not
+automatically inherit the `Debug` trait from their members, so are generally
+not supported; see [Rust by Example](https://doc.rust-lang.org/rust-by-example/primitives/tuples.html#tuples).
 
 ## Writing matchers
 

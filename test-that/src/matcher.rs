@@ -43,6 +43,10 @@ use std::fmt::Debug;
 /// assert_that!(value, (eq(1), ends_with("world")));
 /// ```
 ///
+/// Tuples of more than twelve items do not automatically inherit the `Debug`
+/// trait from their members, so are generally not supported; see
+/// [Rust by Example](https://doc.rust-lang.org/rust-by-example/primitives/tuples.html#tuples).
+///
 /// [`and`]: crate::matcher::MatcherExt::and
 /// [`or`]: crate::matcher::MatcherExt::or
 /// [`not`]: crate::matchers::not
