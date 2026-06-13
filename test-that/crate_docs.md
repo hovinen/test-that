@@ -527,6 +527,19 @@ fn always_fails() -> TestResult<()> {
 
 ## Integrations with other crates
 
+### Non-fatal assertions with other test libraries
+
+Test That! requires the use of the [`test`] attribute macro to enable non-fatal
+assertions. This integrates with other common test attribute macros such as
+[`tokio::test`] and [`rstest`]. Just apply both attribute macros to your test.
+
+> **Note:**
+> In the case of rstest, make sure to put `#[test_that::test]` *before*
+> `#[rstest]`. Otherwise the annotated test will run twice, since both macros will
+> attempt to register a test with the Rust test harness.
+
+### Converting errors into test failures
+
 Test That! includes integrations with the
 [Anyhow](https://crates.io/crates/anyhow) and
 [Proptest](https://crates.io/crates/proptest) crates to simplify turning
@@ -585,3 +598,5 @@ through the `?` operator as the example above shows.
 [`or_fail()`]: OrFailExt::or_fail
 [`Matcher`]: matcher::Matcher
 [`Describable`]: matcher::Describable
+[`tokio::test`]: https://docs.rs/tokio/latest/tokio/attr.test.html
+[`rstest`]: https://docs.rs/rstest/latest/rstest/attr.rstest.html

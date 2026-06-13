@@ -67,7 +67,34 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// }
 /// ```
 ///
+/// This integrates with other common test attribute macros such as [`tokio::test`]
+/// and [`rstest`]. Just apply both attribute macros to your test.
+///
+/// ```ignore
+/// #[test_that::test]
+/// #[rstest]
+/// #[case(1)]
+/// #[case(2)]
+/// #[case(3)]
+/// fn rstest_works_with_test_that(#[case] value: u32) -> Result<()> {
+///     verify_that!(value, gt(0))
+/// }
+///
+/// #[test_that::test]
+/// #[tokio::test]
+/// async fn tokio_works_with_test_that() -> Result<()> {
+///     verify_that!(get_some_value_async().await, gt(0))
+/// }
+/// ```
+///
+/// > **Note:**
+/// > In the case of rstest, make sure to put `#[test_that::test]` *before*
+/// > `#[rstest]`. Otherwise the annotated test will run twice, since both macros will
+/// > attempt to register a test with the Rust test harness.
+///
 /// [`test_that::Result`]: type.Result.html
+/// [`tokio::test`]: https://docs.rs/tokio/latest/tokio/attr.test.html
+/// [`rstest`]: https://docs.rs/rstest/latest/rstest/attr.rstest.html
 #[proc_macro_attribute]
 pub fn test(
     _args: proc_macro::TokenStream,

@@ -312,20 +312,13 @@ test:
 fn rstest_works_with_test_that(#[case] value: u32) -> Result<()> {
     verify_that!(value, gt(0))
 }
-```
 
-```rust
 #[test_that::test]
 #[tokio::test]
 async fn tokio_works_with_test_that() -> Result<()> {
     verify_that!(get_some_value_async().await, gt(0))
 }
 ```
-
-> [!NOTE]
-> In the case of rstest, make sure to put `#[test_that::test]` *before*
-> `#[rstest]`. Otherwise the annotated test will run twice, since both macros will
-> attempt to register a test with the Rust test harness.
 
 ### Predicate assertions
 
