@@ -15,7 +15,6 @@
 #![doc(hidden)]
 
 use crate::matcher_support::edit_distance;
-#[rustversion::since(1.70)]
 use std::io::IsTerminal;
 use std::{borrow::Cow, fmt::Display};
 
@@ -294,18 +293,12 @@ impl<'a> Default for Buffer<'a> {
     }
 }
 
-#[rustversion::since(1.70)]
 fn stdout_supports_color() -> bool {
     match (is_env_var_set("NO_COLOR"), is_env_var_set("FORCE_COLOR")) {
         (true, _) => false,
         (false, true) => true,
         (false, false) => std::io::stdout().is_terminal(),
     }
-}
-
-#[rustversion::not(since(1.70))]
-fn stdout_supports_color() -> bool {
-    is_env_var_set("FORCE_COLOR")
 }
 
 fn is_env_var_set(var: &'static str) -> bool {

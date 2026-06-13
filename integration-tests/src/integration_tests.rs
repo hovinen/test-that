@@ -507,25 +507,6 @@ mod tests {
     }
 
     #[test]
-    #[rustversion::before(1.76)]
-    fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output()
-    -> TestResult<()> {
-        let output = run_external_process_in_tests_directory(
-            "verify_predicate_with_failure_as_method_in_submodule",
-        )?;
-
-        verify_that!(
-            output,
-            contains_substring(indoc! {"
-                a_submodule :: A_STRUCT_IN_SUBMODULE.eq_predicate_as_method(a, b) was false with
-                  a = 1,
-                  b = 2
-                "})
-        )
-    }
-
-    #[test]
-    #[rustversion::since(1.76)]
     fn verify_pred_should_show_correct_qualified_function_name_in_test_failure_output()
     -> TestResult<()> {
         let output = run_external_process_in_tests_directory(

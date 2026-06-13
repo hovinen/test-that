@@ -399,10 +399,6 @@ fn matches_enum_without_field() -> TestResult<()> {
     verify_that!(actual, matches_pattern!(AnEnum::A))
 }
 
-#[rustversion::before(1.76)]
-const ANENUM_A_REPR: &str = "AnEnum :: A";
-
-#[rustversion::since(1.76)]
 const ANENUM_A_REPR: &str = "AnEnum::A";
 
 #[test]
