@@ -114,7 +114,7 @@ To make an assertion using a matcher, Test That! offers three macros:
    failed, but allows the test to continue running (called a _non-fatal
    assertion_). It requires the use of the [`test_that::test`] attribute macro
    on the test itself.
- * [`verify_that!`] has no side effects and evaluates to a [`Result<()>`] whose
+ * [`verify_that!`] has no side effects and evaluates to a [`Result`] whose
    `Err` variant describes the assertion failure, if there is one. In
    combination with the
    [`?` operator](https://doc.rust-lang.org/reference/expressions/operator-expr.html#the-question-mark-operator),
@@ -140,7 +140,7 @@ fn two_logged_failures() {
 }
 
 #[test]
-fn immediate_failure_without_panic() -> Result<()> {
+fn immediate_failure_without_panic() -> TestResult<()> {
     let value = 2;
     verify_that!(value, eq(4))?; // Test fails and aborts.
     verify_that!(value, eq(2))?; // Never executes.
@@ -148,7 +148,7 @@ fn immediate_failure_without_panic() -> Result<()> {
 }
 
 #[test]
-fn simple_assertion() -> Result<()> {
+fn simple_assertion() -> TestResult<()> {
     let value = 2;
     verify_that!(value, eq(4)) // One can also just return the last assertion.
 }
@@ -291,7 +291,7 @@ function must also return [`Result<()>`]:
 use test_that::prelude::*;
 
 #[test_that::test]
-fn failing_non_fatal_assertion() -> Result<()> {
+fn failing_non_fatal_assertion() -> TestResult<()> {
     let value = 2;
     expect_that!(value, eq(3));  // Just marks the test as having failed.
     verify_that!(value, eq(2))?;  // Passes, so does not abort the test.
@@ -304,7 +304,7 @@ fn failing_non_fatal_assertion() -> Result<()> {
 use test_that::prelude::*;
 
 #[test_that::test]
-fn failing_fatal_assertion_after_non_fatal_assertion() -> Result<()> {
+fn failing_fatal_assertion_after_non_fatal_assertion() -> TestResult<()> {
     let value = 2;
     verify_that!(value, eq(3))?; // Fails and aborts the test.
     expect_that!(value, eq(3));  // Never executes, since the test already aborted.
@@ -325,13 +325,13 @@ test:
 #[case(1)]
 #[case(2)]
 #[case(3)]
-fn rstest_works_with_test_that(#[case] value: u32) -> Result<()> {
+fn rstest_works_with_test_that(#[case] value: u32) -> TestResult<()> {
     verify_that!(value, gt(0))
 }
 
 #[test_that::test]
 #[tokio::test]
-async fn tokio_works_with_test_that() -> Result<()> {
+async fn tokio_works_with_test_that() -> TestResult<()> {
     verify_that!(get_some_value_async().await, gt(0))
 }
 ```
@@ -362,7 +362,7 @@ stuff_is_correct(x, y) was false with
   y = 4
 ```
 
-The `verify_pred!` invocation evaluates to a [`Result<()>`] just like
+The `verify_pred!` invocation evaluates to a [`Result`] just like
 [`verify_that!`]. There is also a macro [`expect_pred!`] to make a non-fatal
 predicaticate assertion.
 
@@ -374,7 +374,7 @@ cause a test to fail, with an optional formatted message:
 
 ```rust
 #[test]
-fn always_fails() -> Result<()> {
+fn always_fails() -> TestResult<()> {
     fail!("This test must fail with {}", "today")
 }
 ```
@@ -508,4 +508,4 @@ to this project.
 [`Describable`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describable.html
 [`Describe`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describe.html
 [`Matcher`]: https://docs.rs/test_that/*/test_that/matcher/trait.Matcher.html
-[`Result<()>`]: https://docs.rs/test_that/*/test_that/type.Result.html
+[`Result`]: https://docs.rs/test_that/*/test_that/type.Result.html
