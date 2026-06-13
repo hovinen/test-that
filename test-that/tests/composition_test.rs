@@ -126,3 +126,8 @@ fn field_can_be_nested_inside_result_of() -> TestResult<()> {
         result_of!(|s: &OuterStruct| s.inner, field!(InnerStruct.string, starts_with("Hello")))
     )
 }
+
+#[test]
+fn eq_matcher_into_str_matcher_works_outside_crate() -> TestResult<()> {
+    verify_that!("Hello, world!", eq("hello, world!").ignoring_ascii_case())
+}

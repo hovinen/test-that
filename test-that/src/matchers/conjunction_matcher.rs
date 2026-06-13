@@ -22,49 +22,59 @@ use crate::{
 };
 use std::fmt::Debug;
 
-/// Matcher created by [`MatcherExt::and`][crate::matcher::MatcherExt::and].
-///
-/// **For internal use only. API stablility is not guaranteed!**
-#[doc(hidden)]
-pub struct ConjunctionMatcher<M1, M2> {
-    m1: M1,
-    m2: M2,
-}
+pub mod __internal {
+    use super::*;
 
-impl<M1, M2> ConjunctionMatcher<M1, M2> {
-    pub(crate) fn new(m1: M1, m2: M2) -> Self {
-        Self { m1, m2 }
+    /// Matcher created by [`MatcherExt::and`][crate::matcher::MatcherExt::and].
+    ///
+    /// **For internal use only. API stablility is not guaranteed!**
+    #[doc(hidden)]
+    pub struct ConjunctionMatcher<M1, M2> {
+        pub(super) m1: M1,
+        pub(super) m2: M2,
     }
-}
 
-impl<T: Debug + ?Sized, M1: Matcher<T>, M2: Matcher<T>> Matcher<T> for ConjunctionMatcher<M1, M2> {
-    fn matches(&self, actual: &T) -> MatcherResult {
-        match (self.m1.matches(actual), self.m2.matches(actual)) {
-            (MatcherResult::Match, MatcherResult::Match) => MatcherResult::Match,
-            _ => MatcherResult::NoMatch,
+    impl<M1, M2> ConjunctionMatcher<M1, M2> {
+        pub(crate) fn new(m1: M1, m2: M2) -> Self {
+            Self { m1, m2 }
         }
     }
 
-    fn explain_match(&self, actual: &T) -> Description {
-        match (self.m1.matches(actual), self.m2.matches(actual)) {
-            (MatcherResult::Match, MatcherResult::Match) => Description::new()
-                .nested(self.m1.explain_match(actual))
-                .text("and")
-                .nested(self.m2.explain_match(actual)),
-            (MatcherResult::NoMatch, MatcherResult::Match) => self.m1.explain_match(actual),
-            (MatcherResult::Match, MatcherResult::NoMatch) => self.m2.explain_match(actual),
-            (MatcherResult::NoMatch, MatcherResult::NoMatch) => Description::new()
-                .nested(self.m1.explain_match(actual))
-                .text("and")
-                .nested(self.m2.explain_match(actual)),
+    impl<T: Debug + ?Sized, M1: Matcher<T>, M2: Matcher<T>> Matcher<T>
+        for ConjunctionMatcher<M1, M2>
+    {
+        fn matches(&self, actual: &T) -> MatcherResult {
+            match (self.m1.matches(actual), self.m2.matches(actual)) {
+                (MatcherResult::Match, MatcherResult::Match) => MatcherResult::Match,
+                _ => MatcherResult::NoMatch,
+            }
+        }
+
+        fn explain_match(&self, actual: &T) -> Description {
+            match (self.m1.matches(actual), self.m2.matches(actual)) {
+                (MatcherResult::Match, MatcherResult::Match) => Description::new()
+                    .nested(self.m1.explain_match(actual))
+                    .text("and")
+                    .nested(self.m2.explain_match(actual)),
+                (MatcherResult::NoMatch, MatcherResult::Match) => self.m1.explain_match(actual),
+                (MatcherResult::Match, MatcherResult::NoMatch) => self.m2.explain_match(actual),
+                (MatcherResult::NoMatch, MatcherResult::NoMatch) => Description::new()
+                    .nested(self.m1.explain_match(actual))
+                    .text("and")
+                    .nested(self.m2.explain_match(actual)),
+            }
         }
     }
-}
 
-impl<M1: Describable, M2: Describable> Describable for ConjunctionMatcher<M1, M2> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        format!("{}, and {}", self.m1.describe(matcher_result), self.m2.describe(matcher_result))
+    impl<M1: Describable, M2: Describable> Describable for ConjunctionMatcher<M1, M2> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            format!(
+                "{}, and {}",
+                self.m1.describe(matcher_result),
+                self.m2.describe(matcher_result)
+            )
             .into()
+        }
     }
 }
 

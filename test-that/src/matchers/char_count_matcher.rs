@@ -57,44 +57,48 @@ use std::fmt::Debug;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn char_count<E: Matcher<usize>>(expected: E) -> CharCountMatcher<E> {
-    CharCountMatcher { expected }
+pub fn char_count<E: Matcher<usize>>(expected: E) -> __internal::CharCountMatcher<E> {
+    __internal::CharCountMatcher { expected }
 }
 
-#[doc(hidden)]
-pub struct CharCountMatcher<E> {
-    expected: E,
-}
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharCountMatcher<E> {
-    fn matches(&self, actual: &T) -> MatcherResult {
-        self.expected.matches(&actual.as_ref().chars().count())
+    #[doc(hidden)]
+    pub struct CharCountMatcher<E> {
+        pub(super) expected: E,
     }
 
-    fn explain_match(&self, actual: &T) -> Description {
-        let actual_size = actual.as_ref().chars().count();
-        format!(
-            "which has character count {}, {}",
-            actual_size,
-            self.expected.explain_match(&actual_size)
-        )
-        .into()
-    }
-}
+    impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharCountMatcher<E> {
+        fn matches(&self, actual: &T) -> MatcherResult {
+            self.expected.matches(&actual.as_ref().chars().count())
+        }
 
-impl<E: Matcher<usize>> Describable for CharCountMatcher<E> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!(
-                "has character count, which {}",
-                self.expected.describe(MatcherResult::Match)
+        fn explain_match(&self, actual: &T) -> Description {
+            let actual_size = actual.as_ref().chars().count();
+            format!(
+                "which has character count {}, {}",
+                actual_size,
+                self.expected.explain_match(&actual_size)
             )
-            .into(),
-            MatcherResult::NoMatch => format!(
-                "has character count, which {}",
-                self.expected.describe(MatcherResult::NoMatch)
-            )
-            .into(),
+            .into()
+        }
+    }
+
+    impl<E: Matcher<usize>> Describable for CharCountMatcher<E> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!(
+                    "has character count, which {}",
+                    self.expected.describe(MatcherResult::Match)
+                )
+                .into(),
+                MatcherResult::NoMatch => format!(
+                    "has character count, which {}",
+                    self.expected.describe(MatcherResult::NoMatch)
+                )
+                .into(),
+            }
         }
     }
 }

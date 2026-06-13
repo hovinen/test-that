@@ -39,41 +39,45 @@ use std::fmt::Debug;
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn some<InnerMatcherT>(inner: InnerMatcherT) -> SomeMatcher<InnerMatcherT> {
-    SomeMatcher { inner }
+pub fn some<InnerMatcherT>(inner: InnerMatcherT) -> __internal::SomeMatcher<InnerMatcherT> {
+    __internal::SomeMatcher { inner }
 }
 
-#[doc(hidden)]
-pub struct SomeMatcher<InnerMatcherT> {
-    inner: InnerMatcherT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<Option<T>> for SomeMatcher<InnerMatcherT> {
-    fn matches(&self, actual: &Option<T>) -> MatcherResult {
-        actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
+    #[doc(hidden)]
+    pub struct SomeMatcher<InnerMatcherT> {
+        pub(super) inner: InnerMatcherT,
     }
 
-    fn explain_match(&self, actual: &Option<T>) -> Description {
-        match (self.matches(actual), actual) {
-            (_, Some(t)) => {
-                Description::new().text("which has a value").nested(self.inner.explain_match(t))
+    impl<T: Debug, InnerMatcherT: Matcher<T>> Matcher<Option<T>> for SomeMatcher<InnerMatcherT> {
+        fn matches(&self, actual: &Option<T>) -> MatcherResult {
+            actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
+        }
+
+        fn explain_match(&self, actual: &Option<T>) -> Description {
+            match (self.matches(actual), actual) {
+                (_, Some(t)) => {
+                    Description::new().text("which has a value").nested(self.inner.explain_match(t))
+                }
+                (_, None) => "which is None".into(),
             }
-            (_, None) => "which is None".into(),
         }
     }
-}
 
-impl<InnerMatcherT: Describable> Describable for SomeMatcher<InnerMatcherT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("has a value which {}", self.inner.describe(MatcherResult::Match)).into()
+    impl<InnerMatcherT: Describable> Describable for SomeMatcher<InnerMatcherT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => {
+                    format!("has a value which {}", self.inner.describe(MatcherResult::Match)).into()
+                }
+                MatcherResult::NoMatch => format!(
+                    "is None or has a value which {}",
+                    self.inner.describe(MatcherResult::NoMatch)
+                )
+                .into(),
             }
-            MatcherResult::NoMatch => format!(
-                "is None or has a value which {}",
-                self.inner.describe(MatcherResult::NoMatch)
-            )
-            .into(),
         }
     }
 }

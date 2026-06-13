@@ -33,24 +33,28 @@ use std::fmt::Debug;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn anything() -> AnythingMatcher {
-    AnythingMatcher
+pub fn anything() -> __internal::AnythingMatcher {
+    __internal::AnythingMatcher
 }
 
-#[doc(hidden)]
-pub struct AnythingMatcher;
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug + ?Sized> Matcher<T> for AnythingMatcher {
-    fn matches(&self, _: &T) -> MatcherResult {
-        MatcherResult::Match
+    #[doc(hidden)]
+    pub struct AnythingMatcher;
+
+    impl<T: Debug + ?Sized> Matcher<T> for AnythingMatcher {
+        fn matches(&self, _: &T) -> MatcherResult {
+            MatcherResult::Match
+        }
     }
-}
 
-impl Describable for AnythingMatcher {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => "is anything".into(),
-            MatcherResult::NoMatch => "never matches".into(),
+    impl Describable for AnythingMatcher {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => "is anything".into(),
+                MatcherResult::NoMatch => "never matches".into(),
+            }
         }
     }
 }

@@ -85,92 +85,102 @@ use std::{fmt::Debug, marker::PhantomData};
 /// runtime proportional to the *product* of the sizes of the actual and
 /// expected containers as well as the time to check equality of each pair of
 /// items. It should not be used on especially large containers.
-pub fn subset_of<ExpectedT: Debug, Mode>(superset: ExpectedT) -> SubsetOfMatcher<ExpectedT, Mode> {
-    SubsetOfMatcher { superset, phantom: Default::default() }
-}
-
-#[doc(hidden)]
-pub struct SubsetOfMatcher<ExpectedT, Mode> {
+pub fn subset_of<ExpectedT: Debug, Mode>(
     superset: ExpectedT,
-    phantom: PhantomData<Mode>,
+) -> __internal::SubsetOfMatcher<ExpectedT, Mode> {
+    __internal::SubsetOfMatcher { superset, phantom: Default::default() }
 }
 
-impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
-    for SubsetOfMatcher<ExpectedT, RefItems>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        for actual_item in actual {
-            if self.expected_is_missing(actual_item) {
-                return MatcherResult::NoMatch;
+pub mod __internal {
+    use super::*;
+
+    #[doc(hidden)]
+    pub struct SubsetOfMatcher<ExpectedT, Mode> {
+        pub(super) superset: ExpectedT,
+        pub(super) phantom: PhantomData<Mode>,
+    }
+
+    impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
+        for SubsetOfMatcher<ExpectedT, RefItems>
+    where
+        for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
+        for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            for actual_item in actual {
+                if self.expected_is_missing(actual_item) {
+                    return MatcherResult::NoMatch;
+                }
+            }
+            MatcherResult::Match
+        }
+
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            let unexpected_elements = actual
+                .into_iter()
+                .enumerate()
+                .filter(|&(_, actual_item)| self.expected_is_missing(actual_item))
+                .map(|(idx, actual_item)| format!("{actual_item:#?} at #{idx}"))
+                .collect::<Vec<_>>();
+
+            match unexpected_elements.len() {
+                0 => "which no element is unexpected".into(),
+                1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
+                _ => {
+                    format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into()
+                }
             }
         }
-        MatcherResult::Match
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        let unexpected_elements = actual
-            .into_iter()
-            .enumerate()
-            .filter(|&(_, actual_item)| self.expected_is_missing(actual_item))
-            .map(|(idx, actual_item)| format!("{actual_item:#?} at #{idx}"))
-            .collect::<Vec<_>>();
-
-        match unexpected_elements.len() {
-            0 => "which no element is unexpected".into(),
-            1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
-            _ => format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into(),
+    impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
+        for SubsetOfMatcher<ExpectedT, OwnedItems>
+    where
+        for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+        for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            for actual_item in actual {
+                if self.expected_is_missing(&actual_item) {
+                    return MatcherResult::NoMatch;
+                }
+            }
+            MatcherResult::Match
         }
-    }
-}
 
-impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
-    for SubsetOfMatcher<ExpectedT, OwnedItems>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
-    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        for actual_item in actual {
-            if self.expected_is_missing(&actual_item) {
-                return MatcherResult::NoMatch;
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            let unexpected_elements = actual
+                .into_iter()
+                .enumerate()
+                .filter(|&(_, ref actual_item)| self.expected_is_missing(actual_item))
+                .map(|(idx, actual_item)| format!("{actual_item:#?} at #{idx}"))
+                .collect::<Vec<_>>();
+
+            match unexpected_elements.len() {
+                0 => "which no element is unexpected".into(),
+                1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
+                _ => {
+                    format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into()
+                }
             }
         }
-        MatcherResult::Match
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        let unexpected_elements = actual
-            .into_iter()
-            .enumerate()
-            .filter(|&(_, ref actual_item)| self.expected_is_missing(actual_item))
-            .map(|(idx, actual_item)| format!("{actual_item:#?} at #{idx}"))
-            .collect::<Vec<_>>();
-
-        match unexpected_elements.len() {
-            0 => "which no element is unexpected".into(),
-            1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
-            _ => format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into(),
+    impl<ElementT: PartialEq, ExpectedT, Mode> SubsetOfMatcher<ExpectedT, Mode>
+    where
+        for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
+    {
+        fn expected_is_missing(&self, needle: &ElementT) -> bool {
+            !self.superset.into_iter().any(|item| *item == *needle)
         }
     }
-}
 
-impl<ElementT: PartialEq, ExpectedT, Mode> SubsetOfMatcher<ExpectedT, Mode>
-where
-    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
-{
-    fn expected_is_missing(&self, needle: &ElementT) -> bool {
-        !self.superset.into_iter().any(|item| *item == *needle)
-    }
-}
-
-impl<ExpectedT: Debug, Mode> Describable for SubsetOfMatcher<ExpectedT, Mode> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is a subset of {:#?}", self.superset).into(),
-            MatcherResult::NoMatch => format!("isn't a subset of {:#?}", self.superset).into(),
+    impl<ExpectedT: Debug, Mode> Describable for SubsetOfMatcher<ExpectedT, Mode> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!("is a subset of {:#?}", self.superset).into(),
+                MatcherResult::NoMatch => format!("isn't a subset of {:#?}", self.superset).into(),
+            }
         }
     }
 }

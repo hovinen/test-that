@@ -21,22 +21,26 @@ use num_traits::float::Float;
 use std::fmt::Debug;
 
 /// Matches a floating point value which is NaN.
-pub fn is_nan() -> IsNanMatcher {
-    IsNanMatcher
+pub fn is_nan() -> __internal::IsNanMatcher {
+    __internal::IsNanMatcher
 }
 
-#[doc(hidden)]
-pub struct IsNanMatcher;
+pub mod __internal {
+    use super::*;
 
-impl<T: Float + Debug> Matcher<T> for IsNanMatcher {
-    fn matches(&self, actual: &T) -> MatcherResult {
-        actual.is_nan().into()
+    #[doc(hidden)]
+    pub struct IsNanMatcher;
+
+    impl<T: Float + Debug> Matcher<T> for IsNanMatcher {
+        fn matches(&self, actual: &T) -> MatcherResult {
+            actual.is_nan().into()
+        }
     }
-}
 
-impl Describable for IsNanMatcher {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        if matcher_result.into() { "is NaN" } else { "isn't NaN" }.into()
+    impl Describable for IsNanMatcher {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            if matcher_result.into() { "is NaN" } else { "isn't NaN" }.into()
+        }
     }
 }
 

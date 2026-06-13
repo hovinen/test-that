@@ -93,120 +93,126 @@ use std::marker::PhantomData;
 // compiler.
 pub fn container_eq<ExpectedContainerT, Mode>(
     expected: ExpectedContainerT,
-) -> ContainerEqMatcher<ExpectedContainerT, Mode>
+) -> __internal::ContainerEqMatcher<ExpectedContainerT, Mode>
 where
     ExpectedContainerT: Debug,
 {
-    ContainerEqMatcher { expected, phantom: Default::default() }
+    __internal::ContainerEqMatcher { expected, phantom: Default::default() }
 }
 
-#[doc(hidden)]
-pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {
-    expected: ExpectedContainerT,
-    phantom: PhantomData<Mode>,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
-    Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, RefItems>
-where
-    ActualElementT: PartialEq<ExpectedElementT> + Debug + ?Sized,
-    ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
-    ExpectedElementT: Debug,
-    ExpectedContainerT: Debug,
-    for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
-    for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
-{
-    fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
-        (*actual == self.expected).into()
+    #[doc(hidden)]
+    pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {
+        pub(super) expected: ExpectedContainerT,
+        pub(super) phantom: PhantomData<Mode>,
     }
 
-    fn explain_match(&self, actual: &ActualContainerT) -> Description {
-        build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual)).into()
-    }
-}
-
-impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, RefItems>
-where
-    for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
-{
-    fn get_missing_items<ActualElementT, ActualContainerT>(
-        &self,
-        actual: &ActualContainerT,
-    ) -> Vec<&ExpectedElementT>
+    impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
+        Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, RefItems>
     where
-        ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
-        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        ActualElementT: PartialEq<ExpectedElementT> + Debug + ?Sized,
+        ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
+        ExpectedElementT: Debug,
+        ExpectedContainerT: Debug,
         for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
+        for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
     {
-        self.expected.into_iter().filter(|&i| !actual.into_iter().any(|j| j == i)).collect()
+        fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
+            (*actual == self.expected).into()
+        }
+
+        fn explain_match(&self, actual: &ActualContainerT) -> Description {
+            build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual))
+                .into()
+        }
     }
 
-    fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
-        &self,
-        actual: &'a ActualContainerT,
-    ) -> Vec<&'a ActualElementT>
+    impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, RefItems>
     where
-        ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
-        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
-        for<'b> &'b ActualContainerT: IntoIterator<Item = &'b ActualElementT>,
+        for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
     {
-        actual.into_iter().filter(|&i| !self.expected.into_iter().any(|j| i == j)).collect()
-    }
-}
+        fn get_missing_items<ActualElementT, ActualContainerT>(
+            &self,
+            actual: &ActualContainerT,
+        ) -> Vec<&ExpectedElementT>
+        where
+            ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
+            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+            for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
+        {
+            self.expected.into_iter().filter(|&i| !actual.into_iter().any(|j| j == i)).collect()
+        }
 
-impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
-    Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, OwnedItems>
-where
-    ActualElementT: PartialEq<ExpectedElementT> + Debug,
-    ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
-    ExpectedElementT: Debug,
-    ExpectedContainerT: Debug,
-    for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
-    for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
-{
-    fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
-        (*actual == self.expected).into()
+        fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
+            &self,
+            actual: &'a ActualContainerT,
+        ) -> Vec<&'a ActualElementT>
+        where
+            ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
+            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+            for<'b> &'b ActualContainerT: IntoIterator<Item = &'b ActualElementT>,
+        {
+            actual.into_iter().filter(|&i| !self.expected.into_iter().any(|j| i == j)).collect()
+        }
     }
 
-    fn explain_match(&self, actual: &ActualContainerT) -> Description {
-        build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual)).into()
-    }
-}
-
-impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, OwnedItems>
-where
-    for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
-{
-    fn get_missing_items<ActualElementT, ActualContainerT>(
-        &self,
-        actual: &ActualContainerT,
-    ) -> Vec<ExpectedElementT>
+    impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
+        Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, OwnedItems>
     where
-        ActualElementT: PartialEq<ExpectedElementT>,
-        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        ActualElementT: PartialEq<ExpectedElementT> + Debug,
+        ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
+        ExpectedElementT: Debug,
+        ExpectedContainerT: Debug,
         for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
+        for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
     {
-        self.expected.into_iter().filter(|i| !actual.into_iter().any(|j| j == *i)).collect()
+        fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
+            (*actual == self.expected).into()
+        }
+
+        fn explain_match(&self, actual: &ActualContainerT) -> Description {
+            build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual))
+                .into()
+        }
     }
 
-    fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
-        &self,
-        actual: &'a ActualContainerT,
-    ) -> Vec<ActualElementT>
+    impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, OwnedItems>
     where
-        ActualElementT: PartialEq<ExpectedElementT>,
-        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
-        for<'b> &'b ActualContainerT: IntoIterator<Item = ActualElementT>,
+        for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
     {
-        actual.into_iter().filter(|i| !self.expected.into_iter().any(|j| *i == j)).collect()
-    }
-}
+        fn get_missing_items<ActualElementT, ActualContainerT>(
+            &self,
+            actual: &ActualContainerT,
+        ) -> Vec<ExpectedElementT>
+        where
+            ActualElementT: PartialEq<ExpectedElementT>,
+            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+            for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
+        {
+            self.expected.into_iter().filter(|i| !actual.into_iter().any(|j| j == *i)).collect()
+        }
 
-impl<ExpectedContainerT: Debug, Mode> Describable for ContainerEqMatcher<ExpectedContainerT, Mode> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
-            MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
+        fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
+            &self,
+            actual: &'a ActualContainerT,
+        ) -> Vec<ActualElementT>
+        where
+            ActualElementT: PartialEq<ExpectedElementT>,
+            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+            for<'b> &'b ActualContainerT: IntoIterator<Item = ActualElementT>,
+        {
+            actual.into_iter().filter(|i| !self.expected.into_iter().any(|j| *i == j)).collect()
+        }
+    }
+
+    impl<ExpectedContainerT: Debug, Mode> Describable for ContainerEqMatcher<ExpectedContainerT, Mode> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
+                MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
+            }
         }
     }
 }

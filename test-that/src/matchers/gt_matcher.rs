@@ -76,29 +76,33 @@ use std::fmt::Debug;
 ///
 /// You can find the standard library `PartialOrd` implementation in
 /// <https://doc.rust-lang.org/core/cmp/trait.PartialOrd.html#implementors>
-pub fn gt<ExpectedT>(expected: ExpectedT) -> GtMatcher<ExpectedT> {
-    GtMatcher { expected }
+pub fn gt<ExpectedT>(expected: ExpectedT) -> __internal::GtMatcher<ExpectedT> {
+    __internal::GtMatcher { expected }
 }
 
-#[doc(hidden)]
-pub struct GtMatcher<ExpectedT> {
-    expected: ExpectedT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
-    for GtMatcher<ExpectedT>
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        (*actual > self.expected).into()
+    #[doc(hidden)]
+    pub struct GtMatcher<ExpectedT> {
+        pub(super) expected: ExpectedT,
     }
-}
 
-impl<ExpectedT: Debug> Describable for GtMatcher<ExpectedT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is greater than {:?}", self.expected).into(),
-            MatcherResult::NoMatch => {
-                format!("is less than or equal to {:?}", self.expected).into()
+    impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
+        for GtMatcher<ExpectedT>
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            (*actual > self.expected).into()
+        }
+    }
+
+    impl<ExpectedT: Debug> Describable for GtMatcher<ExpectedT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!("is greater than {:?}", self.expected).into(),
+                MatcherResult::NoMatch => {
+                    format!("is less than or equal to {:?}", self.expected).into()
+                }
             }
         }
     }

@@ -52,44 +52,50 @@ use std::{fmt::Debug, ops::Deref};
 /// ```
 ///
 /// Otherwise, this has the same behaviour as [`eq`][crate::matchers::eq].
-pub fn eq_deref_of<ExpectedRefT>(expected: ExpectedRefT) -> EqDerefOfMatcher<ExpectedRefT> {
-    EqDerefOfMatcher { expected }
+pub fn eq_deref_of<ExpectedRefT>(
+    expected: ExpectedRefT,
+) -> __internal::EqDerefOfMatcher<ExpectedRefT> {
+    __internal::EqDerefOfMatcher { expected }
 }
 
-#[doc(hidden)]
-pub struct EqDerefOfMatcher<ExpectedRefT> {
-    pub(crate) expected: ExpectedRefT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ActualT, ExpectedRefT, ExpectedT> Matcher<ActualT> for EqDerefOfMatcher<ExpectedRefT>
-where
-    ActualT: Debug + ?Sized,
-    ExpectedRefT: Deref<Target = ExpectedT> + Debug,
-    ExpectedT: PartialEq<ActualT> + Debug,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        (self.expected.deref() == actual).into()
+    #[doc(hidden)]
+    pub struct EqDerefOfMatcher<ExpectedRefT> {
+        pub(crate) expected: ExpectedRefT,
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        format!(
-            "which {}{}",
-            &self.describe(self.matches(actual)),
-            create_diff(
-                &format!("{:#?}", actual),
-                &format!("{:#?}", self.expected.deref()),
-                edit_distance::Mode::Exact,
+    impl<ActualT, ExpectedRefT, ExpectedT> Matcher<ActualT> for EqDerefOfMatcher<ExpectedRefT>
+    where
+        ActualT: Debug + ?Sized,
+        ExpectedRefT: Deref<Target = ExpectedT> + Debug,
+        ExpectedT: PartialEq<ActualT> + Debug,
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            (self.expected.deref() == actual).into()
+        }
+
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            format!(
+                "which {}{}",
+                &self.describe(self.matches(actual)),
+                create_diff(
+                    &format!("{:#?}", actual),
+                    &format!("{:#?}", self.expected.deref()),
+                    edit_distance::Mode::Exact,
+                )
             )
-        )
-        .into()
+            .into()
+        }
     }
-}
 
-impl<ExpectedRefT: Debug> Describable for EqDerefOfMatcher<ExpectedRefT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
-            MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
+    impl<ExpectedRefT: Debug> Describable for EqDerefOfMatcher<ExpectedRefT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
+                MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
+            }
         }
     }
 }

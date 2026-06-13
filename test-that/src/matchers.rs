@@ -54,7 +54,7 @@ pub use char_count_matcher::char_count;
 pub use contains_regex_matcher::contains_regex;
 pub use display_matcher::displays_as;
 pub use eq_deref_of_matcher::eq_deref_of;
-pub use eq_matcher::{EqMatcher, eq};
+pub use eq_matcher::eq;
 pub use err_matcher::err;
 pub use ge_matcher::ge;
 pub use gt_matcher::gt;
@@ -88,17 +88,17 @@ pub use crate::{
 // should only be used through their respective macros.
 #[doc(hidden)]
 pub mod __internal {
-    pub use super::all_matcher::internal::AllMatcher;
-    pub use super::any_matcher::internal::AnyMatcher;
-    pub use super::conjunction_matcher::ConjunctionMatcher;
+    pub use super::all_matcher::__internal::AllMatcher;
+    pub use super::any_matcher::__internal::AnyMatcher;
+    pub use super::conjunction_matcher::__internal::ConjunctionMatcher;
     pub use super::containers::container_contains::Requirements;
-    pub use super::containers::container_contains::ordered_matcher::internal::ContainerContainsOrderedMatcher;
-    pub use super::containers::container_contains::unordered_matcher::internal::{
+    pub use super::containers::container_contains::ordered_matcher::__internal::ContainerContainsOrderedMatcher;
+    pub use super::containers::container_contains::unordered_matcher::__internal::{
         ContainerContainsUnorderedMatcher, MapContainsMatcher,
     };
-    pub use super::containers::pointwise_matcher::internal::PointwiseMatcher;
-    pub use super::disjunction_matcher::DisjunctionMatcher;
-    pub use super::field_matcher::internal::field_matcher;
+    pub use super::containers::pointwise_matcher::__internal::PointwiseMatcher;
+    pub use super::disjunction_matcher::__internal::DisjunctionMatcher;
+    pub use super::field_matcher::__internal::field_matcher;
     pub use super::is_matcher::is;
-    pub use super::result_of_matcher::internal::result_of;
+    pub use super::result_of_matcher::__internal::result_of;
 }

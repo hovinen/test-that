@@ -71,50 +71,54 @@ use std::fmt::Debug;
 /// options on how equality is checked through the
 /// [`StrMatcherConfigurator`][crate::matchers::str_matcher::StrMatcherConfigurator]
 /// extension trait, which is implemented for this matcher.
-pub fn eq<T>(expected: T) -> EqMatcher<T> {
-    EqMatcher { expected }
+pub fn eq<T>(expected: T) -> __internal::EqMatcher<T> {
+    __internal::EqMatcher { expected }
 }
 
-#[doc(hidden)]
-pub struct EqMatcher<T> {
-    pub(crate) expected: T,
-}
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug, A: Debug + ?Sized + PartialEq<T>> Matcher<A> for EqMatcher<T> {
-    fn matches(&self, actual: &A) -> MatcherResult {
-        (*actual == self.expected).into()
+    #[doc(hidden)]
+    pub struct EqMatcher<T> {
+        pub(crate) expected: T,
     }
 
-    fn explain_match(&self, actual: &A) -> Description {
-        let expected_debug = format!("{:#?}", self.expected);
-        let actual_debug = format!("{:#?}", actual);
-        let description = self.describe(self.matches(actual));
+    impl<T: Debug, A: Debug + ?Sized + PartialEq<T>> Matcher<A> for EqMatcher<T> {
+        fn matches(&self, actual: &A) -> MatcherResult {
+            (*actual == self.expected).into()
+        }
 
-        let diff = if is_multiline_string_debug(&actual_debug)
-            && is_multiline_string_debug(&expected_debug)
-        {
-            create_diff(
-                // The two calls below return None if and only if the strings expected_debug
-                // respectively actual_debug are not enclosed in ". The calls to
-                // is_multiline_string_debug above ensure that they are. So the calls cannot
-                // actually return None and unwrap() should not panic.
-                &to_display_output(&actual_debug).unwrap(),
-                &to_display_output(&expected_debug).unwrap(),
-                edit_distance::Mode::Exact,
-            )
-        } else {
-            create_diff(&actual_debug, &expected_debug, edit_distance::Mode::Exact)
-        };
+        fn explain_match(&self, actual: &A) -> Description {
+            let expected_debug = format!("{:#?}", self.expected);
+            let actual_debug = format!("{:#?}", actual);
+            let description = self.describe(self.matches(actual));
 
-        format!("which {description}{diff}").into()
+            let diff = if is_multiline_string_debug(&actual_debug)
+                && is_multiline_string_debug(&expected_debug)
+            {
+                create_diff(
+                    // The two calls below return None if and only if the strings expected_debug
+                    // respectively actual_debug are not enclosed in ". The calls to
+                    // is_multiline_string_debug above ensure that they are. So the calls cannot
+                    // actually return None and unwrap() should not panic.
+                    &to_display_output(&actual_debug).unwrap(),
+                    &to_display_output(&expected_debug).unwrap(),
+                    edit_distance::Mode::Exact,
+                )
+            } else {
+                create_diff(&actual_debug, &expected_debug, edit_distance::Mode::Exact)
+            };
+
+            format!("which {description}{diff}").into()
+        }
     }
-}
 
-impl<T: Debug> Describable for EqMatcher<T> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
-            MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
+    impl<T: Debug> Describable for EqMatcher<T> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
+                MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
+            }
         }
     }
 }

@@ -20,7 +20,10 @@ use crate::{
         edit_distance,
         summarize_diff::{create_diff, create_diff_reversed},
     },
-    matchers::{eq_deref_of_matcher::EqDerefOfMatcher, eq_matcher::EqMatcher},
+    matchers::{
+        eq_deref_of_matcher::__internal::EqDerefOfMatcher,
+        eq_matcher::__internal::EqMatcher,
+    },
 };
 use std::borrow::Cow;
 use std::fmt::Debug;

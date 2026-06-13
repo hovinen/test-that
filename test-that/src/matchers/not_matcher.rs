@@ -34,35 +34,39 @@ use std::fmt::Debug;
 /// # should_pass().unwrap();
 /// # should_fail().unwrap_err();
 /// ```
-pub fn not<InnerMatcherT>(inner: InnerMatcherT) -> NotMatcher<InnerMatcherT> {
-    NotMatcher { inner }
+pub fn not<InnerMatcherT>(inner: InnerMatcherT) -> __internal::NotMatcher<InnerMatcherT> {
+    __internal::NotMatcher { inner }
 }
 
-#[doc(hidden)]
-pub struct NotMatcher<InnerMatcherT> {
-    inner: InnerMatcherT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug + ?Sized, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<InnerMatcherT> {
-    fn matches(&self, actual: &T) -> MatcherResult {
-        match self.inner.matches(actual) {
-            MatcherResult::Match => MatcherResult::NoMatch,
-            MatcherResult::NoMatch => MatcherResult::Match,
+    #[doc(hidden)]
+    pub struct NotMatcher<InnerMatcherT> {
+        pub(super) inner: InnerMatcherT,
+    }
+
+    impl<T: Debug + ?Sized, InnerMatcherT: Matcher<T>> Matcher<T> for NotMatcher<InnerMatcherT> {
+        fn matches(&self, actual: &T) -> MatcherResult {
+            match self.inner.matches(actual) {
+                MatcherResult::Match => MatcherResult::NoMatch,
+                MatcherResult::NoMatch => MatcherResult::Match,
+            }
+        }
+
+        fn explain_match(&self, actual: &T) -> Description {
+            self.inner.explain_match(actual)
         }
     }
 
-    fn explain_match(&self, actual: &T) -> Description {
-        self.inner.explain_match(actual)
-    }
-}
-
-impl<InnerMatcherT: Describable> Describable for NotMatcher<InnerMatcherT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        self.inner.describe(if matcher_result.into() {
-            MatcherResult::NoMatch
-        } else {
-            MatcherResult::Match
-        })
+    impl<InnerMatcherT: Describable> Describable for NotMatcher<InnerMatcherT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            self.inner.describe(if matcher_result.into() {
+                MatcherResult::NoMatch
+            } else {
+                MatcherResult::Match
+            })
+        }
     }
 }
 

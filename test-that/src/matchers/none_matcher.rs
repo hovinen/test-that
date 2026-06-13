@@ -32,24 +32,28 @@ use std::fmt::Debug;
 /// # should_pass().unwrap();
 /// # should_fail().unwrap_err();
 /// ```
-pub fn none() -> NoneMatcher {
-    NoneMatcher
+pub fn none() -> __internal::NoneMatcher {
+    __internal::NoneMatcher
 }
 
-#[doc(hidden)]
-pub struct NoneMatcher;
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug> Matcher<Option<T>> for NoneMatcher {
-    fn matches(&self, actual: &Option<T>) -> MatcherResult {
-        (actual.is_none()).into()
+    #[doc(hidden)]
+    pub struct NoneMatcher;
+
+    impl<T: Debug> Matcher<Option<T>> for NoneMatcher {
+        fn matches(&self, actual: &Option<T>) -> MatcherResult {
+            (actual.is_none()).into()
+        }
     }
-}
 
-impl Describable for NoneMatcher {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => "is none".into(),
-            MatcherResult::NoMatch => "is some(_)".into(),
+    impl Describable for NoneMatcher {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => "is none".into(),
+                MatcherResult::NoMatch => "is some(_)".into(),
+            }
         }
     }
 }

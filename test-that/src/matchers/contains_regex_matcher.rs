@@ -52,29 +52,36 @@ use std::ops::Deref;
 // compiler treats it as a Matcher<str> only and the code
 //   verify_that!("Some value".to_string(), contains_regex(".*value"))?;
 // doesn't compile.
-pub fn contains_regex<PatternT: Deref<Target = str>>(pattern: PatternT) -> ContainsRegexMatcher {
-    ContainsRegexMatcher { regex: Regex::new(pattern.deref()).unwrap() }
+pub fn contains_regex<PatternT: Deref<Target = str>>(
+    pattern: PatternT,
+) -> __internal::ContainsRegexMatcher {
+    __internal::ContainsRegexMatcher { regex: Regex::new(pattern.deref()).unwrap() }
 }
 
-#[doc(hidden)]
-pub struct ContainsRegexMatcher {
-    regex: Regex,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher<ActualT> for ContainsRegexMatcher {
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        self.regex.is_match(actual.as_ref()).into()
+    #[doc(hidden)]
+    pub struct ContainsRegexMatcher {
+        pub(super) regex: Regex,
     }
-}
 
-impl Describable for ContainsRegexMatcher {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("contains the regular expression {:#?}", self.regex.as_str()).into()
-            }
-            MatcherResult::NoMatch => {
-                format!("doesn't contain the regular expression {:#?}", self.regex.as_str()).into()
+    impl<ActualT: AsRef<str> + Debug + ?Sized> Matcher<ActualT> for ContainsRegexMatcher {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            self.regex.is_match(actual.as_ref()).into()
+        }
+    }
+
+    impl Describable for ContainsRegexMatcher {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => {
+                    format!("contains the regular expression {:#?}", self.regex.as_str()).into()
+                }
+                MatcherResult::NoMatch => {
+                    format!("doesn't contain the regular expression {:#?}", self.regex.as_str())
+                        .into()
+                }
             }
         }
     }

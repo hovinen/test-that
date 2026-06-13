@@ -76,30 +76,34 @@ use std::fmt::Debug;
 ///
 /// You can find the standard library `PartialOrd` implementation in
 /// <https://doc.rust-lang.org/core/cmp/trait.PartialOrd.html#implementors>
-pub fn ge<ExpectedT>(expected: ExpectedT) -> GeMatcher<ExpectedT> {
-    GeMatcher { expected }
+pub fn ge<ExpectedT>(expected: ExpectedT) -> __internal::GeMatcher<ExpectedT> {
+    __internal::GeMatcher { expected }
 }
 
-#[doc(hidden)]
-pub struct GeMatcher<ExpectedT> {
-    expected: ExpectedT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
-    for GeMatcher<ExpectedT>
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        (*actual >= self.expected).into()
+    #[doc(hidden)]
+    pub struct GeMatcher<ExpectedT> {
+        pub(super) expected: ExpectedT,
     }
-}
 
-impl<ExpectedT: Debug> Describable for GeMatcher<ExpectedT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("is greater than or equal to {:?}", self.expected).into()
+    impl<ActualT: Debug + PartialOrd<ExpectedT>, ExpectedT: Debug> Matcher<ActualT>
+        for GeMatcher<ExpectedT>
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            (*actual >= self.expected).into()
+        }
+    }
+
+    impl<ExpectedT: Debug> Describable for GeMatcher<ExpectedT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => {
+                    format!("is greater than or equal to {:?}", self.expected).into()
+                }
+                MatcherResult::NoMatch => format!("is less than {:?}", self.expected).into(),
             }
-            MatcherResult::NoMatch => format!("is less than {:?}", self.expected).into(),
         }
     }
 }

@@ -62,58 +62,65 @@ use std::hash::Hash;
 /// However, `has_entry` will offer somewhat better diagnostic messages in the
 /// case of assertion failure. And it avoid the extra allocation hidden in the
 /// code above.
-pub fn has_entry<KeyT, MatcherT>(key: KeyT, inner: MatcherT) -> HasEntryMatcher<KeyT, MatcherT> {
-    HasEntryMatcher { key, inner }
-}
-
-#[doc(hidden)]
-pub struct HasEntryMatcher<KeyT, MatcherT> {
+pub fn has_entry<KeyT, MatcherT>(
     key: KeyT,
     inner: MatcherT,
+) -> __internal::HasEntryMatcher<KeyT, MatcherT> {
+    __internal::HasEntryMatcher { key, inner }
 }
 
-impl<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>
-    Matcher<HashMap<KeyT, ValueT>> for HasEntryMatcher<KeyT, MatcherT>
-{
-    fn matches(&self, actual: &HashMap<KeyT, ValueT>) -> MatcherResult {
-        if let Some(value) = actual.get(&self.key) {
-            self.inner.matches(value)
-        } else {
-            MatcherResult::NoMatch
+pub mod __internal {
+    use super::*;
+
+    #[doc(hidden)]
+    pub struct HasEntryMatcher<KeyT, MatcherT> {
+        pub(super) key: KeyT,
+        pub(super) inner: MatcherT,
+    }
+
+    impl<KeyT: Debug + Eq + Hash, ValueT: Debug, MatcherT: Matcher<ValueT>>
+        Matcher<HashMap<KeyT, ValueT>> for HasEntryMatcher<KeyT, MatcherT>
+    {
+        fn matches(&self, actual: &HashMap<KeyT, ValueT>) -> MatcherResult {
+            if let Some(value) = actual.get(&self.key) {
+                self.inner.matches(value)
+            } else {
+                MatcherResult::NoMatch
+            }
+        }
+
+        fn explain_match(&self, actual: &HashMap<KeyT, ValueT>) -> Description {
+            if let Some(value) = actual.get(&self.key) {
+                format!(
+                    "which contains key {:?}, but is mapped to value {:#?}, {}",
+                    self.key,
+                    value,
+                    self.inner.explain_match(value)
+                )
+                .into()
+            } else {
+                format!("which doesn't contain key {:?}", self.key).into()
+            }
         }
     }
 
-    fn explain_match(&self, actual: &HashMap<KeyT, ValueT>) -> Description {
-        if let Some(value) = actual.get(&self.key) {
-            format!(
-                "which contains key {:?}, but is mapped to value {:#?}, {}",
-                self.key,
-                value,
-                self.inner.explain_match(value)
-            )
-            .into()
-        } else {
-            format!("which doesn't contain key {:?}", self.key).into()
-        }
-    }
-}
-
-impl<KeyT: Debug, MatcherT: Describable> Describable for HasEntryMatcher<KeyT, MatcherT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!(
-                "contains key {:?}, which value {}",
-                self.key,
-                self.inner.describe(MatcherResult::Match)
-            )
-            .into(),
-            MatcherResult::NoMatch => format!(
-                "doesn't contain key {:?} or contains key {:?}, which value {}",
-                self.key,
-                self.key,
-                self.inner.describe(MatcherResult::NoMatch)
-            )
-            .into(),
+    impl<KeyT: Debug, MatcherT: Describable> Describable for HasEntryMatcher<KeyT, MatcherT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!(
+                    "contains key {:?}, which value {}",
+                    self.key,
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
+                MatcherResult::NoMatch => format!(
+                    "doesn't contain key {:?} or contains key {:?}, which value {}",
+                    self.key,
+                    self.key,
+                    self.inner.describe(MatcherResult::NoMatch)
+                )
+                .into(),
+            }
         }
     }
 }

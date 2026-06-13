@@ -24,40 +24,48 @@ use std::fmt::{Debug, Display};
 /// let result = "Hello, world!";
 /// assert_that!(result, displays_as(eq("Hello, world!")));
 /// ```
-pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> DisplayMatcher<InnerMatcher> {
-    DisplayMatcher { inner }
+pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> __internal::DisplayMatcher<InnerMatcher> {
+    __internal::DisplayMatcher { inner }
 }
 
-#[doc(hidden)]
-pub struct DisplayMatcher<InnerMatcher> {
-    inner: InnerMatcher,
-}
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
-    for DisplayMatcher<InnerMatcher>
-{
-    fn matches(&self, actual: &T) -> MatcherResult {
-        self.inner.matches(&format!("{actual}"))
+    #[doc(hidden)]
+    pub struct DisplayMatcher<InnerMatcher> {
+        pub(super) inner: InnerMatcher,
     }
 
-    fn explain_match(&self, actual: &T) -> Description {
-        format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
-            .into()
-    }
-}
+    impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
+        for DisplayMatcher<InnerMatcher>
+    {
+        fn matches(&self, actual: &T) -> MatcherResult {
+            self.inner.matches(&format!("{actual}"))
+        }
 
-impl<InnerMatcher: Describable> Describable for DisplayMatcher<InnerMatcher> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("displays as a string which {}", self.inner.describe(MatcherResult::Match))
-                    .into()
-            }
-            MatcherResult::NoMatch => format!(
-                "doesn't display as a string which {}",
-                self.inner.describe(MatcherResult::Match)
+        fn explain_match(&self, actual: &T) -> Description {
+            format!(
+                "which displays as a string {}",
+                self.inner.explain_match(&format!("{actual}"))
             )
-            .into(),
+            .into()
+        }
+    }
+
+    impl<InnerMatcher: Describable> Describable for DisplayMatcher<InnerMatcher> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!(
+                    "displays as a string which {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
+                MatcherResult::NoMatch => format!(
+                    "doesn't display as a string which {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
+            }
         }
     }
 }

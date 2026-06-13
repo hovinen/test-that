@@ -32,33 +32,37 @@ use std::ops::Deref;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn points_to<MatcherT>(expected: MatcherT) -> PointsToMatcher<MatcherT> {
-    PointsToMatcher { expected }
+pub fn points_to<MatcherT>(expected: MatcherT) -> __internal::PointsToMatcher<MatcherT> {
+    __internal::PointsToMatcher { expected }
 }
 
-#[doc(hidden)]
-pub struct PointsToMatcher<MatcherT> {
-    expected: MatcherT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ExpectedT, MatcherT, ActualT> Matcher<ActualT> for PointsToMatcher<MatcherT>
-where
-    ExpectedT: Debug + ?Sized,
-    MatcherT: Matcher<ExpectedT>,
-    ActualT: Deref<Target = ExpectedT> + Debug + ?Sized,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        self.expected.matches(actual.deref())
+    #[doc(hidden)]
+    pub struct PointsToMatcher<MatcherT> {
+        pub(super) expected: MatcherT,
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        self.expected.explain_match(actual.deref())
-    }
-}
+    impl<ExpectedT, MatcherT, ActualT> Matcher<ActualT> for PointsToMatcher<MatcherT>
+    where
+        ExpectedT: Debug + ?Sized,
+        MatcherT: Matcher<ExpectedT>,
+        ActualT: Deref<Target = ExpectedT> + Debug + ?Sized,
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            self.expected.matches(actual.deref())
+        }
 
-impl<MatcherT: Describable> Describable for PointsToMatcher<MatcherT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        self.expected.describe(matcher_result)
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            self.expected.explain_match(actual.deref())
+        }
+    }
+
+    impl<MatcherT: Describable> Describable for PointsToMatcher<MatcherT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            self.expected.describe(matcher_result)
+        }
     }
 }
 

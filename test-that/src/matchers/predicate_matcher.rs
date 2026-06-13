@@ -39,19 +39,19 @@ use std::{fmt::Debug, marker::PhantomData};
 /// This is easily fixed by explicitly declaring the type of the argument
 pub fn predicate<T: Debug + ?Sized, P>(
     predicate: P,
-) -> PredicateMatcher<T, P, NoDescription, NoDescription>
+) -> PredicateMatcher<T, P, __internal::NoDescription, __internal::NoDescription>
 where
     for<'a> P: Fn(&'a T) -> bool,
 {
     PredicateMatcher {
         predicate,
-        positive_description: NoDescription,
-        negative_description: NoDescription,
+        positive_description: __internal::NoDescription,
+        negative_description: __internal::NoDescription,
         phantom: Default::default(),
     }
 }
 
-impl<T, P> PredicateMatcher<T, P, NoDescription, NoDescription> {
+impl<T, P> PredicateMatcher<T, P, __internal::NoDescription, __internal::NoDescription> {
     /// Configures this instance to provide a more meaningful description.
     ///
     /// For example, to make sure the error message is more useful
@@ -121,9 +121,11 @@ where
     }
 }
 
-// Sentinel type to tag a MatcherBuilder as without a description.
-#[doc(hidden)]
-pub struct NoDescription;
+pub mod __internal {
+    // Sentinel type to tag a MatcherBuilder as without a description.
+    #[doc(hidden)]
+    pub struct NoDescription;
+}
 
 impl<T: Debug, P, D1: PredicateDescription, D2: PredicateDescription> Matcher<T>
     for PredicateMatcher<T, P, D1, D2>
@@ -135,7 +137,8 @@ where
     }
 }
 
-impl<T: Debug, P> Matcher<T> for PredicateMatcher<T, P, NoDescription, NoDescription>
+impl<T: Debug, P> Matcher<T>
+    for PredicateMatcher<T, P, __internal::NoDescription, __internal::NoDescription>
 where
     for<'a> P: Fn(&'a T) -> bool,
 {
@@ -144,7 +147,9 @@ where
     }
 }
 
-impl<T: Debug, P> Describable for PredicateMatcher<T, P, NoDescription, NoDescription> {
+impl<T: Debug, P> Describable
+    for PredicateMatcher<T, P, __internal::NoDescription, __internal::NoDescription>
+{
     fn describe(&self, result: MatcherResult) -> Description {
         match result {
             MatcherResult::Match => "matches".into(),

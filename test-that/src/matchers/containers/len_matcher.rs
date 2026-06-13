@@ -48,39 +48,51 @@ use std::fmt::Debug;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn len<E: Matcher<usize>>(expected: E) -> LenMatcher<E> {
-    LenMatcher { expected }
+pub fn len<E: Matcher<usize>>(expected: E) -> __internal::LenMatcher<E> {
+    __internal::LenMatcher { expected }
 }
 
-#[doc(hidden)]
-pub struct LenMatcher<E> {
-    expected: E,
-}
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug + ?Sized, E: Matcher<usize>> Matcher<T> for LenMatcher<E>
-where
-    for<'a> &'a T: IntoIterator,
-{
-    fn matches(&self, actual: &T) -> MatcherResult {
-        self.expected.matches(&count_elements(actual))
+    #[doc(hidden)]
+    pub struct LenMatcher<E> {
+        pub(super) expected: E,
     }
 
-    fn explain_match(&self, actual: &T) -> Description {
-        let actual_size = count_elements(actual);
-        format!("which has length {}, {}", actual_size, self.expected.explain_match(&actual_size))
+    impl<T: Debug + ?Sized, E: Matcher<usize>> Matcher<T> for LenMatcher<E>
+    where
+        for<'a> &'a T: IntoIterator,
+    {
+        fn matches(&self, actual: &T) -> MatcherResult {
+            self.expected.matches(&count_elements(actual))
+        }
+
+        fn explain_match(&self, actual: &T) -> Description {
+            let actual_size = count_elements(actual);
+            format!(
+                "which has length {}, {}",
+                actual_size,
+                self.expected.explain_match(&actual_size)
+            )
             .into()
+        }
     }
-}
 
-impl<E: Describable> Describable for LenMatcher<E> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("has length, which {}", self.expected.describe(MatcherResult::Match)).into()
-            }
-            MatcherResult::NoMatch => {
-                format!("has length, which {}", self.expected.describe(MatcherResult::NoMatch))
+    impl<E: Describable> Describable for LenMatcher<E> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => {
+                    format!("has length, which {}", self.expected.describe(MatcherResult::Match))
+                        .into()
+                }
+                MatcherResult::NoMatch => {
+                    format!(
+                        "has length, which {}",
+                        self.expected.describe(MatcherResult::NoMatch)
+                    )
                     .into()
+                }
             }
         }
     }

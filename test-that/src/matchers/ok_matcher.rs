@@ -39,45 +39,49 @@ use std::fmt::Debug;
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn ok<InnerMatcherT>(inner: InnerMatcherT) -> OkMatcher<InnerMatcherT> {
-    OkMatcher { inner }
+pub fn ok<InnerMatcherT>(inner: InnerMatcherT) -> __internal::OkMatcher<InnerMatcherT> {
+    __internal::OkMatcher { inner }
 }
 
-#[doc(hidden)]
-pub struct OkMatcher<InnerMatcherT> {
-    inner: InnerMatcherT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug, E: Debug, InnerMatcherT: Matcher<T>> Matcher<std::result::Result<T, E>>
-    for OkMatcher<InnerMatcherT>
-{
-    fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
-        actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
+    #[doc(hidden)]
+    pub struct OkMatcher<InnerMatcherT> {
+        pub(super) inner: InnerMatcherT,
     }
 
-    fn explain_match(&self, actual: &std::result::Result<T, E>) -> Description {
-        match actual {
-            Ok(o) => {
-                Description::new().text("which is a success").nested(self.inner.explain_match(o))
+    impl<T: Debug, E: Debug, InnerMatcherT: Matcher<T>> Matcher<std::result::Result<T, E>>
+        for OkMatcher<InnerMatcherT>
+    {
+        fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
+            actual.as_ref().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
+        }
+
+        fn explain_match(&self, actual: &std::result::Result<T, E>) -> Description {
+            match actual {
+                Ok(o) => {
+                    Description::new().text("which is a success").nested(self.inner.explain_match(o))
+                }
+                Err(_) => "which is an error".into(),
             }
-            Err(_) => "which is an error".into(),
         }
     }
-}
 
-impl<InnerMatcherT: Describable> Describable for OkMatcher<InnerMatcherT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!(
-                "is a success containing a value, which {}",
-                self.inner.describe(MatcherResult::Match)
-            )
-            .into(),
-            MatcherResult::NoMatch => format!(
-                "is an error or a success containing a value, which {}",
-                self.inner.describe(MatcherResult::NoMatch)
-            )
-            .into(),
+    impl<InnerMatcherT: Describable> Describable for OkMatcher<InnerMatcherT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!(
+                    "is a success containing a value, which {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
+                MatcherResult::NoMatch => format!(
+                    "is an error or a success containing a value, which {}",
+                    self.inner.describe(MatcherResult::NoMatch)
+                )
+                .into(),
+            }
         }
     }
 }

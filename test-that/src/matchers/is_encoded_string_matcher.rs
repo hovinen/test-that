@@ -49,50 +49,60 @@ use std::fmt::Debug;
 /// # should_fail_1().unwrap_err();
 /// # should_fail_2().unwrap_err();
 /// ```
-pub fn is_utf8_string<InnerMatcherT>(inner: InnerMatcherT) -> IsEncodedStringMatcher<InnerMatcherT>
+pub fn is_utf8_string<InnerMatcherT>(
+    inner: InnerMatcherT,
+) -> __internal::IsEncodedStringMatcher<InnerMatcherT>
 where
     InnerMatcherT: Matcher<String>,
 {
-    IsEncodedStringMatcher { inner }
+    __internal::IsEncodedStringMatcher { inner }
 }
 
-#[doc(hidden)]
-pub struct IsEncodedStringMatcher<InnerMatcherT> {
-    inner: InnerMatcherT,
-}
+pub mod __internal {
+    use super::*;
 
-impl<'a, ActualT: AsRef<[u8]> + Debug + 'a, InnerMatcherT: Matcher<String>> Matcher<ActualT>
-    for IsEncodedStringMatcher<InnerMatcherT>
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        String::from_utf8(actual.as_ref().to_vec())
-            .map(|s| self.inner.matches(&s))
-            .unwrap_or(MatcherResult::NoMatch)
+    #[doc(hidden)]
+    pub struct IsEncodedStringMatcher<InnerMatcherT> {
+        pub(super) inner: InnerMatcherT,
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        match String::from_utf8(actual.as_ref().to_vec()) {
-            Ok(s) => {
-                format!("which is a UTF-8 encoded string {}", self.inner.explain_match(&s)).into()
+    impl<'a, ActualT: AsRef<[u8]> + Debug + 'a, InnerMatcherT: Matcher<String>> Matcher<ActualT>
+        for IsEncodedStringMatcher<InnerMatcherT>
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            String::from_utf8(actual.as_ref().to_vec())
+                .map(|s| self.inner.matches(&s))
+                .unwrap_or(MatcherResult::NoMatch)
+        }
+
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            match String::from_utf8(actual.as_ref().to_vec()) {
+                Ok(s) => {
+                    format!(
+                        "which is a UTF-8 encoded string {}",
+                        self.inner.explain_match(&s)
+                    )
+                    .into()
+                }
+                Err(e) => format!("which is not a UTF-8 encoded string: {e}").into(),
             }
-            Err(e) => format!("which is not a UTF-8 encoded string: {e}").into(),
         }
     }
-}
 
-impl<InnerMatcherT: Describable> Describable for IsEncodedStringMatcher<InnerMatcherT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!(
-                "is a UTF-8 encoded string which {}",
-                self.inner.describe(MatcherResult::Match)
-            )
-            .into(),
-            MatcherResult::NoMatch => format!(
-                "is not a UTF-8 encoded string which {}",
-                self.inner.describe(MatcherResult::Match)
-            )
-            .into(),
+    impl<InnerMatcherT: Describable> Describable for IsEncodedStringMatcher<InnerMatcherT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!(
+                    "is a UTF-8 encoded string which {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
+                MatcherResult::NoMatch => format!(
+                    "is not a UTF-8 encoded string which {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
+            }
         }
     }
 }

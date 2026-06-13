@@ -77,115 +77,127 @@ use std::marker::PhantomData;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn each<MatcherT, Mode>(inner: MatcherT) -> EachMatcher<MatcherT, Mode> {
-    EachMatcher { inner, phantom: PhantomData }
+pub fn each<MatcherT, Mode>(inner: MatcherT) -> __internal::EachMatcher<MatcherT, Mode> {
+    __internal::EachMatcher { inner, phantom: PhantomData }
 }
 
-#[doc(hidden)]
-pub struct EachMatcher<MatcherT, Mode> {
-    inner: MatcherT,
-    phantom: PhantomData<Mode>,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT: Matcher<ElementT>> Matcher<ActualT>
-    for EachMatcher<MatcherT, RefItems>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        for element in actual {
-            if self.inner.matches(element).is_no_match() {
-                return MatcherResult::NoMatch;
-            }
-        }
-        MatcherResult::Match
+    #[doc(hidden)]
+    pub struct EachMatcher<MatcherT, Mode> {
+        pub(super) inner: MatcherT,
+        pub(super) phantom: PhantomData<Mode>,
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        let mut non_matching_elements = Vec::new();
-        for (index, element) in actual.into_iter().enumerate() {
-            if self.inner.matches(element).is_no_match() {
-                non_matching_elements.push((index, element, self.inner.explain_match(element)));
+    impl<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT: Matcher<ElementT>> Matcher<ActualT>
+        for EachMatcher<MatcherT, RefItems>
+    where
+        for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            for element in actual {
+                if self.inner.matches(element).is_no_match() {
+                    return MatcherResult::NoMatch;
+                }
             }
+            MatcherResult::Match
         }
-        if non_matching_elements.is_empty() {
-            return format!("whose each element {}", self.inner.describe(MatcherResult::Match))
+
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            let mut non_matching_elements = Vec::new();
+            for (index, element) in actual.into_iter().enumerate() {
+                if self.inner.matches(element).is_no_match() {
+                    non_matching_elements.push((index, element, self.inner.explain_match(element)));
+                }
+            }
+            if non_matching_elements.is_empty() {
+                return format!(
+                    "whose each element {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
                 .into();
-        }
-        if non_matching_elements.len() == 1 {
-            let (idx, element, explanation) = non_matching_elements.remove(0);
-            return format!("whose element #{idx} is {element:?}, {explanation}").into();
-        }
-
-        let failed_indexes = non_matching_elements
-            .iter()
-            .map(|&(idx, _, _)| format!("#{idx}"))
-            .collect::<Vec<_>>()
-            .join(", ");
-        let element_explanations = non_matching_elements
-            .iter()
-            .map(|&(_, element, ref explanation)| format!("{element:?}, {explanation}"))
-            .collect::<Description>()
-            .indent();
-        format!("whose elements {failed_indexes} don't match\n{element_explanations}").into()
-    }
-}
-
-impl<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT: Matcher<ElementT>> Matcher<ActualT>
-    for EachMatcher<MatcherT, OwnedItems>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        for element in actual {
-            if self.inner.matches(&element).is_no_match() {
-                return MatcherResult::NoMatch;
             }
+            if non_matching_elements.len() == 1 {
+                let (idx, element, explanation) = non_matching_elements.remove(0);
+                return format!("whose element #{idx} is {element:?}, {explanation}").into();
+            }
+
+            let failed_indexes = non_matching_elements
+                .iter()
+                .map(|&(idx, _, _)| format!("#{idx}"))
+                .collect::<Vec<_>>()
+                .join(", ");
+            let element_explanations = non_matching_elements
+                .iter()
+                .map(|&(_, element, ref explanation)| format!("{element:?}, {explanation}"))
+                .collect::<Description>()
+                .indent();
+            format!("whose elements {failed_indexes} don't match\n{element_explanations}").into()
         }
-        MatcherResult::Match
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        let mut non_matching_elements = Vec::new();
-        for (index, element) in actual.into_iter().enumerate() {
-            if self.inner.matches(&element).is_no_match() {
-                let explanation = self.inner.explain_match(&element);
-                non_matching_elements.push((index, element, explanation));
+    impl<ElementT: Debug, ActualT: Debug + ?Sized, MatcherT: Matcher<ElementT>> Matcher<ActualT>
+        for EachMatcher<MatcherT, OwnedItems>
+    where
+        for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            for element in actual {
+                if self.inner.matches(&element).is_no_match() {
+                    return MatcherResult::NoMatch;
+                }
             }
+            MatcherResult::Match
         }
-        if non_matching_elements.is_empty() {
-            return format!("whose each element {}", self.inner.describe(MatcherResult::Match))
+
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            let mut non_matching_elements = Vec::new();
+            for (index, element) in actual.into_iter().enumerate() {
+                if self.inner.matches(&element).is_no_match() {
+                    let explanation = self.inner.explain_match(&element);
+                    non_matching_elements.push((index, element, explanation));
+                }
+            }
+            if non_matching_elements.is_empty() {
+                return format!(
+                    "whose each element {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
                 .into();
-        }
-        if non_matching_elements.len() == 1 {
-            let (idx, element, explanation) = non_matching_elements.remove(0);
-            return format!("whose element #{idx} is {element:?}, {explanation}").into();
-        }
-
-        let failed_indexes = non_matching_elements
-            .iter()
-            .map(|&(idx, _, _)| format!("#{idx}"))
-            .collect::<Vec<_>>()
-            .join(", ");
-        let element_explanations = non_matching_elements
-            .iter()
-            .map(|&(_, ref element, ref explanation)| format!("{element:?}, {explanation}"))
-            .collect::<Description>()
-            .indent();
-        format!("whose elements {failed_indexes} don't match\n{element_explanations}").into()
-    }
-}
-
-impl<MatcherT: Describable, Mode> Describable for EachMatcher<MatcherT, Mode> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("only contains elements that {}", self.inner.describe(MatcherResult::Match))
-                    .into()
             }
-            MatcherResult::NoMatch => {
-                format!("contains no element that {}", self.inner.describe(MatcherResult::Match))
-                    .into()
+            if non_matching_elements.len() == 1 {
+                let (idx, element, explanation) = non_matching_elements.remove(0);
+                return format!("whose element #{idx} is {element:?}, {explanation}").into();
+            }
+
+            let failed_indexes = non_matching_elements
+                .iter()
+                .map(|&(idx, _, _)| format!("#{idx}"))
+                .collect::<Vec<_>>()
+                .join(", ");
+            let element_explanations = non_matching_elements
+                .iter()
+                .map(|&(_, ref element, ref explanation)| format!("{element:?}, {explanation}"))
+                .collect::<Description>()
+                .indent();
+            format!("whose elements {failed_indexes} don't match\n{element_explanations}").into()
+        }
+    }
+
+    impl<MatcherT: Describable, Mode> Describable for EachMatcher<MatcherT, Mode> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!(
+                    "only contains elements that {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
+                MatcherResult::NoMatch => format!(
+                    "contains no element that {}",
+                    self.inner.describe(MatcherResult::Match)
+                )
+                .into(),
             }
         }
     }

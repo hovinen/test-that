@@ -87,105 +87,109 @@ use std::{fmt::Debug, marker::PhantomData};
 /// items. It should not be used on especially large containers.
 pub fn superset_of<ExpectedT: Debug, Mode>(
     subset: ExpectedT,
-) -> SupersetOfMatcher<ExpectedT, Mode> {
-    SupersetOfMatcher { subset, phantom: Default::default() }
+) -> __internal::SupersetOfMatcher<ExpectedT, Mode> {
+    __internal::SupersetOfMatcher { subset, phantom: Default::default() }
 }
 
-#[doc(hidden)]
-pub struct SupersetOfMatcher<ExpectedT, Mode> {
-    subset: ExpectedT,
-    phantom: PhantomData<Mode>,
-}
+pub mod __internal {
+    use super::*;
 
-impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
-    for SupersetOfMatcher<ExpectedT, RefItems>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
-    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        for expected_item in &self.subset {
-            if Self::actual_is_missing(actual, expected_item) {
-                return MatcherResult::NoMatch;
-            }
-        }
-        MatcherResult::Match
+    #[doc(hidden)]
+    pub struct SupersetOfMatcher<ExpectedT, Mode> {
+        pub(super) subset: ExpectedT,
+        pub(super) phantom: PhantomData<Mode>,
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        let missing_items: Vec<_> = self
-            .subset
-            .into_iter()
-            .filter(|expected_item| Self::actual_is_missing(actual, expected_item))
-            .map(|expected_item| format!("{expected_item:#?}"))
-            .collect();
-        match missing_items.len() {
-            0 => "whose no element is missing".into(),
-            1 => format!("whose element {} is missing", &missing_items[0]).into(),
-            _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
-        }
-    }
-}
-
-impl<ExpectedT: Debug> SupersetOfMatcher<ExpectedT, RefItems> {
-    fn actual_is_missing<ElementT: PartialEq, ActualT: ?Sized>(
-        actual: &ActualT,
-        needle: &ElementT,
-    ) -> bool
+    impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
+        for SupersetOfMatcher<ExpectedT, RefItems>
     where
         for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
+        for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
     {
-        !actual.into_iter().any(|item| *item == *needle)
-    }
-}
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            for expected_item in &self.subset {
+                if Self::actual_is_missing(actual, expected_item) {
+                    return MatcherResult::NoMatch;
+                }
+            }
+            MatcherResult::Match
+        }
 
-impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
-    for SupersetOfMatcher<ExpectedT, OwnedItems>
-where
-    for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
-    for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        for expected_item in &self.subset {
-            if Self::actual_is_missing(actual, expected_item) {
-                return MatcherResult::NoMatch;
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            let missing_items: Vec<_> = self
+                .subset
+                .into_iter()
+                .filter(|expected_item| Self::actual_is_missing(actual, expected_item))
+                .map(|expected_item| format!("{expected_item:#?}"))
+                .collect();
+            match missing_items.len() {
+                0 => "whose no element is missing".into(),
+                1 => format!("whose element {} is missing", &missing_items[0]).into(),
+                _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
             }
         }
-        MatcherResult::Match
     }
 
-    fn explain_match(&self, actual: &ActualT) -> Description {
-        let missing_items: Vec<_> = self
-            .subset
-            .into_iter()
-            .filter(|expected_item| Self::actual_is_missing(actual, expected_item))
-            .map(|expected_item| format!("{expected_item:#?}"))
-            .collect();
-        match missing_items.len() {
-            0 => "whose no element is missing".into(),
-            1 => format!("whose element {} is missing", &missing_items[0]).into(),
-            _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
+    impl<ExpectedT: Debug> SupersetOfMatcher<ExpectedT, RefItems> {
+        fn actual_is_missing<ElementT: PartialEq, ActualT: ?Sized>(
+            actual: &ActualT,
+            needle: &ElementT,
+        ) -> bool
+        where
+            for<'a> &'a ActualT: IntoIterator<Item = &'a ElementT>,
+        {
+            !actual.into_iter().any(|item| *item == *needle)
         }
     }
-}
 
-impl<ExpectedT: Debug> SupersetOfMatcher<ExpectedT, OwnedItems> {
-    fn actual_is_missing<ElementT: PartialEq, ActualT: ?Sized>(
-        actual: &ActualT,
-        needle: &ElementT,
-    ) -> bool
+    impl<ElementT: Debug + PartialEq, ActualT: Debug + ?Sized, ExpectedT: Debug> Matcher<ActualT>
+        for SupersetOfMatcher<ExpectedT, OwnedItems>
     where
         for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+        for<'a> &'a ExpectedT: IntoIterator<Item = &'a ElementT>,
     {
-        !actual.into_iter().any(|item| item == *needle)
-    }
-}
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            for expected_item in &self.subset {
+                if Self::actual_is_missing(actual, expected_item) {
+                    return MatcherResult::NoMatch;
+                }
+            }
+            MatcherResult::Match
+        }
 
-impl<ExpectedT: Debug, Mode> Describable for SupersetOfMatcher<ExpectedT, Mode> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => format!("is a superset of {:#?}", self.subset).into(),
-            MatcherResult::NoMatch => format!("isn't a superset of {:#?}", self.subset).into(),
+        fn explain_match(&self, actual: &ActualT) -> Description {
+            let missing_items: Vec<_> = self
+                .subset
+                .into_iter()
+                .filter(|expected_item| Self::actual_is_missing(actual, expected_item))
+                .map(|expected_item| format!("{expected_item:#?}"))
+                .collect();
+            match missing_items.len() {
+                0 => "whose no element is missing".into(),
+                1 => format!("whose element {} is missing", &missing_items[0]).into(),
+                _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
+            }
+        }
+    }
+
+    impl<ExpectedT: Debug> SupersetOfMatcher<ExpectedT, OwnedItems> {
+        fn actual_is_missing<ElementT: PartialEq, ActualT: ?Sized>(
+            actual: &ActualT,
+            needle: &ElementT,
+        ) -> bool
+        where
+            for<'a> &'a ActualT: IntoIterator<Item = ElementT>,
+        {
+            !actual.into_iter().any(|item| item == *needle)
+        }
+    }
+
+    impl<ExpectedT: Debug, Mode> Describable for SupersetOfMatcher<ExpectedT, Mode> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => format!("is a superset of {:#?}", self.subset).into(),
+                MatcherResult::NoMatch => format!("isn't a superset of {:#?}", self.subset).into(),
+            }
         }
     }
 }

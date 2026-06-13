@@ -62,37 +62,42 @@ use std::ops::Deref;
 // doesn't compile.
 pub fn matches_regex<PatternT: Deref<Target = str>>(
     pattern: PatternT,
-) -> MatchesRegexMatcher<PatternT> {
+) -> __internal::MatchesRegexMatcher<PatternT> {
     let adjusted_pattern = format!("^{}$", pattern.deref());
     let regex = Regex::new(adjusted_pattern.as_str()).unwrap();
-    MatchesRegexMatcher { regex, pattern, _adjusted_pattern: adjusted_pattern }
+    __internal::MatchesRegexMatcher { regex, pattern, _adjusted_pattern: adjusted_pattern }
 }
 
-#[doc(hidden)]
-pub struct MatchesRegexMatcher<PatternT: Deref<Target = str>> {
-    regex: Regex,
-    pattern: PatternT,
-    _adjusted_pattern: String,
-}
+pub mod __internal {
+    use super::*;
 
-impl<PatternT, ActualT> Matcher<ActualT> for MatchesRegexMatcher<PatternT>
-where
-    PatternT: Deref<Target = str>,
-    ActualT: AsRef<str> + Debug + ?Sized,
-{
-    fn matches(&self, actual: &ActualT) -> MatcherResult {
-        self.regex.is_match(actual.as_ref()).into()
+    #[doc(hidden)]
+    pub struct MatchesRegexMatcher<PatternT: Deref<Target = str>> {
+        pub(super) regex: Regex,
+        pub(super) pattern: PatternT,
+        pub(super) _adjusted_pattern: String,
     }
-}
 
-impl<PatternT: Deref<Target = str>> Describable for MatchesRegexMatcher<PatternT> {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        match matcher_result {
-            MatcherResult::Match => {
-                format!("matches the regular expression {:#?}", self.pattern.deref()).into()
-            }
-            MatcherResult::NoMatch => {
-                format!("doesn't match the regular expression {:#?}", self.pattern.deref()).into()
+    impl<PatternT, ActualT> Matcher<ActualT> for MatchesRegexMatcher<PatternT>
+    where
+        PatternT: Deref<Target = str>,
+        ActualT: AsRef<str> + Debug + ?Sized,
+    {
+        fn matches(&self, actual: &ActualT) -> MatcherResult {
+            self.regex.is_match(actual.as_ref()).into()
+        }
+    }
+
+    impl<PatternT: Deref<Target = str>> Describable for MatchesRegexMatcher<PatternT> {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            match matcher_result {
+                MatcherResult::Match => {
+                    format!("matches the regular expression {:#?}", self.pattern.deref()).into()
+                }
+                MatcherResult::NoMatch => {
+                    format!("doesn't match the regular expression {:#?}", self.pattern.deref())
+                        .into()
+                }
             }
         }
     }

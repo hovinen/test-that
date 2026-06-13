@@ -21,7 +21,7 @@
 ///
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]
-pub mod internal {
+pub mod __internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;

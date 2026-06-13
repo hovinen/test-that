@@ -64,7 +64,7 @@ macro_rules! __all {
 ///
 /// For internal use only. API stablility is not guaranteed!
 #[doc(hidden)]
-pub mod internal {
+pub mod __internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matchers::anything;
@@ -152,7 +152,7 @@ pub mod internal {
 
 #[cfg(test)]
 mod tests {
-    use super::internal;
+    use super::__internal;
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
@@ -161,7 +161,7 @@ mod tests {
     fn description_shows_more_than_one_matcher() -> TestResult<()> {
         let first_matcher = starts_with("A");
         let second_matcher = ends_with("string");
-        let matcher: internal::AllMatcher<String, 2> = all!(first_matcher, second_matcher);
+        let matcher: __internal::AllMatcher<String, 2> = all!(first_matcher, second_matcher);
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -177,7 +177,7 @@ mod tests {
     #[test]
     fn description_shows_one_matcher_directly() -> TestResult<()> {
         let first_matcher = starts_with("A");
-        let matcher: internal::AllMatcher<String, 1> = all!(first_matcher);
+        let matcher: __internal::AllMatcher<String, 1> = all!(first_matcher);
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -190,7 +190,7 @@ mod tests {
     -> TestResult<()> {
         let first_matcher = starts_with("Another");
         let second_matcher = ends_with("string");
-        let matcher: internal::AllMatcher<str, 2> = all!(first_matcher, second_matcher);
+        let matcher: __internal::AllMatcher<str, 2> = all!(first_matcher, second_matcher);
 
         verify_that!(
             matcher.explain_match("A string"),
@@ -201,7 +201,7 @@ mod tests {
     #[test]
     fn mismatch_description_is_simple_when_only_one_consistuent() -> TestResult<()> {
         let first_matcher = starts_with("Another");
-        let matcher: internal::AllMatcher<str, 1> = all!(first_matcher);
+        let matcher: __internal::AllMatcher<str, 1> = all!(first_matcher);
 
         verify_that!(
             matcher.explain_match("A string"),

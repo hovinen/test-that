@@ -13,9 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{convert::Infallible, ops::Deref};
-
 use indoc::indoc;
+use std::{convert::Infallible, ops::Deref};
 use test_that::prelude::*;
 
 #[test]

@@ -21,7 +21,7 @@
 ///
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]
-pub mod internal {
+pub mod __internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
@@ -29,7 +29,7 @@ pub mod internal {
         OwnedItems, RefItems,
         container_contains::{PairBorrow, Requirements},
     };
-    use crate::prelude::__internal::ContainerContainsOrderedMatcher;
+    use crate::matchers::__internal::ContainerContainsOrderedMatcher;
     use std::borrow::Borrow;
     use std::collections::HashSet;
     use std::fmt::Debug;
@@ -763,7 +763,7 @@ pub mod internal {
 
 #[cfg(test)]
 mod tests {
-    use super::internal::MapContainsMatcher;
+    use super::__internal::MapContainsMatcher;
     use crate::matcher::Matcher;
     use crate::matchers::containers::RefItems;
     use crate::prelude::*;

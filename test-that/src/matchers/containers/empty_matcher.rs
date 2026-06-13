@@ -38,25 +38,29 @@ use std::fmt::Debug;
 /// See [module documentation][crate::matchers::containers] for information about
 /// what types this matcher can match.
 
-pub fn empty() -> EmptyMatcher {
-    EmptyMatcher
+pub fn empty() -> __internal::EmptyMatcher {
+    __internal::EmptyMatcher
 }
 
-#[doc(hidden)]
-pub struct EmptyMatcher;
+pub mod __internal {
+    use super::*;
 
-impl<T: Debug + ?Sized> Matcher<T> for EmptyMatcher
-where
-    for<'a> &'a T: IntoIterator,
-{
-    fn matches(&self, actual: &T) -> MatcherResult {
-        actual.into_iter().next().is_none().into()
+    #[doc(hidden)]
+    pub struct EmptyMatcher;
+
+    impl<T: Debug + ?Sized> Matcher<T> for EmptyMatcher
+    where
+        for<'a> &'a T: IntoIterator,
+    {
+        fn matches(&self, actual: &T) -> MatcherResult {
+            actual.into_iter().next().is_none().into()
+        }
     }
-}
 
-impl Describable for EmptyMatcher {
-    fn describe(&self, matcher_result: MatcherResult) -> Description {
-        if matcher_result.into() { "is empty" } else { "isn't empty" }.into()
+    impl Describable for EmptyMatcher {
+        fn describe(&self, matcher_result: MatcherResult) -> Description {
+            if matcher_result.into() { "is empty" } else { "isn't empty" }.into()
+        }
     }
 }
 
