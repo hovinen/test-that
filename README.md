@@ -16,6 +16,24 @@
 
 Test That! is a powerful test assertion library for Rust.
 
+## TL;DR
+
+Write test assertions which precisely specify your _intent_:
+
+```rust
+let vec = vec![5, 123, -4];
+assert_that!(vec, each(gt(0)));
+```
+
+and get informative, meaningful diagnostics when the tests fail:
+
+```
+Value of: vec
+Expected: only contains elements that is greater than 0
+Actual: [5, 123, -4],
+  whose element #2 is -4, which is less than or equal to 0
+```
+
 ## Background
 
 The existing assertions which come with Rust are fairly primitive:
