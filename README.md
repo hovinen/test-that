@@ -217,7 +217,7 @@ fn struct_has_expected_values() {
 
 One can write one's own matchers. To do so, create a struct holding the
 matcher's data and have it implement the traits [`Matcher`] and
-['Describable']:
+[`Describable`]:
 
 ```rust
 pub struct MyEqMatcher<T> {
@@ -508,6 +508,5 @@ to this project.
 [`Describable`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describable.html
 [`Describe`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describe.html
 [`Matcher`]: https://docs.rs/test_that/*/test_that/matcher/trait.Matcher.html
-[`Describable`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describable.html
 [`Result`]: https://docs.rs/test_that/*/test_that/type.Result.html
 [`TestResult`]: https://docs.rs/test-that/0.1.0/test_that/type.TestResult.html
