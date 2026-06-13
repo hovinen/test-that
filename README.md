@@ -1,5 +1,7 @@
 # Test That!
 
+[![crates.io][crates-badge]][crates-url]
+[![docs.rs][docs-badge]][docs-url]
 [![Apache licensed][license-badge]][license-url]
 [![Build Status][actions-badge]][actions-url]
 
@@ -13,10 +15,6 @@
 [actions-url]: https://github.com/hovinen/test-that/actions?query=workflow%3ACI+branch%3Amain
 
 Test That! is a powerful test assertion library for Rust.
-
-> [!NOTE]
-> This is not yet released on crates.io. There is still some work to be done on
-> it.
 
 ## Background
 
