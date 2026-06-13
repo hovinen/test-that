@@ -32,7 +32,7 @@ authors = [
 ]
 
 [features]
-default = []
+default = ["regex"]
 googletest-compat = []
 googletest-migrate = ["googletest-compat"]
 
@@ -41,7 +41,7 @@ test-that-macro = { path = "../test-that-macro", version = "0.1.0" }
 anyhow = { version = "1", optional = true }
 num-traits = "0.2.17"
 proptest = { version = "1.11.0", optional = true }
-regex = "1.12.3"
+regex = { version = "1.12.3", optional = true }
 
 [dev-dependencies]
 indoc = "2"

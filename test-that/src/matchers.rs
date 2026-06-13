@@ -21,6 +21,7 @@ mod anything_matcher;
 mod char_count_matcher;
 mod conjunction_matcher;
 pub mod containers;
+#[cfg(feature = "regex")]
 mod contains_regex_matcher;
 mod disjunction_matcher;
 mod display_matcher;
@@ -37,6 +38,7 @@ mod is_nan_matcher;
 mod le_matcher;
 mod lt_matcher;
 mod matches_pattern;
+#[cfg(feature = "regex")]
 mod matches_regex_matcher;
 mod near_matcher;
 mod none_matcher;
@@ -51,6 +53,7 @@ mod tuple_matcher;
 
 pub use anything_matcher::anything;
 pub use char_count_matcher::char_count;
+#[cfg(feature = "regex")]
 pub use contains_regex_matcher::contains_regex;
 pub use display_matcher::displays_as;
 pub use eq_deref_of_matcher::eq_deref_of;
@@ -63,6 +66,7 @@ pub use is_encoded_string_matcher::is_utf8_string;
 pub use is_nan_matcher::is_nan;
 pub use le_matcher::le;
 pub use lt_matcher::lt;
+#[cfg(feature = "regex")]
 pub use matches_regex_matcher::matches_regex;
 pub use near_matcher::{NearMatcher, approx_eq, near};
 pub use none_matcher::none;

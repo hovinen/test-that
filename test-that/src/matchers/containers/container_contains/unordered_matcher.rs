@@ -25,11 +25,11 @@ pub mod __internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
+    use crate::matchers::__internal::ContainerContainsOrderedMatcher;
     use crate::matchers::containers::{
         OwnedItems, RefItems,
         container_contains::{PairBorrow, Requirements},
     };
-    use crate::matchers::__internal::ContainerContainsOrderedMatcher;
     use std::borrow::Borrow;
     use std::collections::HashSet;
     use std::fmt::Debug;
@@ -798,6 +798,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "regex")]
     #[test]
     fn contains_exactly_description_no_full_match_with_map() -> TestResult<()> {
         // ContainerContainsUnorderedMatcher maintains references to the matchers, so
