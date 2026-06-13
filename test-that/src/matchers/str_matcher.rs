@@ -146,9 +146,15 @@ pub fn ends_with<T>(expected: T) -> StrMatcher<T> {
 
 /// Extension trait to configure [`StrMatcher`].
 ///
-/// Matchers which match against string values and, through configuration,
-/// specialise to [`StrMatcher`] implement this trait. That includes
-/// [`EqMatcher`] and [`StrMatcher`].
+/// This can be used with the following matchers:
+///
+///  * [`eq`][crate::matchers::eq_matcher::eq] when used with types which deref to `str`, including
+///    `String` and `&str`,
+///  * [`eq_deref_of`][crate::matchers::eq_deref_of_matcher::eq_deref_of] when used with types which
+///    deref to `str`,
+///  * [`contains_substring`],
+///  * [`starts_with`],
+///  * [`ends_with`].
 pub trait StrMatcherConfigurator<ExpectedT> {
     /// Configures the matcher to ignore any leading whitespace in either the
     /// actual or the expected value.
@@ -275,12 +281,15 @@ pub trait StrMatcherConfigurator<ExpectedT> {
 /// A matcher which matches equality or containment of a string-like value in a
 /// configurable way.
 ///
-/// The following matcher methods instantiate this:
+/// See [`StrMatcherConfigurator`] for methods which modify the behaviour of this
+/// matcher.
 ///
-///  * [`eq`][crate::matchers::eq_matcher::eq],
+/// The following matcher functions instantiate this:
+///
 ///  * [`contains_substring`],
 ///  * [`starts_with`],
-///  * [`ends_with`].
+///  * [`ends_with`],
+///  * all methods of [`StrMatcherConfigurator`].
 pub struct StrMatcher<ExpectedT> {
     expected: ExpectedT,
     configuration: Configuration,
