@@ -474,6 +474,9 @@ The key differences include:
 * The `matches_pattern!` matcher in Test That! does not support exhaustive
   matching. The `..` syntax used in GoogleTest is neither necessary nor allowed.
 
+* The attribute macro to enable non-fatal assertions in Test That! is
+  `#[test_that::test]` rather than `#[gtest]`.
+
 * Test That! has no `verify_eq!` or similar. Use `verify_that!(.., eq())`.
 
 * Test That! also has no matcher `ne`. Use `not(eq(..))`.
