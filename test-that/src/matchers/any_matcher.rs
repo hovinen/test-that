@@ -57,8 +57,7 @@
 #[doc(hidden)]
 macro_rules! __any {
     ($($matcher:expr),* $(,)?) => {{
-        use $crate::matchers::__internal::AnyMatcher;
-        AnyMatcher::new([$(Box::new($matcher)),*])
+        $crate::matchers::__internal::AnyMatcher::new([$(Box::new($matcher)),*])
     }}
 }
 

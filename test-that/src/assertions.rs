@@ -389,8 +389,7 @@ macro_rules! assert_pred {
 #[macro_export]
 macro_rules! expect_that {
     ($actual:expr, $expected:expr $(,)?) => {{
-        use $crate::TestResultExt;
-        $crate::verify_that!($actual, $expected).and_log_failure();
+        $crate::TestResultExt::and_log_failure($crate::verify_that!($actual, $expected));
     }};
 
     ($actual:expr, $expected:expr, $($format_args:expr),* $(,)?) => {
@@ -420,8 +419,7 @@ macro_rules! expect_that {
 #[macro_export]
 macro_rules! expect_pred {
     ($($content:tt)*) => {{
-        use $crate::TestResultExt;
-        $crate::verify_pred!($($content)*).and_log_failure();
+        $crate::TestResultExt::and_log_failure($crate::verify_pred!($($content)*));
     }};
 }
 

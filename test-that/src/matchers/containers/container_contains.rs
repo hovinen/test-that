@@ -387,27 +387,24 @@ macro_rules! __contains_each {
 #[doc(hidden)]
 macro_rules! __is_contained_in {
     ($(,)?) => {{
-        use $crate::matchers::__internal::{
-            ContainerContainsUnorderedMatcher, Requirements
-        };
-        ContainerContainsUnorderedMatcher::new([], Requirements::Subset)
+        $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
+            [],
+            $crate::matchers::__internal::Requirements::Subset,
+        )
     }};
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
-        use $crate::matchers::__internal::{
-            MapContainsMatcher, Requirements
-        };
-        MapContainsMatcher::new(
+        $crate::matchers::__internal::MapContainsMatcher::new(
             [$((Box::new($key_matcher), Box::new($value_matcher))),*],
-            Requirements::Subset
+            $crate::matchers::__internal::Requirements::Subset,
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
-        use $crate::matchers::__internal::{
-            ContainerContainsUnorderedMatcher, Requirements
-        };
-        ContainerContainsUnorderedMatcher::new([$(Box::new($matcher)),*], Requirements::Subset)
+        $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
+            [$(Box::new($matcher)),*],
+            $crate::matchers::__internal::Requirements::Subset,
+        )
     }}
 }
 
