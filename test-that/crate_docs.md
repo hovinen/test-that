@@ -43,6 +43,7 @@ fn fails_and_panics() {
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test_that::test]
 # */
+# #[cfg(feature = "test-that-macro")]
 fn two_logged_failures() {
     let value = 2;
     expect_that!(value, eq(4)); // Test now failed, but continues executing.
@@ -73,6 +74,7 @@ Matchers are composable:
 ```
 use test_that::prelude::*;
 
+# #[cfg(feature = "test-that-macro")] {
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test_that::test]
 # */
@@ -84,6 +86,7 @@ fn contains_at_least_one_item_at_least_3() {
 #     .unwrap();
 }
 # contains_at_least_one_item_at_least_3();
+# }
 ```
 
 They can also be logically combined:
@@ -91,6 +94,7 @@ They can also be logically combined:
 ```
 use test_that::prelude::*;
 
+# #[cfg(feature = "test-that-macro")] {
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test_that::test]
 # */
@@ -113,6 +117,7 @@ fn outside_interval_from_0_to_2() {
 #     .unwrap();
 }
 # outside_interval_from_0_to_2();
+# }
 ```
 
 ## Available matchers
@@ -448,6 +453,7 @@ The new matcher can then be used in the assertion macros:
 # pub fn eq_my_way<T>(expected: T) -> MyEqMatcher<T> {
 #     MyEqMatcher { expected }
 # }
+# #[cfg(feature = "test-that-macro")] {
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test_that::test]
 # */
@@ -458,6 +464,7 @@ fn should_be_equal_by_my_definition() {
 #     .unwrap();
 }
 # should_be_equal_by_my_definition();
+# }
 ```
 
 ## Non-fatal assertions
@@ -472,6 +479,8 @@ also be marked with [`test_that::test`][crate::test] instead of the
 Rust-standard `#[test]`.
 
 ```no_run
+# use test_that::prelude::*;
+# #[cfg(feature = "test-that-macro")] {
 use test_that::prelude::*;
 
 #[test_that::test]
@@ -481,12 +490,15 @@ fn three_non_fatal_assertions() {
     expect_that!(value, eq(3));  // Fails; logs failure and marks the test failed.
     expect_that!(value, eq(4));  // A second failure, also logged.
 }
+# }
 ```
 
 This can be used in the same tests as `verify_that!`, in which case the test
 function must also return [`TestResult<()>`]:
 
 ```no_run
+# use test_that::prelude::*;
+# #[cfg(feature = "test-that-macro")] {
 use test_that::prelude::*;
 
 # /* Make sure this also compiles as a doctest.
@@ -499,9 +511,12 @@ fn failing_non_fatal_assertion() -> TestResult<()> {
     Ok(())        // Because of the failing expect_that! call above, the
                   // test fails despite returning Ok(())
 }
+# }
 ```
 
 ```no_run
+# use test_that::prelude::*;
+# #[cfg(feature = "test-that-macro")] {
 use test_that::prelude::*;
 
 #[test_that::test]
@@ -512,6 +527,7 @@ fn failing_fatal_assertion_after_non_fatal_assertion() -> TestResult<()> {
     expect_that!(value, eq(3));  // Never executes, since the test already aborted.
     Ok(())
 }
+# }
 ```
 
 ## Predicate assertions

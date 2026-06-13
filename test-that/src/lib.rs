@@ -15,6 +15,7 @@
 
 #![doc = include_str!("../crate_docs.md")]
 
+#[cfg(feature = "test-that-macro")]
 extern crate test_that_macro;
 
 #[cfg(test)]
@@ -60,9 +61,12 @@ pub mod prelude {
     pub use super::matchers::containers::*;
     pub use super::matchers::*;
     pub use super::verify_current_test_outcome;
-    pub use super::{assert_that, expect_pred, expect_that, fail, verify_pred, verify_that};
+    pub use super::{assert_that, fail, verify_pred, verify_that};
+    #[cfg(feature = "test-that-macro")]
+    pub use super::{expect_pred, expect_that};
 }
 
+#[cfg(feature = "test-that-macro")]
 pub use test_that_macro::test;
 
 use internal::test_outcome::{TestAssertionFailure, TestOutcome};
@@ -109,6 +113,7 @@ pub type Result<T> = TestResult<T>;
 ///
 /// ```
 /// # use test_that::prelude::*;
+/// # #[cfg(feature = "test-that-macro")] {
 /// # /* Make sure this also compiles as a doctest.
 /// #[test_that::test]
 /// # */
@@ -122,6 +127,7 @@ pub type Result<T> = TestResult<T>;
 ///     verify_that!(foo(), gt(0))      // Does not execute if the line above aborts.
 /// }
 /// # verify_that!(should_fail_and_not_execute_last_assertion(), err(displays_as(contains_substring("Test failed")))).unwrap();
+/// # }
 /// ```
 pub fn verify_current_test_outcome() -> TestResult<()> {
     TestOutcome::get_current_test_outcome()
