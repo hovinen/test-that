@@ -22,14 +22,20 @@ use crate::matchers::__internal::ConjunctionMatcher;
 use crate::matchers::__internal::DisjunctionMatcher;
 use std::fmt::Debug;
 
-/// An interface for checking an arbitrary condition on a datum.
+/// Represents an arbitrary condition on data of the given type which can be
+/// checked to perform an assertion.
 ///
-/// `ActualT` is a type parameter rather than an associated type so that a
-/// single matcher type may match against multiple actual types. For example,
-/// the `some` matcher implements both `Matcher<Option<T>>` and (where the
-/// inner matcher applies to an unsized type) `Matcher<Option<&T>>`. Property
-/// extractors returning `Option<&T>` rely on the latter impl so that the
-/// borrow's lifetime can thread through type inference.
+/// Matchers are the core of the assertion language of Test That!. They can be
+/// combined and composed to assert on complex data structures. The variety
+/// of available matchers allows precise specification of the intent of the
+/// assertion.
+///
+/// Matchers can be logically combined with the [`and`] and [`or`] methods as
+/// well as the [`not`] matcher.
+///
+/// [`and`]: crate::matcher::MatcherExt::and
+/// [`or`]: crate::matcher::MatcherExt::or
+/// [`not`]: crate::matchers::not
 pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
     /// Returns whether the condition matches the datum `actual`.
     ///
@@ -102,11 +108,11 @@ pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
 ///
 /// This trait is implemented for all [`Sized`] types, but the resulting
 /// combinators are only useful when the underlying types implement [`Matcher`].
-///
-/// It is kept separate from [`Matcher`] so that the type parameter `ActualT`
-/// does not need to be known at the `.and()` / `.or()` call site. Type
-/// inference determines `ActualT` later, when the combined matcher is applied
-/// to an actual value.
+//
+// This is kept separate from [`Matcher`] so that the type parameter `ActualT`
+// does not need to be known at the `.and()` / `.or()` call site. Type
+// inference determines `ActualT` later, when the combined matcher is applied
+// to an actual value.
 pub trait MatcherExt: Sized {
     /// Constructs a matcher that matches both `self` and `right`.
     ///
