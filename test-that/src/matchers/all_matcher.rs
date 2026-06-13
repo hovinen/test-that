@@ -103,7 +103,7 @@ pub mod internal {
 
         fn explain_match(&self, actual: &T) -> Description {
             match N {
-                0 => anything::<T>().explain_match(actual),
+                0 => anything().explain_match(actual),
                 1 => self.components[0].explain_match(actual),
                 _ => {
                     let failures = self
@@ -131,7 +131,7 @@ pub mod internal {
     impl<'a, T: Debug + ?Sized, const N: usize> Describable for AllMatcher<'a, T, N> {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             match N {
-                0 => anything::<T>().describe(matcher_result),
+                0 => anything().describe(matcher_result),
                 1 => self.components[0].describe(matcher_result),
                 _ => {
                     let header = if matcher_result.into() {

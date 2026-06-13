@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use std::fmt::Debug;
 
 /// Matches anything. This matcher always succeeds.
 ///
@@ -33,19 +33,20 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn anything<T: Debug + ?Sized>() -> impl Matcher<T> {
-    Anything::<T>(Default::default())
+pub fn anything() -> AnythingMatcher {
+    AnythingMatcher
 }
 
-struct Anything<T: ?Sized>(PhantomData<T>);
+#[doc(hidden)]
+pub struct AnythingMatcher;
 
-impl<T: Debug + ?Sized> Matcher<T> for Anything<T> {
+impl<T: Debug + ?Sized> Matcher<T> for AnythingMatcher {
     fn matches(&self, _: &T) -> MatcherResult {
         MatcherResult::Match
     }
 }
 
-impl<T: Debug + ?Sized> Describable for Anything<T> {
+impl Describable for AnythingMatcher {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => "is anything".into(),
