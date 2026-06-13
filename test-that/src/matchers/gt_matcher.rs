@@ -80,6 +80,7 @@ pub fn gt<ExpectedT>(expected: ExpectedT) -> GtMatcher<ExpectedT> {
     GtMatcher { expected }
 }
 
+#[doc(hidden)]
 pub struct GtMatcher<ExpectedT> {
     expected: ExpectedT,
 }

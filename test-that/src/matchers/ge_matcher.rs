@@ -80,6 +80,7 @@ pub fn ge<ExpectedT>(expected: ExpectedT) -> GeMatcher<ExpectedT> {
     GeMatcher { expected }
 }
 
+#[doc(hidden)]
 pub struct GeMatcher<ExpectedT> {
     expected: ExpectedT,
 }

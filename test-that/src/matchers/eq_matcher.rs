@@ -75,9 +75,7 @@ pub fn eq<T>(expected: T) -> EqMatcher<T> {
     EqMatcher { expected }
 }
 
-/// A matcher which matches a value equal to `expected`.
-///
-/// See [`eq`].
+#[doc(hidden)]
 pub struct EqMatcher<T> {
     pub(crate) expected: T,
 }

@@ -61,6 +61,7 @@ pub fn char_count<E: Matcher<usize>>(expected: E) -> CharLenMatcher<E> {
     CharLenMatcher { expected }
 }
 
+#[doc(hidden)]
 pub struct CharLenMatcher<E> {
     expected: E,
 }

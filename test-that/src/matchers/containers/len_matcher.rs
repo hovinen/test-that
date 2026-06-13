@@ -54,6 +54,7 @@ pub fn len<E: Matcher<usize>>(expected: E) -> LenMatcher<E> {
     LenMatcher { expected }
 }
 
+#[doc(hidden)]
 pub struct LenMatcher<E> {
     expected: E,
 }

@@ -80,6 +80,7 @@ pub fn le<ExpectedT>(expected: ExpectedT) -> LeMatcher<ExpectedT> {
     LeMatcher { expected }
 }
 
+#[doc(hidden)]
 pub struct LeMatcher<ExpectedT> {
     expected: ExpectedT,
 }
