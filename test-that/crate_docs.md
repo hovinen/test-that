@@ -218,7 +218,7 @@ The following matchers are provided in Test That!:
 One can compose matcher invocations to express conditions on complex data
 structures.
 
-```
+```rust
 # use test_that::prelude::*;
 #[derive(Debug)]
 struct StructWithVec {
@@ -235,7 +235,7 @@ In general, owned values are matched against owned values, references against
 references, and so on. When matching against a reference, one can use
 [`points_to`] to "dereference" it.
 
-```
+```rust
 # use test_that::prelude::*;
 #[derive(Debug)]
 struct StructWithRef<'a> {
@@ -251,7 +251,7 @@ assert_that!(value, matches_pattern!(StructWithRef {
 The assertion macros as well as the matcher [`matches_pattern!`] (and it's alias
 [`pat!`]) support a shorthand notation for this using the `*` sigil:
 
-```
+```rust
 # use test_that::prelude::*;
 #[derive(Debug)]
 struct StructWithRef<'a> {
@@ -266,7 +266,7 @@ assert_that!(value, matches_pattern!(StructWithRef {
 
 One does _not_ derefernce string slices when matching against them.
 
-```
+```rust
 # use test_that::prelude::*;
 #[derive(Debug)]
 struct StructWithVec<'a> {
@@ -280,7 +280,7 @@ assert_that!(value, matches_pattern!(StructWithVec {
 
 One does, however, dereference _array_ slices.
 
-```
+```rust
 # use test_that::prelude::*;
 #[derive(Debug)]
 struct StructWithSlice<'a> {
@@ -291,6 +291,17 @@ let value = StructWithSlice { slice: &inner };
 assert_that!(value, matches_pattern!(StructWithSlice {
     *slice: contains(eq(2)),
 }));
+```
+
+## Matching on tuples
+
+One can match on a plain tuple of up to twelve items by constructing a tuple
+of matchers.
+
+```rust
+# use test_that::prelude::*;
+let value = (1, "Hello, world");
+assert_that!(value, (eq(1), ends_with("world")));
 ```
 
 ## Writing matchers

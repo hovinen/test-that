@@ -33,6 +33,16 @@ use std::fmt::Debug;
 /// Matchers can be logically combined with the [`and`] and [`or`] methods as
 /// well as the [`not`] matcher.
 ///
+/// This trait is implemented for tuples of up to twelve arbitrary
+/// implementations of `Matcher`. So one can match tuples of up to twelve
+/// items using corresponding tuple of matchers.
+///
+/// ```rust
+/// # use test_that::prelude::*;
+/// let value = (1, "Hello, world");
+/// assert_that!(value, (eq(1), ends_with("world")));
+/// ```
+///
 /// [`and`]: crate::matcher::MatcherExt::and
 /// [`or`]: crate::matcher::MatcherExt::or
 /// [`not`]: crate::matchers::not
