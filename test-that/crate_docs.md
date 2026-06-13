@@ -293,6 +293,24 @@ assert_that!(value, matches_pattern!(StructWithSlice {
 }));
 ```
 
+Both [`points_to`] and the `*` sigil also work with smart pointers such as
+`Box`, `Rc` and `Arc`.
+
+```rust
+# use test_that::prelude::*;
+#[derive(Debug)]
+struct StructWithBox {
+    boxed: Box<u32>
+}
+let value = StructWithBox { boxed: Box::new(1234) };
+assert_that!(value, matches_pattern!(StructWithBox {
+    boxed: points_to(gt(1000)),
+}));
+assert_that!(value, matches_pattern!(StructWithBox {
+    *boxed: gt(1000),
+}));
+```
+
 ## Matching on tuples
 
 One can match on a plain tuple of up to twelve items by constructing a tuple

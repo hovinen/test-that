@@ -21,13 +21,18 @@ use std::ops::Deref;
 /// Matches a (smart) pointer pointing to a value matched by the [`Matcher`]
 /// `expected`.
 ///
-/// This allows easily matching smart pointers such as `Box`, `Rc`, and `Arc`.
+/// This allows easily matching smart pointers such as `Box`, `Rc`, and `Arc`
+/// as well as slices.
+///
 /// For example:
 ///
 /// ```
 /// # use test_that::prelude::*;
+/// # use std::rc::Rc;
 /// # fn should_pass() -> TestResult<()> {
 /// verify_that!(Box::new(123), points_to(eq(123)))?;
+/// verify_that!(Rc::new(123), points_to(eq(123)))?;
+/// verify_that!(&[123], points_to(contains(eq(123))))?;
 /// #     Ok(())
 /// # }
 /// # should_pass().unwrap();
