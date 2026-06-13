@@ -240,6 +240,25 @@ macro_rules! __contains_exactly {
 ///    message then shows the best matching it could find, including which
 ///    matchers did not have corresponding unique elements in the container.
 ///
+/// ## Enforcing the order of elements
+///
+/// To enforce that the elements appear in the same order as the matchers, use
+/// [`in_order`][crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order]:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![1, 2, 3], contains_each![eq(1), anything()].in_order())?;   // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], contains_each![eq(1), anything()].in_order())?;   // Fails: wrong order
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail().unwrap_err();
+/// ```
+///
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect
@@ -343,6 +362,25 @@ macro_rules! __contains_each {
 ///    matchers is 1-1 and fails if that is not the case. The failure message
 ///    then shows the best matching it could find, including which container
 ///    elements did not have corresponding matchers.
+///
+/// ## Enforcing the order of elements
+///
+/// To enforce that the elements appear in the same order as the matchers, use
+/// [`in_order`][crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order]:
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![1, 2, 3], is_contained_in![eq(0), eq(1), ge(2), anything(), eq(4)].in_order())?;   // Passes
+/// #     Ok(())
+/// # }
+/// # fn should_fail() -> TestResult<()> {
+/// verify_that!(vec![3, 2, 1], is_contained_in![eq(0), eq(1), ge(2), anything(), eq(4)].in_order())?;   // Fails: wrong order
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// # should_fail().unwrap_err();
+/// ```
 ///
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
