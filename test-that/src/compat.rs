@@ -13,6 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//! Aliases to ease porting from [GoogleTest Rust](https://docs.rs/googletest).
+
 use crate::OrFailExt;
 
 /// Alias for [`contains_exactly!`] with [`in_order()`].
