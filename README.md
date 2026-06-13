@@ -115,8 +115,8 @@ To make an assertion using a matcher, Test That! offers three macros:
    assertion_). It requires the use of the [`test_that::test`] attribute macro
    on the test itself.
  * [`verify_that!`] has no side effects and evaluates to a [`Result`] whose
-   `Err` variant describes the assertion failure, if there is one. In
-   combination with the
+   `Err` variant describes the assertion failure, if there is one (type
+   alias: [`TestResult`]). In combination with the
    [`?` operator](https://doc.rust-lang.org/reference/expressions/operator-expr.html#the-question-mark-operator),
    this can be used to abort the test on assertion failure without panicking.
    (It is also the building block for the other two macros above.)
@@ -507,5 +507,6 @@ to this project.
 [`verify_that!`]: https://docs.rs/test_that/*/test_that/macro.verify_that.html
 [`Describable`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describable.html
 [`Describe`]: https://docs.rs/test_that/*/test_that/matcher/trait.Describe.html
-[`Matcher`]: https://docs.rs/test_that/*/test_that/matcher/trait.Matcher.html
+[`Matcher`]: https://docs.rs/test-that/*/test_that/type.TestResult.html
 [`Result`]: https://docs.rs/test_that/*/test_that/type.Result.html
+[`TestResult`]: https://docs.rs/test_that/*/test_that/type.Result.html
