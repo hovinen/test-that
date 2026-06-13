@@ -795,6 +795,65 @@ fn matches_struct_with_a_method_returning_a_reference() -> TestResult<()> {
 }
 
 #[test]
+fn matches_struct_with_a_reference_field() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_ref: &'a u32,
+    }
+
+    let inner = 123;
+    let actual = AStruct { a_ref: &inner };
+
+    verify_that!(actual, matches_pattern!(AStruct { *a_ref: eq(123) }))
+}
+
+#[test]
+fn matches_struct_with_a_reference_field_in_last_position() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        first_field: u32,
+        a_ref: &'a u32,
+    }
+
+    let inner = 123;
+    let actual = AStruct { first_field: 321, a_ref: &inner };
+
+    verify_that!(actual, matches_pattern!(AStruct { first_field: eq(321), *a_ref: eq(123) }))
+}
+
+#[test]
+fn matches_struct_with_a_reference_field_in_first_position() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_ref: &'a u32,
+        last_field: u32,
+    }
+
+    let inner = 123;
+    let actual = AStruct { a_ref: &inner, last_field: 321 };
+
+    verify_that!(actual, matches_pattern!(AStruct { *a_ref: eq(123), last_field: eq(321) }))
+}
+
+#[test]
+fn matches_struct_with_a_reference_field_in_middle_position() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        first_field: u32,
+        a_ref: &'a u32,
+        last_field: u32,
+    }
+
+    let inner = 123;
+    let actual = AStruct { first_field: 321, a_ref: &inner, last_field: 432 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { first_field: eq(321), *a_ref: eq(123), last_field: eq(432) })
+    )
+}
+
+#[test]
 fn matches_struct_with_a_method_returning_a_reference_with_trailing_comma() -> TestResult<()> {
     #[derive(Debug)]
     struct AStruct {
