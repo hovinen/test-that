@@ -158,7 +158,7 @@ The following matchers are provided in Test That!:
 | [`points_to`]        | Any [`Deref`] such as `&`, `Rc`, etc. whose value the argument matches.  |
 | [`pointwise!`]       | A container whose contents the arguments match in a pointwise fashion.   |
 | [`predicate`]        | A value on which the given predicate returns true.                       |
-| [`result_of!`]       | The result of applying the given closure is matched by the given matcher. |
+| [`result_of!`]       | The result of applying the given closure matched by the given matcher.   |
 | [`some`]             | An [`Option`] containing `Some` whose value the argument matches.        |
 | [`starts_with`]      | A string starting with the given prefix.                                 |
 | [`subset_of`]        | A container all of whose elements are contained in the argument.         |
