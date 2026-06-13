@@ -1,11 +1,11 @@
 A rich test assertion library for Rust.
 
-This library provides:
+This crate provides:
 
  * A framework for writing matchers which can be combined to make a wide
    range of assertions on data,
  * A rich set of matchers, and
- * A new set of test assertion macros.
+ * A set of test assertion macros.
 
 ## Assertions and matchers
 
@@ -102,6 +102,17 @@ fn strictly_between_9_and_11() {
 #     .unwrap();
 }
 # strictly_between_9_and_11();
+# /* The attribute macro would prevent the function from being compiled in a doctest.
+#[test_that::test]
+# */
+fn outside_interval_from_0_to_2() {
+# test_that::internal::test_outcome::TestOutcome::init_current_test_outcome();
+    let value = 10;
+    expect_that!(value, lt(0).or(gt(2)));
+# test_that::internal::test_outcome::TestOutcome::close_current_test_outcome::<&str>(Ok(()))
+#     .unwrap();
+}
+# outside_interval_from_0_to_2();
 ```
 
 ## Available matchers
@@ -118,7 +129,7 @@ The following matchers are provided in Test That!:
 | [`container_eq`]     | Same as [`eq`], but for containers (with a better mismatch description). |
 | [`contains`]         | A container containing an element matched by the given matcher.          |
 | [`contains_each!`]   | A container containing distinct elements each of the arguments match.    |
-| [`contains_exactly!`] | A container whose elements the arguments match, in any order.     |
+| [`contains_exactly!`] | A container whose elements the arguments match, in any order.           |
 | [`contains_regex`]   | A string containing a substring matching the given regular expression.   |
 | [`contains_substring`] | A string containing the given substring.                               |
 | [`displays_as`]      | A [`Display`] value whose formatted string is matched by the argument.   |
@@ -147,7 +158,7 @@ The following matchers are provided in Test That!:
 | [`points_to`]        | Any [`Deref`] such as `&`, `Rc`, etc. whose value the argument matches.  |
 | [`pointwise!`]       | A container whose contents the arguments match in a pointwise fashion.   |
 | [`predicate`]        | A value on which the given predicate returns true.                       |
-| [`result_of`]        | The result of applying the given closure is matched by the given matcher. |
+| [`result_of!`]       | The result of applying the given closure is matched by the given matcher. |
 | [`some`]             | An [`Option`] containing `Some` whose value the argument matches.        |
 | [`starts_with`]      | A string starting with the given prefix.                                 |
 | [`subset_of`]        | A container all of whose elements are contained in the argument.         |
@@ -190,7 +201,7 @@ The following matchers are provided in Test That!:
 [`points_to`]: matchers::points_to
 [`pointwise!`]: matchers::containers::pointwise
 [`predicate`]: matchers::predicate
-[`result_of`]: matchers::result_of
+[`result_of!`]: matchers::result_of
 [`some`]: matchers::some
 [`starts_with`]: matchers::starts_with
 [`subset_of`]: matchers::containers::subset_of
@@ -202,17 +213,97 @@ The following matchers are provided in Test That!:
 [`PartialEq`]: std::cmp::PartialEq
 [`PartialOrd`]: std::cmp::PartialOrd
 
+## Matching on complex data structures
+
+One can compose matcher invocations to express conditions on complex data
+structures.
+
+```
+# use test_that::prelude::*;
+#[derive(Debug)]
+struct StructWithVec {
+    vec: Vec<String>,
+}
+let value = StructWithVec { vec: vec!["Hello, world!".into()] };
+assert_that!(value, matches_pattern!(StructWithVec {
+    vec: contains(starts_with("Hello")),
+}));
+```
+
+The matchers follow a _parallel structure_ to the data structure being matched.
+In general, owned values are matched against owned values, references against
+references, and so on. When matching against a reference, one can use
+[`points_to`] to "dereference" it.
+
+```
+# use test_that::prelude::*;
+#[derive(Debug)]
+struct StructWithRef<'a> {
+    reference: &'a u32
+}
+let inner = 1234;
+let value = StructWithRef { reference: &inner };
+assert_that!(value, matches_pattern!(StructWithRef {
+    reference: points_to(gt(1000)),
+}));
+```
+
+The assertion macros as well as the matcher [`matches_pattern!`] (and it's alias
+[`pat!`]) support a shorthand notation for this using the `*` sigil:
+
+```
+# use test_that::prelude::*;
+#[derive(Debug)]
+struct StructWithRef<'a> {
+    reference: &'a u32
+}
+let inner = 1234;
+let value = StructWithRef { reference: &inner };
+assert_that!(value, matches_pattern!(StructWithRef {
+    *reference: gt(1000),
+}));
+```
+
+One does _not_ derefernce string slices when matching against them.
+
+```
+# use test_that::prelude::*;
+#[derive(Debug)]
+struct StructWithVec<'a> {
+    vec: Vec<&'a str>,
+}
+let value = StructWithVec { vec: vec!["Hello, world!"] };
+assert_that!(value, matches_pattern!(StructWithVec {
+    vec: contains(starts_with("Hello")),
+}));
+```
+
+One does, however, dereference _array_ slices.
+
+```
+# use test_that::prelude::*;
+#[derive(Debug)]
+struct StructWithSlice<'a> {
+    slice: &'a [u32],
+}
+let inner = [1, 2, 3];
+let value = StructWithSlice { slice: &inner };
+assert_that!(value, matches_pattern!(StructWithSlice {
+    *slice: contains(eq(2)),
+}));
+```
+
 ## Writing matchers
 
 One can extend the library by writing additional matchers. To do so, create
-a struct holding the matcher's data and have it implement the trait
-[`Matcher`]:
+a struct holding the matcher's data and have it implement the traits
+[`Matcher`] and [`Describable`]:
 
 ```no_run
 use test_that::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
 use std::fmt::Debug;
 
-struct MyEqMatcher<T> {
+pub struct MyEqMatcher<T> {
     expected: T,
 }
 
@@ -240,45 +331,45 @@ impl<T: Debug> Describable for MyEqMatcher<T> {
 }
 ```
 
- It is recommended to expose a function which constructs the matcher:
+One should also expose a function which constructs the matcher:
 
- ```no_run
- # use test_that::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
- # use std::fmt::Debug;
- #
- # struct MyEqMatcher<T> {
- #    expected: T,
- # }
- #
- # impl<T: PartialEq + Debug> Matcher<T> for MyEqMatcher<T> {
- #    fn matches(&self, actual: &T) -> MatcherResult {
- #        if self.expected == *actual {
- #            MatcherResult::Match
- #        } else {
- #            MatcherResult::NoMatch
- #        }
- #    }
- # }
- #
- # impl<T: Debug> Describable for MyEqMatcher<T> {
- #    fn describe(&self, matcher_result: MatcherResult) -> Description {
- #        match matcher_result {
- #            MatcherResult::Match => {
- #                format!("is equal to {:?} the way I define it", self.expected).into()
- #            }
- #            MatcherResult::NoMatch => {
- #                format!("isn't equal to {:?} the way I define it", self.expected).into()
- #            }
- #        }
- #    }
- # }
- #
- pub fn eq_my_way<T: PartialEq + Debug>(expected: T) -> impl Matcher<T> {
+```no_run
+# use test_that::{description::Description, matcher::{Describable, Matcher, MatcherResult}};
+# use std::fmt::Debug;
+#
+# struct MyEqMatcher<T> {
+#    expected: T,
+# }
+#
+# impl<T: PartialEq + Debug> Matcher<T> for MyEqMatcher<T> {
+#    fn matches(&self, actual: &T) -> MatcherResult {
+#        if self.expected == *actual {
+#            MatcherResult::Match
+#        } else {
+#            MatcherResult::NoMatch
+#        }
+#    }
+# }
+#
+# impl<T: Debug> Describable for MyEqMatcher<T> {
+#    fn describe(&self, matcher_result: MatcherResult) -> Description {
+#        match matcher_result {
+#            MatcherResult::Match => {
+#                format!("is equal to {:?} the way I define it", self.expected).into()
+#            }
+#            MatcherResult::NoMatch => {
+#                format!("isn't equal to {:?} the way I define it", self.expected).into()
+#            }
+#        }
+#    }
+# }
+#
+pub fn eq_my_way<T>(expected: T) -> MyEqMatcher<T> {
     MyEqMatcher { expected }
- }
- ```
+}
+```
 
- The new matcher can then be used in the assertion macros:
+The new matcher can then be used in the assertion macros:
 
 ```
 # use test_that::prelude::*;
@@ -312,8 +403,8 @@ impl<T: Debug> Describable for MyEqMatcher<T> {
 #    }
 # }
 #
-# pub fn eq_my_way<T: PartialEq + Debug>(expected: T) -> impl Matcher<T> {
-#    MyEqMatcher { expected }
+# pub fn eq_my_way<T>(expected: T) -> MyEqMatcher<T> {
+#     MyEqMatcher { expected }
 # }
 # /* The attribute macro would prevent the function from being compiled in a doctest.
 #[test_that::test]
@@ -493,3 +584,4 @@ through the `?` operator as the example above shows.
 [`and_log_failure()`]: TestResultExt::and_log_failure
 [`or_fail()`]: OrFailExt::or_fail
 [`Matcher`]: matcher::Matcher
+[`Describable`]: matcher::Describable

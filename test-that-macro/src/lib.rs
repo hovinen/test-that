@@ -16,7 +16,7 @@
 use quote::quote;
 use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 
-/// Marks a test to be run by the Google Rust test runner.
+/// Marks a test which may have non fatal assertions.
 ///
 /// Annotate tests the same way ordinary Rust tests are annotated:
 ///
