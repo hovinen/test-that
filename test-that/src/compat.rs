@@ -17,7 +17,7 @@ use crate::OrFailExt;
 
 /// Alias for [`contains_exactly!`] with [`in_order()`].
 ///
-/// This exists for compatibility with [googletest].
+/// This exists to ease porting from [googletest].
 ///
 /// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
 /// [`in_order()`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
@@ -36,7 +36,7 @@ macro_rules! __elements_are {
 
 /// Alias for [`contains_exactly!`].
 ///
-/// This exists for compatibility with [googletest].
+/// This exists to ease porting from [googletest].
 ///
 /// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
 /// [googletest]: https://docs.rs/googletest
