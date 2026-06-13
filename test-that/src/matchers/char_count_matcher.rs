@@ -57,16 +57,16 @@ use std::fmt::Debug;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn char_count<E: Matcher<usize>>(expected: E) -> CharLenMatcher<E> {
-    CharLenMatcher { expected }
+pub fn char_count<E: Matcher<usize>>(expected: E) -> CharCountMatcher<E> {
+    CharCountMatcher { expected }
 }
 
 #[doc(hidden)]
-pub struct CharLenMatcher<E> {
+pub struct CharCountMatcher<E> {
     expected: E,
 }
 
-impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMatcher<E> {
+impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharCountMatcher<E> {
     fn matches(&self, actual: &T) -> MatcherResult {
         self.expected.matches(&actual.as_ref().chars().count())
     }
@@ -82,7 +82,7 @@ impl<T: Debug + ?Sized + AsRef<str>, E: Matcher<usize>> Matcher<T> for CharLenMa
     }
 }
 
-impl<E: Matcher<usize>> Describable for CharLenMatcher<E> {
+impl<E: Matcher<usize>> Describable for CharCountMatcher<E> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(
