@@ -81,6 +81,7 @@ pub fn each<MatcherT, Mode>(inner: MatcherT) -> EachMatcher<MatcherT, Mode> {
     EachMatcher { inner, phantom: PhantomData }
 }
 
+#[doc(hidden)]
 pub struct EachMatcher<MatcherT, Mode> {
     inner: MatcherT,
     phantom: PhantomData<Mode>,

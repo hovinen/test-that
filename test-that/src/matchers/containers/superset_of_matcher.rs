@@ -92,6 +92,7 @@ pub fn superset_of<ExpectedT: Debug, Mode>(
     SupersetOfMatcher { subset, phantom: Default::default() }
 }
 
+#[doc(hidden)]
 pub struct SupersetOfMatcher<ExpectedT, Mode> {
     subset: ExpectedT,
     phantom: PhantomData<Mode>,

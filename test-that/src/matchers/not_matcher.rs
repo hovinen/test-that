@@ -38,6 +38,7 @@ pub fn not<InnerMatcherT>(inner: InnerMatcherT) -> NotMatcher<InnerMatcherT> {
     NotMatcher { inner }
 }
 
+#[doc(hidden)]
 pub struct NotMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
 }

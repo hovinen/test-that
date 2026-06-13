@@ -66,6 +66,7 @@ pub fn has_entry<KeyT, MatcherT>(key: KeyT, inner: MatcherT) -> HasEntryMatcher<
     HasEntryMatcher { key, inner }
 }
 
+#[doc(hidden)]
 pub struct HasEntryMatcher<KeyT, MatcherT> {
     key: KeyT,
     inner: MatcherT,

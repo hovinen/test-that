@@ -68,10 +68,7 @@ pub fn matches_regex<PatternT: Deref<Target = str>>(
     MatchesRegexMatcher { regex, pattern, _adjusted_pattern: adjusted_pattern }
 }
 
-/// A matcher matching a string-like type matching a given regular expression.
-///
-/// Intended only to be used from the function [`matches_regex`] only.
-/// Should not be referenced by code outside this library.
+#[doc(hidden)]
 pub struct MatchesRegexMatcher<PatternT: Deref<Target = str>> {
     regex: Regex,
     pattern: PatternT,

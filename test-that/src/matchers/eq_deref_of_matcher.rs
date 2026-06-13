@@ -56,9 +56,7 @@ pub fn eq_deref_of<ExpectedRefT>(expected: ExpectedRefT) -> EqDerefOfMatcher<Exp
     EqDerefOfMatcher { expected }
 }
 
-/// A matcher which matches a value equal to the derefenced value of `expected`.
-///
-/// See [`eq_deref_of`].
+#[doc(hidden)]
 pub struct EqDerefOfMatcher<ExpectedRefT> {
     pub(crate) expected: ExpectedRefT,
 }

@@ -36,6 +36,7 @@ pub fn points_to<MatcherT>(expected: MatcherT) -> PointsToMatcher<MatcherT> {
     PointsToMatcher { expected }
 }
 
+#[doc(hidden)]
 pub struct PointsToMatcher<MatcherT> {
     expected: MatcherT,
 }

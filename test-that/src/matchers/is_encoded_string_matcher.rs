@@ -56,6 +56,7 @@ where
     IsEncodedStringMatcher { inner }
 }
 
+#[doc(hidden)]
 pub struct IsEncodedStringMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
 }

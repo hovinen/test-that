@@ -55,6 +55,7 @@ pub fn empty() -> EmptyMatcher {
     EmptyMatcher
 }
 
+#[doc(hidden)]
 pub struct EmptyMatcher;
 
 impl<T: Debug + ?Sized> Matcher<T> for EmptyMatcher

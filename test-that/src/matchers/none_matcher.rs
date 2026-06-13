@@ -36,6 +36,7 @@ pub fn none() -> NoneMatcher {
     NoneMatcher
 }
 
+#[doc(hidden)]
 pub struct NoneMatcher;
 
 impl<T: Debug> Matcher<Option<T>> for NoneMatcher {

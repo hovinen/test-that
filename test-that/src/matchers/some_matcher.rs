@@ -43,6 +43,7 @@ pub fn some<InnerMatcherT>(inner: InnerMatcherT) -> SomeMatcher<InnerMatcherT> {
     SomeMatcher { inner }
 }
 
+#[doc(hidden)]
 pub struct SomeMatcher<InnerMatcherT> {
     inner: InnerMatcherT,
 }

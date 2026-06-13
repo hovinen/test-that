@@ -56,11 +56,7 @@ pub fn contains_regex<PatternT: Deref<Target = str>>(pattern: PatternT) -> Conta
     ContainsRegexMatcher { regex: Regex::new(pattern.deref()).unwrap() }
 }
 
-/// A matcher matching a string-like type containing a substring matching a
-/// given regular expression.
-///
-/// Intended only to be used from the function [`contains_regex`] only.
-/// Should not be referenced by code outside this library.
+#[doc(hidden)]
 pub struct ContainsRegexMatcher {
     regex: Regex,
 }

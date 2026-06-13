@@ -25,6 +25,7 @@ pub fn is_nan() -> IsNanMatcher {
     IsNanMatcher
 }
 
+#[doc(hidden)]
 pub struct IsNanMatcher;
 
 impl<T: Float + Debug> Matcher<T> for IsNanMatcher {

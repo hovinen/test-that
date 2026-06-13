@@ -28,6 +28,7 @@ pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> DisplayMatcher<InnerMat
     DisplayMatcher { inner }
 }
 
+#[doc(hidden)]
 pub struct DisplayMatcher<InnerMatcher> {
     inner: InnerMatcher,
 }

@@ -100,6 +100,7 @@ where
     ContainerEqMatcher { expected, phantom: Default::default() }
 }
 
+#[doc(hidden)]
 pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {
     expected: ExpectedContainerT,
     phantom: PhantomData<Mode>,
