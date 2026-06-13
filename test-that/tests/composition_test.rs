@@ -69,3 +69,60 @@ fn elements_are_works_as_inner_matcher() -> TestResult<()> {
 fn tuple_works_as_inner_matcher() -> TestResult<()> {
     verify_that!(vec![(123,)], contains_exactly![(eq(123),)])
 }
+
+#[test]
+fn result_of_can_be_nested() -> TestResult<()> {
+    #[derive(Debug)]
+    struct InnerStruct<'a> {
+        string: &'a str,
+    }
+    #[derive(Debug)]
+    struct OuterStruct<'a> {
+        inner: InnerStruct<'a>,
+    }
+    let string = String::from("Hello, world");
+    let value = OuterStruct { inner: InnerStruct { string: string.as_str() } };
+    verify_that!(
+        value,
+        result_of!(
+            |s: &OuterStruct| s.inner,
+            result_of!(|s: &InnerStruct| s.string, starts_with("Hello"))
+        )
+    )
+}
+
+#[test]
+fn result_of_can_be_nested_inside_field() -> TestResult<()> {
+    #[derive(Debug)]
+    struct InnerStruct<'a> {
+        string: &'a str,
+    }
+    #[derive(Debug)]
+    struct OuterStruct<'a> {
+        inner: InnerStruct<'a>,
+    }
+    let string = String::from("Hello, world");
+    let value = OuterStruct { inner: InnerStruct { string: string.as_str() } };
+    verify_that!(
+        value,
+        field!(OuterStruct.inner, result_of!(|s: &InnerStruct| s.string, starts_with("Hello")))
+    )
+}
+
+#[test]
+fn field_can_be_nested_inside_result_of() -> TestResult<()> {
+    #[derive(Debug)]
+    struct InnerStruct<'a> {
+        string: &'a str,
+    }
+    #[derive(Debug)]
+    struct OuterStruct<'a> {
+        inner: InnerStruct<'a>,
+    }
+    let string = String::from("Hello, world");
+    let value = OuterStruct { inner: InnerStruct { string: string.as_str() } };
+    verify_that!(
+        value,
+        result_of!(|s: &OuterStruct| s.inner, field!(InnerStruct.string, starts_with("Hello")))
+    )
+}
