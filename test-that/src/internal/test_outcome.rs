@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::cell::{RefCell, RefMut};
-use std::fmt::{Debug, Display, Error, Formatter};
-use std::thread_local;
+use alloc::string::String;
+use core::fmt::{Debug, Display, Error, Formatter};
 
 /// The outcome hitherto of running a test.
 ///
@@ -31,8 +30,9 @@ pub enum TestOutcome {
     Failure,
 }
 
-thread_local! {
-    static CURRENT_TEST_OUTCOME: RefCell<Option<TestOutcome>> = RefCell::new(None);
+#[cfg(feature = "std")]
+std::thread_local! {
+    static CURRENT_TEST_OUTCOME: core::cell::RefCell<Option<TestOutcome>> = core::cell::RefCell::new(None);
 }
 
 impl TestOutcome {
@@ -43,6 +43,7 @@ impl TestOutcome {
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
+    #[cfg(feature = "std")]
     pub fn init_current_test_outcome() {
         Self::with_current_test_outcome(|mut current_test_outcome| {
             *current_test_outcome = Some(TestOutcome::Success);
@@ -62,6 +63,7 @@ impl TestOutcome {
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
+    #[cfg(feature = "std")]
     pub fn close_current_test_outcome<E: Display>(
         inner_result: Result<(), E>,
     ) -> Result<(), TestFailure> {
@@ -77,7 +79,7 @@ impl TestOutcome {
                 }
             };
             if let Err(fatal_assertion_failure) = inner_result {
-                println!("{fatal_assertion_failure}");
+                std::println!("{fatal_assertion_failure}");
             }
             *outcome = None;
             outer_result
@@ -86,6 +88,7 @@ impl TestOutcome {
 
     /// Returns a `Result` corresponding to the outcome of the currently running
     /// test.
+    #[cfg(feature = "std")]
     pub(crate) fn get_current_test_outcome() -> Result<(), TestAssertionFailure> {
         TestOutcome::with_current_test_outcome(|mut outcome| {
             let outcome = outcome
@@ -99,6 +102,7 @@ impl TestOutcome {
     }
 
     /// Records that the currently running test has failed.
+    #[cfg(feature = "std")]
     fn fail_current_test() {
         TestOutcome::with_current_test_outcome(|mut outcome| {
             let outcome = outcome
@@ -112,12 +116,16 @@ impl TestOutcome {
     ///
     /// This is primarily intended for use by assertion macros like
     /// `expect_that!`.
-    fn with_current_test_outcome<T>(action: impl FnOnce(RefMut<Option<TestOutcome>>) -> T) -> T {
+    #[cfg(feature = "std")]
+    fn with_current_test_outcome<T>(
+        action: impl FnOnce(core::cell::RefMut<Option<TestOutcome>>) -> T,
+    ) -> T {
         CURRENT_TEST_OUTCOME.with(|current_test_outcome| action(current_test_outcome.borrow_mut()))
     }
 
     /// Ensure that there is a test context present and panic if there is not.
     pub(crate) fn ensure_text_context_present() {
+        #[cfg(feature = "std")]
         TestOutcome::with_current_test_outcome(|outcome| {
             outcome.as_ref().expect(
                 "
@@ -137,16 +145,17 @@ No test context found.
 /// in the text above.
 pub struct TestFailure;
 
+#[cfg(feature = "std")]
 impl std::error::Error for TestFailure {}
 
-impl std::fmt::Debug for TestFailure {
+impl core::fmt::Debug for TestFailure {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         writeln!(f, "See failure output above")?;
         Ok(())
     }
 }
 
-impl std::fmt::Display for TestFailure {
+impl core::fmt::Display for TestFailure {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
         writeln!(f, "See failure output above")?;
         Ok(())
@@ -173,8 +182,10 @@ impl TestAssertionFailure {
     }
 
     pub(crate) fn log(&self) {
+        #[cfg(feature = "std")]
         TestOutcome::fail_current_test();
-        println!("{}", self);
+        #[cfg(feature = "std")]
+        std::println!("{}", self);
     }
 }
 
@@ -197,15 +208,16 @@ impl Debug for TestAssertionFailure {
     }
 }
 
+#[cfg(feature = "std")]
 impl<T: std::error::Error> From<T> for TestAssertionFailure {
     fn from(value: T) -> Self {
-        TestAssertionFailure::create(format!("{value}"))
+        TestAssertionFailure::create(alloc::format!("{value}"))
     }
 }
 
 #[cfg(feature = "proptest")]
 impl From<TestAssertionFailure> for proptest::test_runner::TestCaseError {
     fn from(value: TestAssertionFailure) -> Self {
-        proptest::test_runner::TestCaseError::Fail(format!("{value}").into())
+        proptest::test_runner::TestCaseError::Fail(alloc::format!("{value}").into())
     }
 }

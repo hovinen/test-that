@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches an `Option` containing a value matched by `inner`.
 ///
@@ -70,8 +70,7 @@ pub mod __internal {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             match matcher_result {
                 MatcherResult::Match => {
-                    format!("has a value which {}", self.inner.describe(MatcherResult::Match))
-                        .into()
+                    format!("has a value which {}", self.inner.describe(MatcherResult::Match)).into()
                 }
                 MatcherResult::NoMatch => format!(
                     "is None or has a value which {}",

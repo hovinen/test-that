@@ -19,7 +19,7 @@ pub(crate) mod ordered_matcher;
 pub(crate) mod unordered_matcher;
 
 use crate::{description::Description, matcher_support::count_elements::count_elements};
-use std::fmt::Display;
+use core::fmt::Display;
 
 /// Matches a container whose elements in any order have a 1:1 correspondence
 /// with the provided element matchers.
@@ -50,8 +50,8 @@ use std::fmt::Display;
 /// # should_fail_3().unwrap_err();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information
-/// about what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
 /// similar collections. The arguments are a sequence of mappings of matchers
@@ -155,14 +155,14 @@ macro_rules! __contains_exactly {
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
         $crate::matchers::__internal::MapContainsMatcher::new(
-            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            [$(($crate::__alloc::boxed::Box::new($key_matcher), $crate::__alloc::boxed::Box::new($value_matcher))),*],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$(Box::new($matcher)),*],
+            [$($crate::__alloc::boxed::Box::new($matcher)),*],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
@@ -205,8 +205,8 @@ macro_rules! __contains_exactly {
 /// # should_fail_3().unwrap_err();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information
-/// about what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
 /// similar collections. The arguments are a sequence of mappings of matchers
@@ -273,14 +273,14 @@ macro_rules! __contains_each {
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
         $crate::matchers::__internal::MapContainsMatcher::new(
-            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            [$(($crate::__alloc::boxed::Box::new($key_matcher), $crate::__alloc::boxed::Box::new($value_matcher))),*],
             $crate::matchers::__internal::Requirements::Superset
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$(Box::new($matcher)),*],
+            [$($crate::__alloc::boxed::Box::new($matcher)),*],
             $crate::matchers::__internal::Requirements::Superset
         )
     }}
@@ -324,8 +324,8 @@ macro_rules! __contains_each {
 /// # should_fail_3().unwrap_err();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information
-/// about what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// This can also match against [`HashMap`][std::collections::HashMap] and
 /// similar collections. The arguments are a sequence of mappings of matchers
@@ -395,14 +395,14 @@ macro_rules! __is_contained_in {
 
     ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
         $crate::matchers::__internal::MapContainsMatcher::new(
-            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            [$(($crate::__alloc::boxed::Box::new($key_matcher), $crate::__alloc::boxed::Box::new($value_matcher))),*],
             $crate::matchers::__internal::Requirements::Subset,
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$(Box::new($matcher)),*],
+            [$($crate::__alloc::boxed::Box::new($matcher)),*],
             $crate::matchers::__internal::Requirements::Subset,
         )
     }}
@@ -487,7 +487,7 @@ impl Requirements {
 }
 
 impl Display for Requirements {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Requirements::PerfectMatch => {
                 write!(f, "perfect")

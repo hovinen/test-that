@@ -55,7 +55,7 @@
 #[doc(hidden)]
 macro_rules! __all {
     ($($matcher:expr),* $(,)?) => {{
-        $crate::matchers::__internal::AllMatcher::new([$(Box::new($matcher)),*])
+        $crate::matchers::__internal::AllMatcher::new([$($crate::__alloc::boxed::Box::new($matcher)),*])
     }}
 }
 
@@ -64,10 +64,12 @@ macro_rules! __all {
 /// For internal use only. API stablility is not guaranteed!
 #[doc(hidden)]
 pub mod __internal {
+    use alloc::boxed::Box;
+    use alloc::vec::Vec;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matchers::anything;
-    use std::fmt::Debug;
+    use core::fmt::Debug;
 
     /// A matcher which matches an input value matched by all matchers in the
     /// array `components`.

@@ -13,12 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
     matchers::containers::{OwnedItems, RefItems},
 };
-use std::{fmt::Debug, marker::PhantomData};
+use core::{fmt::Debug, marker::PhantomData};
 
 /// Matches an iterable type whose elements contain a value matched by `inner`.
 ///
@@ -61,8 +63,8 @@ use std::{fmt::Debug, marker::PhantomData};
 /// # should_fail().unwrap_err();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information
-/// about what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 pub fn contains<InnerMatcherT, ModeT>(
     inner: InnerMatcherT,
 ) -> ContainsMatcher<InnerMatcherT, ModeT> {

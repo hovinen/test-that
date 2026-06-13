@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches the actual value exactly when the inner matcher does _not_ match.
 ///

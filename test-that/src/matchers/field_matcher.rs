@@ -120,7 +120,8 @@ macro_rules! __field {
 #[macro_export]
 macro_rules! field_internal {
     ($($t:ident)::+.$field:tt, $m:expr) => {{
-        $crate::matchers::__internal::field_matcher(
+        use $crate::matchers::__internal::field_matcher;
+        field_matcher(
             |o| {
                 match o {
                     $($t)::* { $field: value, .. } => Some(value),
@@ -145,7 +146,7 @@ pub mod __internal {
         description::Description,
         matcher::{Describable, Matcher, MatcherResult},
     };
-    use std::fmt::Debug;
+    use core::fmt::Debug;
 
     /// Creates a matcher to verify a specific field of the actual struct using
     /// the provided inner matcher.

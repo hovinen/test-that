@@ -32,7 +32,8 @@ authors = [
 ]
 
 [features]
-default = ["regex", "num-traits", "test-that-macro"]
+default = ["regex", "num-traits", "test-that-macro", "std"]
+std = []
 googletest-compat = []
 googletest-migrate = ["googletest-compat"]
 

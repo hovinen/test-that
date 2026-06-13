@@ -13,8 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![no_std]
 #![doc = include_str!("../crate_docs.md")]
 #![cfg_attr(docsrs, feature(doc_cfg), doc(auto_cfg))]
+
+#[macro_use]
+extern crate alloc;
+#[cfg(feature = "std")]
+extern crate std;
+
+/// Re-export of `alloc` for use by this crate's macros.
+/// Do not use directly; it is not part of the public API.
+#[doc(hidden)]
+pub extern crate alloc as __alloc;
 
 #[cfg(feature = "test-that-macro")]
 extern crate test_that_macro;
@@ -48,6 +59,9 @@ pub mod compat;
 /// }
 /// ```
 pub mod prelude {
+    pub use alloc::boxed::Box;
+    pub use alloc::string::{String, ToString};
+    pub use alloc::vec::Vec;
     pub use super::OrFailExt;
     #[cfg(feature = "googletest-compat")]
     #[allow(deprecated)]
@@ -61,9 +75,10 @@ pub mod prelude {
     pub use super::matcher::MatcherExt;
     pub use super::matchers::containers::*;
     pub use super::matchers::*;
-    pub use super::verify_current_test_outcome;
     pub use super::{assert_that, fail, verify_pred, verify_that};
-    #[cfg(feature = "test-that-macro")]
+    #[cfg(feature = "std")]
+    pub use super::verify_current_test_outcome;
+    #[cfg(all(feature = "std", feature = "test-that-macro"))]
     pub use super::{expect_pred, expect_that};
 }
 
@@ -93,7 +108,7 @@ use internal::test_outcome::{TestAssertionFailure, TestOutcome};
 /// of the (fatal) assertion failure which generated this result. Non-fatal
 /// assertion failures, which log the failure and report the test as having
 /// failed but allow it to continue running, are not encoded in this type.
-pub type TestResult<T> = std::result::Result<T, TestAssertionFailure>;
+pub type TestResult<T> = core::result::Result<T, TestAssertionFailure>;
 
 /// Alias for [TestResult] to ease porting from [googletest](https://docs.rs/googletest).
 #[cfg(feature = "googletest-compat")]
@@ -130,6 +145,7 @@ pub type Result<T> = TestResult<T>;
 /// # verify_that!(should_fail_and_not_execute_last_assertion(), err(displays_as(contains_substring("Test failed")))).unwrap();
 /// # }
 /// ```
+#[cfg(feature = "std")]
 pub fn verify_current_test_outcome() -> TestResult<()> {
     TestOutcome::get_current_test_outcome()
 }
@@ -200,7 +216,7 @@ pub trait TestResultExt {
     /// However, consider using [`TestResultExt::with_failure_message`]
     /// instead in that case to avoid unnecessary memory allocation when the
     /// message is not needed.
-    fn failure_message(self, message: impl Into<String>) -> Self;
+    fn failure_message(self, message: impl Into<alloc::string::String>) -> Self;
 
     /// Adds the output of the closure `provider` to the logged failure message
     /// if `self` is a `Result::Err`. Otherwise, does nothing.
@@ -220,10 +236,10 @@ pub trait TestResultExt {
     /// # verify_that!(should_fail(), err(displays_as(contains_substring("Actual 0 was wrong"))))
     /// #     .unwrap();
     /// ```
-    fn with_failure_message(self, provider: impl FnOnce() -> String) -> Self;
+    fn with_failure_message(self, provider: impl FnOnce() -> alloc::string::String) -> Self;
 }
 
-impl<T> TestResultExt for std::result::Result<T, TestAssertionFailure> {
+impl<T> TestResultExt for core::result::Result<T, TestAssertionFailure> {
     fn and_log_failure(self) {
         TestOutcome::ensure_text_context_present();
         if let Err(failure) = self {
@@ -231,14 +247,14 @@ impl<T> TestResultExt for std::result::Result<T, TestAssertionFailure> {
         }
     }
 
-    fn failure_message(mut self, message: impl Into<String>) -> Self {
+    fn failure_message(mut self, message: impl Into<alloc::string::String>) -> Self {
         if let Err(ref mut failure) = self {
             failure.custom_message = Some(message.into());
         }
         self
     }
 
-    fn with_failure_message(mut self, provider: impl FnOnce() -> String) -> Self {
+    fn with_failure_message(mut self, provider: impl FnOnce() -> alloc::string::String) -> Self {
         if let Err(ref mut failure) = self {
             failure.custom_message = Some(provider());
         }
@@ -271,24 +287,24 @@ impl<T> TestResultExt for std::result::Result<T, TestAssertionFailure> {
 pub trait OrFailExt<T> {
     /// Converts this instance into a [`Result`].
     ///
-    /// Typically, the `Self` type is itself a [`std::result::Result`]. This
+    /// Typically, the `Self` type is itself a [`core::result::Result`]. This
     /// method should then map the `Err` variant to a [`TestAssertionFailure`]
     /// and leave the `Ok` variant unchanged.
     fn or_fail(self) -> TestResult<T>;
 }
 
 #[cfg(feature = "anyhow")]
-impl<T> OrFailExt<T> for std::result::Result<T, anyhow::Error> {
-    fn or_fail(self) -> std::result::Result<T, TestAssertionFailure> {
-        self.map_err(|e| TestAssertionFailure::create(format!("{e:#}")))
+impl<T> OrFailExt<T> for core::result::Result<T, anyhow::Error> {
+    fn or_fail(self) -> core::result::Result<T, TestAssertionFailure> {
+        self.map_err(|e| TestAssertionFailure::create(alloc::format!("{e:#}")))
     }
 }
 
 #[cfg(feature = "proptest")]
-impl<OkT, CaseT: std::fmt::Debug> OrFailExt<OkT>
-    for std::result::Result<OkT, proptest::test_runner::TestError<CaseT>>
+impl<OkT, CaseT: core::fmt::Debug> OrFailExt<OkT>
+    for core::result::Result<OkT, proptest::test_runner::TestError<CaseT>>
 {
-    fn or_fail(self) -> std::result::Result<OkT, TestAssertionFailure> {
-        self.map_err(|e| TestAssertionFailure::create(format!("{e}")))
+    fn or_fail(self) -> core::result::Result<OkT, TestAssertionFailure> {
+        self.map_err(|e| TestAssertionFailure::create(alloc::format!("{e}")))
     }
 }

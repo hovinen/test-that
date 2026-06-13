@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches a string whose number of Unicode scalars matches `expected`.
 ///
@@ -110,8 +110,8 @@ mod tests {
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::prelude::*;
     use indoc::indoc;
-    use std::fmt::Debug;
-    use std::marker::PhantomData;
+    use core::fmt::Debug;
+    use core::marker::PhantomData;
 
     #[test]
     fn char_count_matches_string_slice() -> TestResult<()> {

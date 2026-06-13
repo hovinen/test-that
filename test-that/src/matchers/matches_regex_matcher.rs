@@ -13,11 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use alloc::string::{String, ToString};
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use regex::Regex;
-use std::fmt::Debug;
-use std::ops::Deref;
+use core::fmt::Debug;
+use core::ops::Deref;
 
 /// Matches a string the entirety of which which matches the given regular
 /// expression.

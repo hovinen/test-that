@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{
-    borrow::Cow,
-    fmt::{Result, Write},
-};
+use alloc::borrow::Cow;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
+use core::fmt::{Result, Write};
 
 /// Number of space used to indent lines when no alignement is required.
 pub(crate) const INDENTATION_SIZE: usize = 2;
@@ -128,12 +128,13 @@ impl List {
             Decoration::None => 0,
             Decoration::Bullet => 0,
             Decoration::Enumerate => {
-                if self.0.len() > 1 {
-                    ((self.0.len() - 1) as f64).log10().floor() as usize + 1
-                } else {
-                    // Avoid negative logarithm when there is only 0 or 1 element.
-                    1
+                let mut max_index = self.0.len().saturating_sub(1);
+                let mut digits = 1usize;
+                while max_index >= 10 {
+                    max_index /= 10;
+                    digits += 1;
                 }
+                digits
             }
         }
     }

@@ -20,7 +20,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 pub mod __internal {
     use super::*;
@@ -40,7 +40,9 @@ pub mod __internal {
         }
     }
 
-    impl<T: Debug + ?Sized, M1: Matcher<T>, M2: Matcher<T>> Matcher<T> for DisjunctionMatcher<M1, M2> {
+    impl<T: Debug + ?Sized, M1: Matcher<T>, M2: Matcher<T>> Matcher<T>
+        for DisjunctionMatcher<M1, M2>
+    {
         fn matches(&self, actual: &T) -> MatcherResult {
             match (self.m1.matches(actual), self.m2.matches(actual)) {
                 (MatcherResult::NoMatch, MatcherResult::NoMatch) => MatcherResult::NoMatch,
@@ -58,8 +60,12 @@ pub mod __internal {
 
     impl<M1: Describable, M2: Describable> Describable for DisjunctionMatcher<M1, M2> {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
-            format!("{}, or {}", self.m1.describe(matcher_result), self.m2.describe(matcher_result))
-                .into()
+            format!(
+                "{}, or {}",
+                self.m1.describe(matcher_result),
+                self.m2.describe(matcher_result)
+            )
+            .into()
         }
     }
 }

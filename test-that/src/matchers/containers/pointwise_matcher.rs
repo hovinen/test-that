@@ -84,8 +84,8 @@
 /// that all of the containers have the same size. This matcher does not check
 /// whether the sizes match.
 ///
-/// See [module documentation][crate::matchers::containers] for information
-/// about what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 ///
 /// The second argument can be any value implementing `IntoIterator`, such as a
 /// `Vec` or an array. The container does not have to have the same type as the
@@ -108,13 +108,13 @@
 #[doc(hidden)]
 macro_rules! __pointwise {
     ($matcher:expr, $container:expr) => {{
-        $crate::matchers::__internal::PointwiseMatcher::new(
-            $container.into_iter().map($matcher).collect(),
-        )
+        use $crate::matchers::__internal::PointwiseMatcher;
+        PointwiseMatcher::new($container.into_iter().map($matcher).collect())
     }};
 
     ($matcher:expr, $left_container:expr, $right_container:expr) => {{
-        $crate::matchers::__internal::PointwiseMatcher::new(
+        use $crate::matchers::__internal::PointwiseMatcher;
+        PointwiseMatcher::new(
             $left_container
                 .into_iter()
                 .zip($right_container.into_iter())
@@ -124,7 +124,8 @@ macro_rules! __pointwise {
     }};
 
     ($matcher:expr, $left_container:expr, $middle_container:expr, $right_container:expr) => {{
-        $crate::matchers::__internal::PointwiseMatcher::new(
+        use $crate::matchers::__internal::PointwiseMatcher;
+        PointwiseMatcher::new(
             $left_container
                 .into_iter()
                 .zip($right_container.into_iter().zip($middle_container.into_iter()))
@@ -139,11 +140,12 @@ macro_rules! __pointwise {
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
+    use alloc::vec::Vec;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::zipped_iterator::zip;
     use crate::matchers::containers::{OwnedItems, RefItems};
-    use std::{fmt::Debug, marker::PhantomData};
+    use core::{fmt::Debug, marker::PhantomData};
 
     /// This struct is meant to be used only through the `pointwise` macro.
     ///

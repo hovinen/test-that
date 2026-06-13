@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches a `Result` containing `Err` with a value matched by `inner`.
 ///
@@ -51,14 +51,14 @@ pub mod __internal {
         pub(super) inner: InnerMatcherT,
     }
 
-    impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<std::result::Result<T, E>>
+    impl<T: Debug, E: Debug, InnerMatcherT: Matcher<E>> Matcher<core::result::Result<T, E>>
         for ErrMatcher<InnerMatcherT>
     {
-        fn matches(&self, actual: &std::result::Result<T, E>) -> MatcherResult {
+        fn matches(&self, actual: &core::result::Result<T, E>) -> MatcherResult {
             actual.as_ref().err().map(|v| self.inner.matches(v)).unwrap_or(MatcherResult::NoMatch)
         }
 
-        fn explain_match(&self, actual: &std::result::Result<T, E>) -> Description {
+        fn explain_match(&self, actual: &core::result::Result<T, E>) -> Description {
             match actual {
                 Err(e) => {
                     Description::new().text("which is an error").nested(self.inner.explain_match(e))
@@ -72,8 +72,7 @@ pub mod __internal {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             match matcher_result {
                 MatcherResult::Match => {
-                    format!("is an error which {}", self.inner.describe(MatcherResult::Match))
-                        .into()
+                    format!("is an error which {}", self.inner.describe(MatcherResult::Match)).into()
                 }
                 MatcherResult::NoMatch => format!(
                     "is a success or is an error containing a value which {}",
@@ -95,7 +94,7 @@ mod tests {
     #[test]
     fn err_matches_result_with_err_value() -> TestResult<()> {
         let matcher = err(eq(1));
-        let value: std::result::Result<i32, i32> = Err(1);
+        let value: core::result::Result<i32, i32> = Err(1);
 
         let result = matcher.matches(&value);
 
@@ -105,7 +104,7 @@ mod tests {
     #[test]
     fn err_does_not_match_result_with_wrong_err_value() -> TestResult<()> {
         let matcher = err(eq(1));
-        let value: std::result::Result<i32, i32> = Err(0);
+        let value: core::result::Result<i32, i32> = Err(0);
 
         let result = matcher.matches(&value);
 
@@ -115,7 +114,7 @@ mod tests {
     #[test]
     fn err_does_not_match_result_with_ok() -> TestResult<()> {
         let matcher = err(eq(1));
-        let value: std::result::Result<i32, i32> = Ok(1);
+        let value: core::result::Result<i32, i32> = Ok(1);
 
         let result = matcher.matches(&value);
 

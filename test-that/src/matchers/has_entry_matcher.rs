@@ -13,11 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![cfg(feature = "std")]
+
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use std::collections::HashMap;
-use std::fmt::Debug;
-use std::hash::Hash;
+use core::fmt::Debug;
+use core::hash::Hash;
 
 /// Matches a HashMap containing the given `key` whose value is matched by the
 /// matcher `inner`.

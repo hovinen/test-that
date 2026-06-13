@@ -15,8 +15,8 @@
 
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
-use std::fmt::Debug;
-use std::ops::Deref;
+use core::fmt::Debug;
+use core::ops::Deref;
 
 /// Matches a (smart) pointer pointing to a value matched by the [`Matcher`]
 /// `expected`.

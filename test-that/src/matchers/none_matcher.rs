@@ -15,7 +15,7 @@
 
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches an `Option` containing `None`.
 ///

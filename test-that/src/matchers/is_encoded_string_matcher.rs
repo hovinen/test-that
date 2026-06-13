@@ -13,11 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use alloc::string::String;
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches a byte sequence which is a UTF-8 encoded string matched by `inner`.
 ///
@@ -78,8 +79,11 @@ pub mod __internal {
         fn explain_match(&self, actual: &ActualT) -> Description {
             match String::from_utf8(actual.as_ref().to_vec()) {
                 Ok(s) => {
-                    format!("which is a UTF-8 encoded string {}", self.inner.explain_match(&s))
-                        .into()
+                    format!(
+                        "which is a UTF-8 encoded string {}",
+                        self.inner.explain_match(&s)
+                    )
+                    .into()
                 }
                 Err(e) => format!("which is not a UTF-8 encoded string: {e}").into(),
             }

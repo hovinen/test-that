@@ -164,7 +164,7 @@ macro_rules! verify_pred {
         if !$($predicate)*($($arg),*) {
             $crate::assertions::internal::report_failed_predicate(
                 concat!(stringify!($($predicate)*), stringify!(($($arg),*))),
-                vec![$((format!(concat!(stringify!($arg), " = {:?}"), $arg))),*],
+                $crate::__alloc::vec![$((($crate::__alloc::format!(concat!(stringify!($arg), " = {:?}"), $arg)))),*],
                 $crate::internal::source_location::SourceLocation::new(
                     file!(),
                     line!(),
@@ -235,7 +235,7 @@ macro_rules! fail {
         // must_use on expressions is still experimental.
         #[must_use = "The assertion result must be evaluated to affect the test result."]
         fn create_fail_result(message: String) -> $crate::TestResult<()> {
-            Err($crate::internal::test_outcome::TestAssertionFailure::create(format!(
+            Err($crate::internal::test_outcome::TestAssertionFailure::create($crate::__alloc::format!(
                 "{}\n{}",
                 message,
                 $crate::internal::source_location::SourceLocation::new(
@@ -245,7 +245,7 @@ macro_rules! fail {
                 ),
             )))
         }
-        create_fail_result(format!($($message),*))
+        create_fail_result($crate::__alloc::format!($($message),*))
     }};
 
     () => { fail!("Test failed") };
@@ -385,11 +385,12 @@ macro_rules! assert_pred {
 ///   at ...
 /// Test failed. Extra information: Some additional information.
 /// ```
-#[cfg(feature = "test-that-macro")]
+#[cfg(all(feature = "std", feature = "test-that-macro"))]
 #[macro_export]
 macro_rules! expect_that {
     ($actual:expr, $expected:expr $(,)?) => {{
-        $crate::TestResultExt::and_log_failure($crate::verify_that!($actual, $expected));
+        use $crate::TestResultExt;
+        $crate::verify_that!($actual, $expected).and_log_failure();
     }};
 
     ($actual:expr, $expected:expr, $($format_args:expr),* $(,)?) => {
@@ -415,11 +416,12 @@ macro_rules! expect_that {
 /// ```ignore
 /// verify_pred!(predicate(...)).and_log_failure()
 /// ```
-#[cfg(feature = "test-that-macro")]
+#[cfg(all(feature = "std", feature = "test-that-macro"))]
 #[macro_export]
 macro_rules! expect_pred {
     ($($content:tt)*) => {{
-        $crate::TestResultExt::and_log_failure($crate::verify_pred!($($content)*));
+        use $crate::TestResultExt;
+        $crate::verify_pred!($($content)*).and_log_failure();
     }};
 }
 
@@ -432,7 +434,7 @@ pub mod internal {
         internal::{source_location::SourceLocation, test_outcome::TestAssertionFailure},
         matcher::{Matcher, MatcherResult, create_assertion_failure},
     };
-    use std::fmt::Debug;
+    use core::fmt::Debug;
 
     /// Checks whether the matcher `expected` matches the value `actual`, adding
     /// a test failure report if it does not match.
@@ -465,10 +467,10 @@ pub mod internal {
     #[must_use = "The assertion result must be evaluated to affect the test result."]
     pub fn report_failed_predicate(
         actual_expr: &'static str,
-        formatted_arguments: Vec<String>,
+        formatted_arguments: alloc::vec::Vec<alloc::string::String>,
         source_location: SourceLocation,
     ) -> Result<(), TestAssertionFailure> {
-        Err(TestAssertionFailure::create(format!(
+        Err(TestAssertionFailure::create(alloc::format!(
             "{} was false with\n  {}\n{}",
             actual_expr,
             formatted_arguments.join(",\n  "),

@@ -18,7 +18,7 @@ use crate::{
     matcher::{Describable, Matcher, MatcherResult},
     matcher_support::{edit_distance, summarize_diff::create_diff},
 };
-use std::{fmt::Debug, ops::Deref};
+use core::{fmt::Debug, ops::Deref};
 
 /// Matches a value equal (in the sense of `==`) to the dereferenced value of
 /// `expected`.

@@ -31,6 +31,7 @@ mod err_matcher;
 mod field_matcher;
 mod ge_matcher;
 mod gt_matcher;
+#[cfg(feature = "std")]
 mod has_entry_matcher;
 mod is_encoded_string_matcher;
 mod is_matcher;
@@ -63,6 +64,7 @@ pub use eq_matcher::eq;
 pub use err_matcher::err;
 pub use ge_matcher::ge;
 pub use gt_matcher::gt;
+#[cfg(feature = "std")]
 pub use has_entry_matcher::has_entry;
 pub use is_encoded_string_matcher::is_utf8_string;
 #[cfg(feature = "num-traits")]

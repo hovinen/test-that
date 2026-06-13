@@ -18,7 +18,7 @@ use crate::{
     matcher::{Describable, Matcher, MatcherResult},
 };
 use num_traits::float::Float;
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches a floating point value which is NaN.
 pub fn is_nan() -> __internal::IsNanMatcher {

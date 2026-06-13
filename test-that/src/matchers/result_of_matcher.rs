@@ -193,7 +193,7 @@ macro_rules! result_of_internal {
             |$param: $type, matcher| $crate::matcher::Matcher::matches(matcher, &$body),
             |result, matcher| $crate::matcher::Describable::describe(matcher, result),
             |$param: $type, matcher| {
-                ::std::convert::Into::into(format!(
+                ::core::convert::Into::into(format!(
                     concat!(
                         "which after applying `|",
                         stringify!($param),
@@ -220,7 +220,7 @@ pub mod __internal {
         description::Description,
         matcher::{Describable, Matcher, MatcherResult},
     };
-    use std::{fmt::Debug, marker::PhantomData};
+    use core::{fmt::Debug, marker::PhantomData};
 
     pub fn result_of<Input, InnerMatcher, ApplyFn, DescribeFn, ExplainFn>(
         definition: &'static str,

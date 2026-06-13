@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches a value greater (in the sense of `>`) than `expected`.
 ///
@@ -230,28 +230,28 @@ mod tests {
         #[derive(Debug)]
         struct VeryLowNumber {}
 
-        impl std::cmp::PartialEq<u32> for VeryLowNumber {
+        impl core::cmp::PartialEq<u32> for VeryLowNumber {
             fn eq(&self, _other: &u32) -> bool {
                 false
             }
         }
 
         // PartialOrd (required for >) requires PartialEq.
-        impl std::cmp::PartialOrd<u32> for VeryLowNumber {
-            fn partial_cmp(&self, _other: &u32) -> Option<std::cmp::Ordering> {
-                Some(std::cmp::Ordering::Less)
+        impl core::cmp::PartialOrd<u32> for VeryLowNumber {
+            fn partial_cmp(&self, _other: &u32) -> Option<core::cmp::Ordering> {
+                Some(core::cmp::Ordering::Less)
             }
         }
 
-        impl std::cmp::PartialEq<VeryLowNumber> for u32 {
+        impl core::cmp::PartialEq<VeryLowNumber> for u32 {
             fn eq(&self, _other: &VeryLowNumber) -> bool {
                 false
             }
         }
 
-        impl std::cmp::PartialOrd<VeryLowNumber> for u32 {
-            fn partial_cmp(&self, _other: &VeryLowNumber) -> Option<std::cmp::Ordering> {
-                Some(std::cmp::Ordering::Greater)
+        impl core::cmp::PartialOrd<VeryLowNumber> for u32 {
+            fn partial_cmp(&self, _other: &VeryLowNumber) -> Option<core::cmp::Ordering> {
+                Some(core::cmp::Ordering::Greater)
             }
         }
 

@@ -13,11 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use alloc::boxed::Box;
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use crate::matchers::containers::{OwnedItems, RefItems};
-use std::fmt::Debug;
-use std::marker::PhantomData;
+use core::fmt::Debug;
+use core::marker::PhantomData;
 
 /// Matches a container equal (in the sense of `==`) to `expected`.
 ///

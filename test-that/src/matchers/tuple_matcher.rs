@@ -26,7 +26,7 @@ pub mod __internal {
         description::Description,
         matcher::{Describable, Matcher, MatcherResult},
     };
-    use std::fmt::Debug;
+    use core::fmt::Debug;
 
     // This implementation is provided for completeness, but is completely trivial.
     // The only actual value which can be supplied is (), which must match.

@@ -13,11 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use alloc::string::String;
+use alloc::vec::Vec;
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use crate::matcher_support::edit_distance;
 use crate::matcher_support::summarize_diff::create_diff;
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches a value equal (in the sense of `==`) to `expected`.
 ///

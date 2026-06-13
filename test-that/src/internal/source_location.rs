@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fmt::{Display, Error, Formatter};
+use core::fmt::{Display, Error, Formatter};
 
 /// Encapsulates a location in source code.
 ///

@@ -20,7 +20,7 @@ use crate::internal::source_location::SourceLocation;
 use crate::internal::test_outcome::TestAssertionFailure;
 use crate::matchers::__internal::ConjunctionMatcher;
 use crate::matchers::__internal::DisjunctionMatcher;
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Represents an arbitrary condition on data of the given type which can be
 /// checked to perform an assertion.

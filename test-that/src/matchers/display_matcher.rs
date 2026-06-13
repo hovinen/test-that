@@ -13,9 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use alloc::string::String;
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
-use std::fmt::{Debug, Display};
+use core::fmt::{Debug, Display};
 
 /// Matches the string representation of types that implement `Display`.
 ///
@@ -44,8 +45,11 @@ pub mod __internal {
         }
 
         fn explain_match(&self, actual: &T) -> Description {
-            format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
-                .into()
+            format!(
+                "which displays as a string {}",
+                self.inner.explain_match(&format!("{actual}"))
+            )
+            .into()
         }
     }
 
@@ -73,7 +77,7 @@ mod tests {
     use crate::prelude::*;
     use indoc::indoc;
     use serial_test::serial;
-    use std::fmt::{Debug, Display, Error, Formatter};
+    use core::fmt::{Debug, Display, Error, Formatter};
 
     #[test]
     fn display_matches_i32() -> TestResult<()> {

@@ -55,14 +55,14 @@ macro_rules! __unordered_elements_are {
 
     ($(($key_matcher:expr, $value_matcher:expr)),* $(,)?) => {{
         $crate::matchers::__internal::MapContainsMatcher::new(
-            [$((Box::new($key_matcher), Box::new($value_matcher))),*],
+            [$(($crate::__alloc::boxed::Box::new($key_matcher), $crate::__alloc::boxed::Box::new($value_matcher))),*],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
 
     ($($matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$(Box::new($matcher)),*],
+            [$($crate::__alloc::boxed::Box::new($matcher)),*],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};

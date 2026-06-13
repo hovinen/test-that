@@ -17,7 +17,7 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use std::fmt::Debug;
+use core::fmt::Debug;
 
 /// Matches an empty container.
 ///
@@ -35,8 +35,8 @@ use std::fmt::Debug;
 /// # should_pass().unwrap();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information
-/// about what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information about
+/// what types this matcher can match.
 
 pub fn empty() -> __internal::EmptyMatcher {
     __internal::EmptyMatcher

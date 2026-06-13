@@ -22,6 +22,9 @@
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
+    use alloc::boxed::Box;
+    use alloc::string::String;
+    use alloc::vec::Vec;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
@@ -30,10 +33,10 @@ pub mod __internal {
         OwnedItems, RefItems,
         container_contains::{PairBorrow, Requirements},
     };
-    use std::borrow::Borrow;
-    use std::collections::HashSet;
-    use std::fmt::Debug;
-    use std::marker::PhantomData;
+    use alloc::collections::BTreeSet;
+    use core::borrow::Borrow;
+    use core::fmt::Debug;
+    use core::marker::PhantomData;
 
     /// Matches elements of an iterable collection with a sequence of matchers,
     /// in any order.
@@ -652,7 +655,7 @@ pub mod __internal {
         }
 
         fn get_unmatched_expected(&self) -> Vec<usize> {
-            let matched_expected: HashSet<_> = self.0.iter().flatten().collect();
+            let matched_expected: BTreeSet<_> = self.0.iter().flatten().collect();
             (0..N).filter(|expected_idx| !matched_expected.contains(expected_idx)).collect()
         }
 

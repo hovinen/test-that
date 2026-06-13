@@ -14,9 +14,11 @@
 
 #![doc(hidden)]
 
+use alloc::string::String;
+use alloc::vec::Vec;
 use crate::matcher_support::edit_distance;
-use std::io::IsTerminal;
-use std::{borrow::Cow, fmt::Display};
+use alloc::borrow::Cow;
+use core::fmt::Display;
 
 /// Returns a string describing how the expected and actual lines differ.
 ///
@@ -215,7 +217,7 @@ impl<'a> FromIterator<edit_distance::Edit<&'a str>> for BufferedSummary<'a> {
 }
 
 impl<'a> Display for BufferedSummary<'a> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         if !matches!(self.buffer, Buffer::Empty) {
             panic!("Buffer is not empty. This is a bug in gtest_rust.")
         }
@@ -238,7 +240,7 @@ impl<'a> Buffer<'a> {
         match self {
             Buffer::Empty => {}
             Buffer::CommonLineBuffer(common_lines) => {
-                Self::flush_common_lines(std::mem::take(common_lines), summary);
+                Self::flush_common_lines(core::mem::take(common_lines), summary);
             }
             Buffer::ExtraActualLineChunk(extra_actual) => {
                 summary.new_line_for_actual();
@@ -294,13 +296,22 @@ impl<'a> Default for Buffer<'a> {
 }
 
 fn stdout_supports_color() -> bool {
-    match (is_env_var_set("NO_COLOR"), is_env_var_set("FORCE_COLOR")) {
-        (true, _) => false,
-        (false, true) => true,
-        (false, false) => std::io::stdout().is_terminal(),
+    #[cfg(feature = "std")]
+    {
+        use std::io::IsTerminal;
+        match (is_env_var_set("NO_COLOR"), is_env_var_set("FORCE_COLOR")) {
+            (true, _) => false,
+            (false, true) => true,
+            (false, false) => std::io::stdout().is_terminal(),
+        }
+    }
+    #[cfg(not(feature = "std"))]
+    {
+        false
     }
 }
 
+#[cfg(feature = "std")]
 fn is_env_var_set(var: &'static str) -> bool {
     std::env::var(var).map(|s| !s.is_empty()).unwrap_or(false)
 }
@@ -405,7 +416,7 @@ mod tests {
     use crate::{matcher_support::edit_distance::Mode, prelude::*};
     use indoc::indoc;
     use serial_test::{parallel, serial};
-    use std::fmt::Write;
+    use core::fmt::Write;
 
     // Make a long text with each element of the iterator on one line.
     // `collection` must contains at least one element.

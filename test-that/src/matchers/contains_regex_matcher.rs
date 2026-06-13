@@ -16,8 +16,8 @@
 use crate::description::Description;
 use crate::matcher::{Describable, Matcher, MatcherResult};
 use regex::Regex;
-use std::fmt::Debug;
-use std::ops::Deref;
+use core::fmt::Debug;
+use core::ops::Deref;
 
 /// Matches a string containing a substring which matches the given regular
 /// expression.

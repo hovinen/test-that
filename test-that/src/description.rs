@@ -13,10 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{
-    borrow::Cow,
-    fmt::{Display, Formatter, Result},
-};
+use alloc::borrow::Cow;
+use core::fmt::{Display, Formatter, Result};
 
 use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 

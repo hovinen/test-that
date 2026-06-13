@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fmt::Debug;
+use alloc::vec::Vec;
+use core::fmt::Debug;
 
 /// Maximum number of edits which can exist before [`edit_list`] falls back to a
 /// complete rewrite to produce the edit list.
@@ -217,7 +218,7 @@ pub(crate) fn edit_list<T: PartialEq + Copy>(
                 }
                 path.edits.push(Edit::AdditionalActual);
                 return if path.edits.iter().any(|v| !matches!(v, Edit::Both(_))) {
-                    Difference::Editable(std::mem::take(&mut path.edits))
+                    Difference::Editable(core::mem::take(&mut path.edits))
                 } else {
                     Difference::Equal
                 };
