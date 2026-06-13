@@ -23,7 +23,7 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// ```ignore
 /// #[test_that::test]
 /// fn should_work() {
-///     ...
+///    ...
 /// }
 /// ```
 ///
@@ -32,7 +32,8 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// one wishes to use both fatal and non-fatal assertions in the same test. For
 /// example:
 ///
-/// ```ignore
+/// ```
+/// # use test_that::prelude::*;
 /// #[test_that::test]
 /// fn should_work() -> TestResult<()> {
 ///     let value = 2;
@@ -44,7 +45,8 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// This macro can be used with `#[should_panic]` to indicate that the test is
 /// expected to panic. For example:
 ///
-/// ```ignore
+/// ```
+/// # use test_that::prelude::*;
 /// #[test_that::test]
 /// #[should_panic]
 /// fn passes_due_to_should_panic() {
@@ -58,7 +60,8 @@ use syn::{Attribute, ItemFn, ReturnType, parse_macro_input};
 /// that the test panics (and passes) if any non-fatal assertion occurs.
 /// For example, the following test passes:
 ///
-/// ```ignore
+/// ```
+/// # use test_that::prelude::*;
 /// #[test_that::test]
 /// #[should_panic]
 /// fn passes_due_to_should_panic_and_failing_assertion() {
