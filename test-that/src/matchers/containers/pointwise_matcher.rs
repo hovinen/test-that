@@ -45,12 +45,14 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
+/// # #[cfg(feature = "num-traits")] {
 /// # fn should_pass() -> TestResult<()> {
 /// let value = vec![1.00001, 2.000001, 3.00001];
 /// verify_that!(value, pointwise!(|v| near(v, 0.001), [1.0, 2.0, 3.0]))?;
 /// #     Ok(())
 /// # }
 /// # should_pass().unwrap();
+/// # }
 /// ```
 ///
 /// One can pass up to three containers to supply arguments to the function
@@ -58,6 +60,7 @@
 ///
 /// ```
 /// # use test_that::prelude::*;
+/// # #[cfg(feature = "num-traits")] {
 /// # fn should_pass() -> TestResult<()> {
 /// let value = vec![1.00001, 2.000001, 3.00001];
 /// verify_that!(value, pointwise!(|v, t| near(v, t), [1.0, 2.0, 3.0], [0.001, 0.0001, 0.01]))?;
@@ -74,6 +77,7 @@
 /// #     Ok(())
 /// # }
 /// # should_pass().unwrap();
+/// # }
 /// ```
 ///
 /// When using `pointwise!` with multiple containers, the caller must ensure

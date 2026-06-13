@@ -191,18 +191,21 @@ fn pointwise_returns_mismatch_when_actual_value_does_not_match_on_first_and_seco
 }
 
 #[test]
+#[cfg(feature = "num-traits")]
 fn pointwise_matches_single_element_with_lambda_expression_with_extra_value() -> TestResult<()> {
     let value = vec![1.00001f32];
     verify_that!(value, pointwise!(|v| near(v, 0.0001), vec![1.0]))
 }
 
 #[test]
+#[cfg(feature = "num-traits")]
 fn pointwise_matches_single_element_with_two_containers() -> TestResult<()> {
     let value = vec![1.00001f32];
     verify_that!(value, pointwise!(near, vec![1.0], vec![0.0001]))
 }
 
 #[test]
+#[cfg(feature = "num-traits")]
 fn pointwise_matches_single_element_with_three_containers() -> TestResult<()> {
     let value = vec![1.00001f32];
     verify_that!(

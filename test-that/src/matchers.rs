@@ -34,12 +34,14 @@ mod gt_matcher;
 mod has_entry_matcher;
 mod is_encoded_string_matcher;
 mod is_matcher;
+#[cfg(feature = "num-traits")]
 mod is_nan_matcher;
 mod le_matcher;
 mod lt_matcher;
 mod matches_pattern;
 #[cfg(feature = "regex")]
 mod matches_regex_matcher;
+#[cfg(feature = "num-traits")]
 mod near_matcher;
 mod none_matcher;
 mod not_matcher;
@@ -63,11 +65,13 @@ pub use ge_matcher::ge;
 pub use gt_matcher::gt;
 pub use has_entry_matcher::has_entry;
 pub use is_encoded_string_matcher::is_utf8_string;
+#[cfg(feature = "num-traits")]
 pub use is_nan_matcher::is_nan;
 pub use le_matcher::le;
 pub use lt_matcher::lt;
 #[cfg(feature = "regex")]
 pub use matches_regex_matcher::matches_regex;
+#[cfg(feature = "num-traits")]
 pub use near_matcher::{NearMatcher, approx_eq, near};
 pub use none_matcher::none;
 pub use not_matcher::not;
