@@ -13,12 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 /// Matches a string whose number of Unicode scalars matches `expected`.
 ///
 /// In other words, the argument must match the output of
@@ -57,12 +51,16 @@ use core::fmt::Debug;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-pub fn char_count<E: Matcher<usize>>(expected: E) -> __internal::CharCountMatcher<E> {
+pub fn char_count<E>(expected: E) -> __internal::CharCountMatcher<E> {
     __internal::CharCountMatcher { expected }
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct CharCountMatcher<E> {
@@ -109,9 +107,9 @@ mod tests {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::prelude::*;
-    use indoc::indoc;
     use core::fmt::Debug;
     use core::marker::PhantomData;
+    use indoc::indoc;
 
     #[test]
     fn char_count_matches_string_slice() -> TestResult<()> {

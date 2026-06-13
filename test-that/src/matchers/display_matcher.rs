@@ -13,11 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::string::String;
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use core::fmt::{Debug, Display};
-
 /// Matches the string representation of types that implement `Display`.
 ///
 /// ```
@@ -30,7 +25,10 @@ pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> __internal::DisplayMatc
 }
 
 pub mod __internal {
-    use super::*;
+    use alloc::string::String;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use core::fmt::{Debug, Display};
 
     #[doc(hidden)]
     pub struct DisplayMatcher<InnerMatcher> {

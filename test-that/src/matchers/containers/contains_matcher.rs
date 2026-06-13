@@ -14,7 +14,6 @@
 // limitations under the License.
 
 use alloc::boxed::Box;
-use alloc::vec::Vec;
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},

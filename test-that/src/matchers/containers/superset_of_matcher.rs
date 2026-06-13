@@ -13,14 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::vec::Vec;
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-    matchers::containers::{OwnedItems, RefItems},
-};
-use core::{fmt::Debug, marker::PhantomData};
-
 /// Matches a container containing all of the items in the given container
 /// `subset`.
 ///
@@ -86,14 +78,20 @@ use core::{fmt::Debug, marker::PhantomData};
 /// runtime proportional to the *product* of the sizes of the actual and
 /// expected containers as well as the time to check equality of each pair of
 /// items. It should not be used on especially large containers.
-pub fn superset_of<ExpectedT: Debug, Mode>(
+pub fn superset_of<ExpectedT, Mode>(
     subset: ExpectedT,
 ) -> __internal::SupersetOfMatcher<ExpectedT, Mode> {
     __internal::SupersetOfMatcher { subset, phantom: Default::default() }
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+        matchers::containers::{OwnedItems, RefItems},
+    };
+    use alloc::vec::Vec;
+    use core::{fmt::Debug, marker::PhantomData};
 
     #[doc(hidden)]
     pub struct SupersetOfMatcher<ExpectedT, Mode> {

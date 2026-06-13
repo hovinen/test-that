@@ -13,12 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 /// Matches the actual value exactly when the inner matcher does _not_ match.
 ///
 /// ```
@@ -39,7 +33,11 @@ pub fn not<InnerMatcherT>(inner: InnerMatcherT) -> __internal::NotMatcher<InnerM
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct NotMatcher<InnerMatcherT> {

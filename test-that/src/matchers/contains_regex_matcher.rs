@@ -13,10 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
 use regex::Regex;
-use core::fmt::Debug;
 use core::ops::Deref;
 
 /// Matches a string containing a substring which matches the given regular
@@ -59,7 +56,10 @@ pub fn contains_regex<PatternT: Deref<Target = str>>(
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use regex::Regex;
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct ContainsRegexMatcher {

@@ -14,11 +14,7 @@
 // limitations under the License.
 
 use alloc::string::String;
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
+use crate::matcher::Matcher;
 
 /// Matches a byte sequence which is a UTF-8 encoded string matched by `inner`.
 ///
@@ -60,7 +56,12 @@ where
 }
 
 pub mod __internal {
-    use super::*;
+    use alloc::string::String;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct IsEncodedStringMatcher<InnerMatcherT> {

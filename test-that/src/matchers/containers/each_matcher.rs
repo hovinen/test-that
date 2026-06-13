@@ -13,11 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::vec::Vec;
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use crate::matchers::containers::{OwnedItems, RefItems};
-use core::fmt::Debug;
 use core::marker::PhantomData;
 
 /// Matches a container all of whose elements are matched by the matcher
@@ -83,7 +78,12 @@ pub fn each<MatcherT, Mode>(inner: MatcherT) -> __internal::EachMatcher<MatcherT
 }
 
 pub mod __internal {
-    use super::*;
+    use alloc::vec::Vec;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use crate::matchers::containers::{OwnedItems, RefItems};
+    use core::fmt::Debug;
+    use core::marker::PhantomData;
 
     #[doc(hidden)]
     pub struct EachMatcher<MatcherT, Mode> {

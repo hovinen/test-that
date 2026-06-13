@@ -13,13 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-    matcher_support::{edit_distance, summarize_diff::create_diff},
-};
-use core::{fmt::Debug, ops::Deref};
-
 /// Matches a value equal (in the sense of `==`) to the dereferenced value of
 /// `expected`.
 ///
@@ -59,7 +52,12 @@ pub fn eq_deref_of<ExpectedRefT>(
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+        matcher_support::{edit_distance, summarize_diff::create_diff},
+    };
+    use core::{fmt::Debug, ops::Deref};
 
     #[doc(hidden)]
     pub struct EqDerefOfMatcher<ExpectedRefT> {

@@ -15,11 +15,6 @@
 
 use alloc::string::String;
 use alloc::vec::Vec;
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use crate::matcher_support::edit_distance;
-use crate::matcher_support::summarize_diff::create_diff;
-use core::fmt::Debug;
 
 /// Matches a value equal (in the sense of `==`) to `expected`.
 ///
@@ -78,7 +73,12 @@ pub fn eq<T>(expected: T) -> __internal::EqMatcher<T> {
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use crate::matcher_support::edit_distance;
+    use crate::matcher_support::summarize_diff::create_diff;
+    use core::fmt::Debug;
+    use super::{is_multiline_string_debug, to_display_output};
 
     #[doc(hidden)]
     pub struct EqMatcher<T> {

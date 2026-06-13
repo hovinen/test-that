@@ -13,12 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 /// Matches anything. This matcher always succeeds.
 ///
 /// This is useful to check if `actual` matches the specific structure (like
@@ -38,7 +32,11 @@ pub fn anything() -> __internal::AnythingMatcher {
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct AnythingMatcher;

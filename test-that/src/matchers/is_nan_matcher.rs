@@ -13,20 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use num_traits::float::Float;
-use core::fmt::Debug;
-
 /// Matches a floating point value which is NaN.
 pub fn is_nan() -> __internal::IsNanMatcher {
     __internal::IsNanMatcher
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use num_traits::float::Float;
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct IsNanMatcher;

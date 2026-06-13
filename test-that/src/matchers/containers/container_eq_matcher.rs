@@ -13,14 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::boxed::Box;
 use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use crate::matchers::containers::{OwnedItems, RefItems};
 use core::fmt::Debug;
-use core::marker::PhantomData;
 
 /// Matches a container equal (in the sense of `==`) to `expected`.
 ///
@@ -104,7 +99,13 @@ where
 }
 
 pub mod __internal {
-    use super::*;
+    use alloc::vec::Vec;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use crate::matchers::containers::{OwnedItems, RefItems};
+    use core::fmt::Debug;
+    use core::marker::PhantomData;
+    use super::build_explanation;
 
     #[doc(hidden)]
     pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {

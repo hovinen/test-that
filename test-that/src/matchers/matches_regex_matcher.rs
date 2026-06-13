@@ -13,11 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::string::{String, ToString};
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
 use regex::Regex;
-use core::fmt::Debug;
 use core::ops::Deref;
 
 /// Matches a string the entirety of which which matches the given regular
@@ -70,7 +66,12 @@ pub fn matches_regex<PatternT: Deref<Target = str>>(
 }
 
 pub mod __internal {
-    use super::*;
+    use alloc::string::String;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use regex::Regex;
+    use core::fmt::Debug;
+    use core::ops::Deref;
 
     #[doc(hidden)]
     pub struct MatchesRegexMatcher<PatternT: Deref<Target = str>> {

@@ -16,14 +16,12 @@
 // There are no visible documentation elements in this module.
 #![doc(hidden)]
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     /// Matcher created by [`MatcherExt::or`][crate::matcher::MatcherExt::or].
     ///

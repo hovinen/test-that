@@ -15,12 +15,6 @@
 
 #![cfg(feature = "std")]
 
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use std::collections::HashMap;
-use core::fmt::Debug;
-use core::hash::Hash;
-
 /// Matches a HashMap containing the given `key` whose value is matched by the
 /// matcher `inner`.
 ///
@@ -72,7 +66,11 @@ pub fn has_entry<KeyT, MatcherT>(
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use std::collections::HashMap;
+    use core::fmt::Debug;
+    use core::hash::Hash;
 
     #[doc(hidden)]
     pub struct HasEntryMatcher<KeyT, MatcherT> {

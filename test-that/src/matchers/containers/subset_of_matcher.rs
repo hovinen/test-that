@@ -13,14 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::vec::Vec;
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-    matchers::containers::{OwnedItems, RefItems},
-};
-use core::{fmt::Debug, marker::PhantomData};
-
 /// Matches a container all of whose items are in the given container
 /// `superset`.
 ///
@@ -86,14 +78,20 @@ use core::{fmt::Debug, marker::PhantomData};
 /// runtime proportional to the *product* of the sizes of the actual and
 /// expected containers as well as the time to check equality of each pair of
 /// items. It should not be used on especially large containers.
-pub fn subset_of<ExpectedT: Debug, Mode>(
+pub fn subset_of<ExpectedT, Mode>(
     superset: ExpectedT,
 ) -> __internal::SubsetOfMatcher<ExpectedT, Mode> {
     __internal::SubsetOfMatcher { superset, phantom: Default::default() }
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+        matchers::containers::{OwnedItems, RefItems},
+    };
+    use alloc::vec::Vec;
+    use core::{fmt::Debug, marker::PhantomData};
 
     #[doc(hidden)]
     pub struct SubsetOfMatcher<ExpectedT, Mode> {
@@ -127,9 +125,8 @@ pub mod __internal {
             match unexpected_elements.len() {
                 0 => "which no element is unexpected".into(),
                 1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
-                _ => {
-                    format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into()
-                }
+                _ => format!("whose elements {} are unexpected", unexpected_elements.join(", "))
+                    .into(),
             }
         }
     }
@@ -160,9 +157,8 @@ pub mod __internal {
             match unexpected_elements.len() {
                 0 => "which no element is unexpected".into(),
                 1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
-                _ => {
-                    format!("whose elements {} are unexpected", unexpected_elements.join(", ")).into()
-                }
+                _ => format!("whose elements {} are unexpected", unexpected_elements.join(", "))
+                    .into(),
             }
         }
     }

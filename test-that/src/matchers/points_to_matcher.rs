@@ -13,11 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use core::fmt::Debug;
-use core::ops::Deref;
-
 /// Matches a (smart) pointer pointing to a value matched by the [`Matcher`]
 /// `expected`.
 ///
@@ -42,7 +37,10 @@ pub fn points_to<MatcherT>(expected: MatcherT) -> __internal::PointsToMatcher<Ma
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use core::fmt::Debug;
+    use core::ops::Deref;
 
     #[doc(hidden)]
     pub struct PointsToMatcher<MatcherT> {

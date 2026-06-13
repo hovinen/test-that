@@ -13,12 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 /// Matches an `Option` containing a value matched by `inner`.
 ///
 /// ```
@@ -44,7 +38,11 @@ pub fn some<InnerMatcherT>(inner: InnerMatcherT) -> __internal::SomeMatcher<Inne
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct SomeMatcher<InnerMatcherT> {

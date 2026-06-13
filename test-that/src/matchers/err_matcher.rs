@@ -13,12 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 /// Matches a `Result` containing `Err` with a value matched by `inner`.
 ///
 /// ```
@@ -44,7 +38,11 @@ pub fn err<InnerMatcherT>(inner: InnerMatcherT) -> __internal::ErrMatcher<InnerM
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct ErrMatcher<InnerMatcherT> {

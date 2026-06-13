@@ -13,10 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use crate::matcher_support::count_elements::count_elements;
-use core::fmt::Debug;
+use crate::matcher::Matcher;
 
 /// Matches a container whose number of elements matches `expected`.
 ///
@@ -53,7 +50,10 @@ pub fn len<E: Matcher<usize>>(expected: E) -> __internal::LenMatcher<E> {
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use crate::matcher_support::count_elements::count_elements;
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct LenMatcher<E> {

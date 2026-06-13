@@ -13,12 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 /// Matches a value greater (in the sense of `>`) than `expected`.
 ///
 /// The types of the actual and expected values must be comparable via the
@@ -81,7 +75,11 @@ pub fn gt<ExpectedT>(expected: ExpectedT) -> __internal::GtMatcher<ExpectedT> {
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct GtMatcher<ExpectedT> {

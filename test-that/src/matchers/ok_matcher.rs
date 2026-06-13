@@ -13,12 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{
-    description::Description,
-    matcher::{Describable, Matcher, MatcherResult},
-};
-use core::fmt::Debug;
-
 /// Matches a `Result` containing `Ok` with a value matched by `inner`.
 ///
 /// ```
@@ -44,7 +38,11 @@ pub fn ok<InnerMatcherT>(inner: InnerMatcherT) -> __internal::OkMatcher<InnerMat
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+    };
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct OkMatcher<InnerMatcherT> {

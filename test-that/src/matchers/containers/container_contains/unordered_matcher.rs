@@ -23,7 +23,6 @@
 #[doc(hidden)]
 pub mod __internal {
     use alloc::boxed::Box;
-    use alloc::string::String;
     use alloc::vec::Vec;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};

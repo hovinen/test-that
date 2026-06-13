@@ -13,10 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::description::Description;
-use crate::matcher::{Describable, Matcher, MatcherResult};
-use core::fmt::Debug;
-
 /// Matches an `Option` containing `None`.
 ///
 /// ```
@@ -37,7 +33,9 @@ pub fn none() -> __internal::NoneMatcher {
 }
 
 pub mod __internal {
-    use super::*;
+    use crate::description::Description;
+    use crate::matcher::{Describable, Matcher, MatcherResult};
+    use core::fmt::Debug;
 
     #[doc(hidden)]
     pub struct NoneMatcher;
