@@ -29,7 +29,7 @@ authors = [
 ]
 
 [dependencies]
-test-that = { path = "../test-that", version = "0.1.0", features = ["anyhow"] }
+test-that = { path = "../test-that", version = "0.2.0", features = ["anyhow"] }
 anyhow = "1"
 indoc = "2"
 rstest = "0.26.1"
