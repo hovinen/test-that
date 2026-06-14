@@ -23,7 +23,7 @@ repository = "https://github.com/hovinen/test-that"
 readme = "../README.md"
 license = "Apache-2.0"
 edition = "2021"
-rust-version = "1.76.0"
+rust-version = "1.81.0"
 authors = [
   "Bradford Hovinen <bradford@hovinen.me>",
   "Bastien Jacot-Guillarmod <bjacotg@google.com>",
@@ -36,7 +36,8 @@ all-features = true
 rustdoc-args = ["--cfg", "docsrs"]
 
 [features]
-default = ["regex", "num-traits", "test-that-macro", "std"]
+default = ["regex", "num-traits", "non-fatal-assertions", "std"]
+non-fatal-assertions = ["test-that-macro", "std"]
 std = []
 googletest-compat = []
 googletest-migrate = ["googletest-compat"]

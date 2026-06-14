@@ -75,12 +75,12 @@ pub mod prelude {
     #[cfg(feature = "std")]
     pub use super::verify_current_test_outcome;
     pub use super::{assert_that, fail, verify_pred, verify_that};
-    #[cfg(all(feature = "std", feature = "test-that-macro"))]
+    #[cfg(feature = "non-fatal-assertions")]
     pub use super::{expect_pred, expect_that};
 }
 
 use alloc::string::String;
-#[cfg(feature = "test-that-macro")]
+#[cfg(feature = "non-fatal-assertions")]
 pub use test_that_macro::test;
 
 use internal::test_outcome::{TestAssertionFailure, TestOutcome};
@@ -127,7 +127,7 @@ pub type Result<T> = TestResult<T>;
 ///
 /// ```
 /// # use test_that::prelude::*;
-/// # #[cfg(feature = "test-that-macro")] {
+/// # #[cfg(feature = "non-fatal-assertions")] {
 /// # /* Make sure this also compiles as a doctest.
 /// #[test_that::test]
 /// # */

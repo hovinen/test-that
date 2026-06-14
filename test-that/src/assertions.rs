@@ -385,7 +385,7 @@ macro_rules! assert_pred {
 ///   at ...
 /// Test failed. Extra information: Some additional information.
 /// ```
-#[cfg(all(feature = "std", feature = "test-that-macro"))]
+#[cfg(feature = "non-fatal-assertions")]
 #[macro_export]
 macro_rules! expect_that {
     ($actual:expr, $expected:expr $(,)?) => {{
@@ -416,7 +416,7 @@ macro_rules! expect_that {
 /// ```ignore
 /// verify_pred!(predicate(...)).and_log_failure()
 /// ```
-#[cfg(all(feature = "std", feature = "test-that-macro"))]
+#[cfg(feature = "non-fatal-assertions")]
 #[macro_export]
 macro_rules! expect_pred {
     ($($content:tt)*) => {{

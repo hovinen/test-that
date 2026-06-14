@@ -208,8 +208,7 @@ impl Debug for TestAssertionFailure {
     }
 }
 
-#[cfg(feature = "std")]
-impl<T: std::error::Error> From<T> for TestAssertionFailure {
+impl<T: core::error::Error> From<T> for TestAssertionFailure {
     fn from(value: T) -> Self {
         TestAssertionFailure::create(alloc::format!("{value}"))
     }

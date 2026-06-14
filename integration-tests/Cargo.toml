@@ -20,7 +20,7 @@ description = "Integration tests for Test That!"
 repository = "https://github.com/hovinen/test-that"
 license = "Apache-2.0"
 edition = "2021"
-rust-version = "1.76.0"
+rust-version = "1.81.0"
 authors = [
   "Bradford Hovinen <bradford@hovinen.me>",
   "Bastien Jacot-Guillarmod <bjacotg@google.com>",
