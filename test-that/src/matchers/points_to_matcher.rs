@@ -75,9 +75,8 @@ pub mod __internal {
 mod tests {
     use super::points_to;
     use crate::prelude::*;
-    use alloc::{boxed::Box, string::ToString};
+    use alloc::{boxed::Box, rc::Rc, string::ToString};
     use indoc::indoc;
-    use std::rc::Rc;
 
     #[test]
     fn points_to_matches_box_of_int_with_int() -> TestResult<()> {

@@ -234,7 +234,7 @@ mod tests {
 
     #[test]
     fn predicate_matcher_function_pointer() -> TestResult<()> {
-        use std::time::Duration;
+        use core::time::Duration;
         verify_that!(Duration::new(0, 0), predicate(Duration::is_zero))
     }
 }

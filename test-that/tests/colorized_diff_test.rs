@@ -27,6 +27,7 @@ fn build_text<T: Display>(mut collection: impl Iterator<Item = T>) -> String {
     text
 }
 
+#[cfg(feature = "std")]
 #[test]
 fn colors_appear_when_no_color_is_no_set_and_force_color_is_set() -> TestResult<()> {
     std::env::remove_var("NO_COLOR");

@@ -97,7 +97,7 @@ mod tests {
             b: i64,
         }
         impl Display for Struct {
-            fn fmt(&self, f: &mut Formatter<'_>) -> std::result::Result<(), Error> {
+            fn fmt(&self, f: &mut Formatter<'_>) -> core::result::Result<(), Error> {
                 write!(f, "{:?}", self)
             }
         }
@@ -105,6 +105,7 @@ mod tests {
         Ok(())
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn display_displays_error_message_with_explanation_from_inner_matcher() -> TestResult<()> {

@@ -158,6 +158,7 @@ pub trait TestResultExt {
     /// ```
     /// # use test_that::prelude::*;
     /// # use test_that::internal::test_outcome::TestOutcome;
+    /// # #[cfg(feature = "std")]
     /// # TestOutcome::init_current_test_outcome();
     /// let actual = 42;
     /// verify_that!(actual, eq(42)).and_log_failure();
@@ -166,6 +167,7 @@ pub trait TestResultExt {
     ///                          // Test now fails and failure output to stdout
     /// verify_that!(actual, eq(100)).and_log_failure();
     ///               // Test still fails and new failure also output to stdout
+    /// # #[cfg(feature = "std")]
     /// # TestOutcome::close_current_test_outcome::<&str>(Ok(())).unwrap_err();
     /// ```
     fn and_log_failure(self);

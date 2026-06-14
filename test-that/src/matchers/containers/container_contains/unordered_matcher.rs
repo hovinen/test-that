@@ -761,7 +761,7 @@ pub mod __internal {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "std"))]
 mod tests {
     use super::__internal::MapContainsMatcher;
     use crate::matcher::Matcher;

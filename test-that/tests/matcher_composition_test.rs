@@ -128,6 +128,7 @@ fn matches_pattern_on_doubly_nested_struct_with_option_and_vec() -> TestResult<(
     )
 }
 
+#[cfg(feature = "std")]
 #[test]
 fn has_entry_with_vec_of_options_value() -> TestResult<()> {
     use std::collections::HashMap;
@@ -138,7 +139,7 @@ fn has_entry_with_vec_of_options_value() -> TestResult<()> {
 
 #[test]
 fn contains_each_with_ok_starts_with_matchers() -> TestResult<()> {
-    let value: Vec<std::result::Result<String, i32>> =
+    let value: Vec<core::result::Result<String, i32>> =
         vec![Ok("hello world".to_string()), Ok("goodbye".to_string())];
     verify_that!(value, contains_each![ok(starts_with("hello")), ok(starts_with("good"))])
 }
@@ -222,7 +223,7 @@ fn result_of_returning_option_str_ref_with_some_contains_substring() -> TestResu
 
 #[test]
 fn each_ok_not_contains_substring() -> TestResult<()> {
-    let value: Vec<std::result::Result<String, i32>> =
+    let value: Vec<core::result::Result<String, i32>> =
         vec![Ok("hello".to_string()), Ok("world".to_string())];
     verify_that!(value, each(ok(not(contains_substring("bad")))))
 }

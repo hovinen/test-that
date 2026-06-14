@@ -165,6 +165,7 @@ mod tests {
         verify_that!(123, eq(123))
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn eq_struct_debug_diff() -> TestResult<()> {
@@ -195,6 +196,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn eq_vec_debug_diff() -> TestResult<()> {
@@ -218,6 +220,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn eq_vec_debug_diff_length_mismatch() -> TestResult<()> {
@@ -242,6 +245,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn eq_debug_diff_common_lines_omitted() -> TestResult<()> {
@@ -267,6 +271,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn eq_debug_diff_5_common_lines_not_omitted() -> TestResult<()> {
@@ -292,6 +297,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn eq_debug_diff_start_common_lines_omitted() -> TestResult<()> {
@@ -314,6 +320,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn eq_debug_diff_end_common_lines_omitted() -> TestResult<()> {
@@ -353,6 +360,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn match_explanation_contains_diff_of_strings_if_more_than_one_line() -> TestResult<()> {
@@ -385,6 +393,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn match_explanation_does_not_show_diff_if_actual_value_is_single_line() -> TestResult<()> {
@@ -405,6 +414,7 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn match_explanation_does_not_show_diff_if_expected_value_is_single_line() -> TestResult<()> {

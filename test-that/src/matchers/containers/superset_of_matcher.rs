@@ -199,7 +199,6 @@ mod tests {
     use crate::prelude::*;
     use alloc::{string::String, vec::Vec};
     use indoc::indoc;
-    use std::collections::HashSet;
 
     #[test]
     fn superset_of_matches_empty_vec() -> TestResult<()> {
@@ -268,7 +267,7 @@ mod tests {
 
     impl<'a> IntoIterator for &'a OwnedItemContainer {
         type Item = i32;
-        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        type IntoIter = core::iter::Copied<core::slice::Iter<'a, i32>>;
         fn into_iter(self) -> Self::IntoIter {
             self.0.iter().copied()
         }
@@ -314,8 +313,10 @@ mod tests {
         verify_that!(value.as_slice(), points_to(superset_of(["String 1", "String 2", "String 3"])))
     }
 
+    #[cfg(feature = "std")]
     #[test]
     fn superset_of_matches_hash_set_with_one_element() -> TestResult<()> {
+        use std::collections::HashSet;
         verify_that!(HashSet::from([1]), superset_of([1]))
     }
 

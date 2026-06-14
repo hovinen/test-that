@@ -105,9 +105,7 @@ mod tests {
     use core::fmt::Debug;
     use core::marker::PhantomData;
     use indoc::indoc;
-    use std::collections::{
-        BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, VecDeque,
-    };
+    use alloc::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque};
 
     #[test]
     fn len_matcher_matches_vec() -> TestResult<()> {
@@ -161,14 +159,18 @@ mod tests {
         verify_that!(value, len(eq(3)))
     }
 
+    #[cfg(feature = "std")]
     #[test]
     fn len_matcher_matches_hashmap() -> TestResult<()> {
+        use std::collections::HashMap;
         let value = HashMap::from([(1, 2), (2, 3), (3, 4)]);
         verify_that!(value, len(eq(3)))
     }
 
+    #[cfg(feature = "std")]
     #[test]
     fn len_matcher_matches_hashset() -> TestResult<()> {
+        use std::collections::HashSet;
         let value = HashSet::from([1, 2, 3]);
         verify_that!(value, len(eq(3)))
     }
@@ -190,7 +192,7 @@ mod tests {
 
     impl<'a> IntoIterator for &'a OwnedItemContainer {
         type Item = i32;
-        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        type IntoIter = core::iter::Copied<core::slice::Iter<'a, i32>>;
         fn into_iter(self) -> Self::IntoIter {
             self.0.iter().copied()
         }

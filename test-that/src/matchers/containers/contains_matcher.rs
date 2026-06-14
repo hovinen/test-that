@@ -328,7 +328,7 @@ mod tests {
 
     impl<'a> IntoIterator for &'a OwnedItemContainer {
         type Item = i32;
-        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        type IntoIter = core::iter::Copied<core::slice::Iter<'a, i32>>;
         fn into_iter(self) -> Self::IntoIter {
             self.0.iter().copied()
         }

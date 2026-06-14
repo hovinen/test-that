@@ -67,7 +67,6 @@ mod tests {
     use super::empty;
     use crate::prelude::*;
     use alloc::vec::Vec;
-    use std::collections::HashSet;
 
     #[test]
     fn empty_matcher_matches_empty_vec() -> TestResult<()> {
@@ -123,8 +122,10 @@ mod tests {
         verify_that!(*slice, not(empty()))
     }
 
+    #[cfg(feature = "std")]
     #[test]
     fn empty_matcher_matches_empty_hash_set() -> TestResult<()> {
+        use std::collections::HashSet;
         let value: HashSet<i32> = HashSet::new();
         verify_that!(value, empty())
     }
@@ -134,7 +135,7 @@ mod tests {
 
     impl<'a> IntoIterator for &'a OwnedItemContainer {
         type Item = i32;
-        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        type IntoIter = core::iter::Copied<core::slice::Iter<'a, i32>>;
         fn into_iter(self) -> Self::IntoIter {
             self.0.iter().copied()
         }

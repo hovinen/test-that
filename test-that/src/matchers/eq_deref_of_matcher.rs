@@ -124,6 +124,7 @@ mod tests {
         verify_that!(NonCloneNonCopyStruct(123), not(eq_deref_of(&NonCloneNonCopyStruct(234))))
     }
 
+    #[cfg(feature = "std")]
     #[test]
     #[serial]
     fn shows_structured_diff() -> TestResult<()> {

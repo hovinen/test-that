@@ -262,7 +262,6 @@ mod tests {
     use crate::prelude::*;
     use alloc::{string::{String, ToString}, vec::Vec};
     use indoc::indoc;
-    use std::collections::HashSet;
 
     #[test]
     fn container_eq_returns_match_when_containers_match() -> TestResult<()> {
@@ -346,8 +345,10 @@ mod tests {
         )
     }
 
+    #[cfg(feature = "std")]
     #[test]
     fn container_eq_matches_hash_set_with_array() -> TestResult<()> {
+        use std::collections::HashSet;
         verify_that!(HashSet::from([1, 2, 3]), container_eq([1, 2, 3].into()))
     }
 
@@ -447,7 +448,7 @@ mod tests {
 
     impl<'a> IntoIterator for &'a OwnedItemContainer {
         type Item = i32;
-        type IntoIter = std::iter::Copied<std::slice::Iter<'a, i32>>;
+        type IntoIter = core::iter::Copied<core::slice::Iter<'a, i32>>;
         fn into_iter(self) -> Self::IntoIter {
             self.0.iter().copied()
         }

@@ -408,7 +408,7 @@ impl SummaryBuilder {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "std"))]
 mod tests {
     use super::*;
     use crate::{matcher_support::edit_distance::Mode, prelude::*};

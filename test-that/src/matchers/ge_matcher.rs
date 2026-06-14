@@ -113,7 +113,6 @@ mod tests {
     use crate::prelude::*;
     use alloc::string::ToString;
     use indoc::indoc;
-    use std::ffi::OsString;
 
     #[test]
     fn ge_matches_i32_with_i32() -> TestResult<()> {
@@ -169,13 +168,16 @@ mod tests {
     // This means that the test case bellow effectively ensures that
     // `verify_that(actual, ge(expected))` works if `actual >= expected` works
     // (regardless whether the `expected >= actual` works`).
+    #[cfg(feature = "std")]
     #[test]
     fn ge_matches_owned_osstring_reference_with_string_reference() -> TestResult<()> {
+        use std::ffi::OsString;
         let expected = "A";
         let actual: OsString = "B".to_string().into();
         verify_that!(&actual, ge(expected))
     }
 
+    #[cfg(feature = "std")]
     #[test]
     fn ge_matches_ipv6addr_with_ipaddr() -> TestResult<()> {
         use std::net::IpAddr;
