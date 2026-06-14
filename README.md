@@ -479,6 +479,9 @@ The key differences include:
 
 * Test That! has no `verify_eq!` or similar. Use `verify_that!(.., eq())`.
 
+* Test That! does not support the implicit `eq` matcher:
+  `verify_that!(value, 123)`. One must use the `eq` matcher explicitly.
+
 * Test That! also has no matcher `ne`. Use `not(eq(..))`.
 
 * There is no support for fixtures. Such functionality is available in the crate
