@@ -15,11 +15,11 @@
 
 //! The components required to implement matchers.
 
-use crate::description::Description;
-use crate::internal::source_location::SourceLocation;
-use crate::internal::test_outcome::TestAssertionFailure;
-use crate::matchers::__internal::ConjunctionMatcher;
-use crate::matchers::__internal::DisjunctionMatcher;
+use crate::{
+    description::Description,
+    internal::{source_location::SourceLocation, test_outcome::TestAssertionFailure},
+    matchers::__internal::{ConjunctionMatcher, DisjunctionMatcher},
+};
 use core::fmt::Debug;
 
 /// Represents an arbitrary condition on data of the given type which can be

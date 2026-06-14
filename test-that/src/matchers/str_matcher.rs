@@ -24,11 +24,8 @@ use crate::{
         eq_deref_of_matcher::__internal::EqDerefOfMatcher, eq_matcher::__internal::EqMatcher,
     },
 };
-use alloc::borrow::Cow;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-use core::fmt::Debug;
-use core::ops::Deref;
+use alloc::{borrow::Cow, boxed::Box, vec::Vec};
+use core::{fmt::Debug, ops::Deref};
 
 /// Matches a string containing a given substring.
 ///

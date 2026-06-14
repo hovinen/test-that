@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::borrow::Cow;
-use alloc::string::{String, ToString};
-use alloc::vec::Vec;
+use alloc::{
+    borrow::Cow,
+    string::{String, ToString},
+    vec::Vec,
+};
 use core::fmt::{Result, Write};
 
 /// Number of space used to indent lines when no alignement is required.

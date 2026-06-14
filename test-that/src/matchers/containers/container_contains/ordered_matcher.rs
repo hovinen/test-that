@@ -22,14 +22,14 @@
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
-    use crate::description::Description;
-    use crate::matcher::{Describable, Matcher, MatcherResult};
-    use crate::matcher_support::zipped_iterator::zip;
-    use crate::matchers::containers::{OwnedItems, RefItems, container_contains::Requirements};
-    use alloc::boxed::Box;
-    use alloc::vec::Vec;
-    use core::borrow::Borrow;
-    use core::{fmt::Debug, marker::PhantomData};
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+        matcher_support::zipped_iterator::zip,
+        matchers::containers::{OwnedItems, RefItems, container_contains::Requirements},
+    };
+    use alloc::{boxed::Box, vec::Vec};
+    use core::{borrow::Borrow, fmt::Debug, marker::PhantomData};
 
     /// This struct is meant to be used only by the macro `elements_are!`.
     ///

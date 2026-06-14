@@ -15,9 +15,7 @@
 #![doc(hidden)]
 
 use crate::matcher_support::edit_distance;
-use alloc::borrow::Cow;
-use alloc::string::String;
-use alloc::vec::Vec;
+use alloc::{borrow::Cow, string::String, vec::Vec};
 use core::fmt::Display;
 
 /// Returns a string describing how the expected and actual lines differ.

@@ -22,20 +22,18 @@
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
-    use crate::description::Description;
-    use crate::matcher::{Describable, Matcher, MatcherResult};
-    use crate::matcher_support::count_elements::count_elements;
-    use crate::matchers::__internal::ContainerContainsOrderedMatcher;
-    use crate::matchers::containers::{
-        OwnedItems, RefItems,
-        container_contains::{PairBorrow, Requirements},
+    use crate::{
+        description::Description,
+        matcher::{Describable, Matcher, MatcherResult},
+        matcher_support::count_elements::count_elements,
+        matchers::__internal::ContainerContainsOrderedMatcher,
+        matchers::containers::{
+            OwnedItems, RefItems,
+            container_contains::{PairBorrow, Requirements},
+        },
     };
-    use alloc::boxed::Box;
-    use alloc::collections::BTreeSet;
-    use alloc::vec::Vec;
-    use core::borrow::Borrow;
-    use core::fmt::Debug;
-    use core::marker::PhantomData;
+    use alloc::{boxed::Box, collections::BTreeSet, vec::Vec};
+    use core::{borrow::Borrow, fmt::Debug, marker::PhantomData};
 
     /// Matches elements of an iterable collection with a sequence of matchers,
     /// in any order.
