@@ -77,11 +77,6 @@ pub mod prelude {
     pub use super::{assert_that, fail, verify_pred, verify_that};
     #[cfg(all(feature = "std", feature = "test-that-macro"))]
     pub use super::{expect_pred, expect_that};
-    pub use alloc::{
-        boxed::Box,
-        string::{String, ToString},
-        vec::Vec,
-    };
 }
 
 use alloc::string::String;

@@ -287,6 +287,7 @@ mod tests {
     use super::*;
     use crate::prelude::TestResult as Result;
     use crate::prelude::*;
+    use alloc::vec::Vec;
     use quickcheck::{Arbitrary, TestResult, quickcheck};
 
     #[test]

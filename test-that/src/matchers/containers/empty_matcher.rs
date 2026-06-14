@@ -66,6 +66,7 @@ pub mod __internal {
 mod tests {
     use super::empty;
     use crate::prelude::*;
+    use alloc::vec::Vec;
     use std::collections::HashSet;
 
     #[test]

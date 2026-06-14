@@ -101,6 +101,7 @@ mod tests {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::prelude::*;
+    use alloc::vec::Vec;
     use core::fmt::Debug;
     use core::marker::PhantomData;
     use indoc::indoc;

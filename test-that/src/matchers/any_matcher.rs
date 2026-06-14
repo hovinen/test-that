@@ -156,6 +156,7 @@ mod tests {
     use super::__internal;
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
+    use alloc::string::String;
     use indoc::indoc;
 
     #[test]

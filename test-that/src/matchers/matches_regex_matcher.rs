@@ -110,6 +110,7 @@ mod tests {
     use super::matches_regex;
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
+    use alloc::string::ToString;
 
     #[test]
     fn matches_regex_matches_string_reference_with_pattern() -> TestResult<()> {

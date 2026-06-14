@@ -75,6 +75,7 @@ pub mod __internal {
 mod tests {
     use super::points_to;
     use crate::prelude::*;
+    use alloc::{boxed::Box, string::ToString};
     use indoc::indoc;
     use std::rc::Rc;
 

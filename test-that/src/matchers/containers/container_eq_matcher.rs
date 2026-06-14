@@ -260,6 +260,7 @@ fn build_explanation<T: Debug, U: Debug>(missing: Vec<T>, unexpected: Vec<U>) ->
 #[cfg(test)]
 mod tests {
     use crate::prelude::*;
+    use alloc::{string::{String, ToString}, vec::Vec};
     use indoc::indoc;
     use std::collections::HashSet;
 

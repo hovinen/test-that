@@ -231,6 +231,7 @@ mod tests {
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::matchers::containers::RefItems;
     use crate::prelude::*;
+    use alloc::{string::String, vec::Vec};
 
     #[test]
     fn contains_matches_singleton_slice_with_value() -> TestResult<()> {

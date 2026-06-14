@@ -197,6 +197,7 @@ pub mod __internal {
 mod tests {
     use super::superset_of;
     use crate::prelude::*;
+    use alloc::{string::String, vec::Vec};
     use indoc::indoc;
     use std::collections::HashSet;
 

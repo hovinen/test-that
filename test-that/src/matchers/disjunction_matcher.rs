@@ -65,6 +65,7 @@ pub mod __internal {
 #[cfg(test)]
 mod tests {
     use crate::prelude::*;
+    use alloc::string::ToString;
     use indoc::indoc;
 
     #[test]

@@ -111,6 +111,7 @@ mod tests {
     use super::gt;
     use crate::matcher::{Describable as _, Matcher, MatcherResult};
     use crate::prelude::*;
+    use alloc::string::ToString;
     use indoc::indoc;
     use std::ffi::OsString;
 

@@ -234,7 +234,7 @@ macro_rules! fail {
         // We wrap this in a function so that we can annotate it with the must_use attribute.
         // must_use on expressions is still experimental.
         #[must_use = "The assertion result must be evaluated to affect the test result."]
-        fn create_fail_result(message: String) -> $crate::TestResult<()> {
+        fn create_fail_result(message: $crate::__alloc::string::String) -> $crate::TestResult<()> {
             Err($crate::internal::test_outcome::TestAssertionFailure::create($crate::__alloc::format!(
                 "{}\n{}",
                 message,

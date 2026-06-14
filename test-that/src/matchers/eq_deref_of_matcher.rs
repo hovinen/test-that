@@ -102,6 +102,7 @@ pub mod __internal {
 mod tests {
     use super::eq_deref_of;
     use crate::prelude::*;
+    use alloc::{boxed::Box, string::String};
     use indoc::indoc;
     use serial_test::serial;
 

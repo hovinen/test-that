@@ -139,6 +139,7 @@ fn to_display_output(string: &str) -> Option<String> {
 mod tests {
     use super::eq;
     use crate::prelude::*;
+    use alloc::{string::{String, ToString}, vec::Vec};
     use indoc::indoc;
     use serial_test::serial;
 

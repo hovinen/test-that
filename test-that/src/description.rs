@@ -237,6 +237,7 @@ impl<T: Into<Cow<'static, str>>> From<T> for Description {
 mod tests {
     use super::Description;
     use crate::prelude::*;
+    use alloc::string::ToString;
     use indoc::indoc;
 
     #[test]

@@ -592,6 +592,7 @@ mod tests {
     use super::{StrMatcher, StrMatcherConfigurator, contains_substring, ends_with, starts_with};
     use crate::matcher::{Describable as _, MatcherResult};
     use crate::prelude::*;
+    use alloc::string::ToString;
     use indoc::indoc;
 
     #[test]

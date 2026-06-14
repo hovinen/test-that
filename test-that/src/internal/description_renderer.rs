@@ -270,6 +270,7 @@ enum Decoration {
 mod tests {
     use super::{Block, Fragment, List};
     use crate::prelude::*;
+    use alloc::{string::String, vec::Vec};
     use indoc::indoc;
 
     #[test]
