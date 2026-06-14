@@ -46,8 +46,8 @@ use core::marker::PhantomData;
 /// # should_pass_2().unwrap();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information about
-/// what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information
+/// about what types this matcher can match.
 ///
 /// One can also verify the contents of a slice using
 /// [points_to][crate::matchers::points_to]:
@@ -78,10 +78,10 @@ pub fn each<MatcherT, Mode>(inner: MatcherT) -> __internal::EachMatcher<MatcherT
 }
 
 pub mod __internal {
-    use alloc::vec::Vec;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matchers::containers::{OwnedItems, RefItems};
+    use alloc::vec::Vec;
     use core::fmt::Debug;
     use core::marker::PhantomData;
 
@@ -113,11 +113,8 @@ pub mod __internal {
                 }
             }
             if non_matching_elements.is_empty() {
-                return format!(
-                    "whose each element {}",
-                    self.inner.describe(MatcherResult::Match)
-                )
-                .into();
+                return format!("whose each element {}", self.inner.describe(MatcherResult::Match))
+                    .into();
             }
             if non_matching_elements.len() == 1 {
                 let (idx, element, explanation) = non_matching_elements.remove(0);
@@ -161,11 +158,8 @@ pub mod __internal {
                 }
             }
             if non_matching_elements.is_empty() {
-                return format!(
-                    "whose each element {}",
-                    self.inner.describe(MatcherResult::Match)
-                )
-                .into();
+                return format!("whose each element {}", self.inner.describe(MatcherResult::Match))
+                    .into();
             }
             if non_matching_elements.len() == 1 {
                 let (idx, element, explanation) = non_matching_elements.remove(0);

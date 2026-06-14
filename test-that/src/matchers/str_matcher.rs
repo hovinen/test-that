@@ -13,8 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::boxed::Box;
-use alloc::vec::Vec;
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
@@ -23,11 +21,12 @@ use crate::{
         summarize_diff::{create_diff, create_diff_reversed},
     },
     matchers::{
-        eq_deref_of_matcher::__internal::EqDerefOfMatcher,
-        eq_matcher::__internal::EqMatcher,
+        eq_deref_of_matcher::__internal::EqDerefOfMatcher, eq_matcher::__internal::EqMatcher,
     },
 };
 use alloc::borrow::Cow;
+use alloc::boxed::Box;
+use alloc::vec::Vec;
 use core::fmt::Debug;
 use core::ops::Deref;
 
@@ -153,10 +152,10 @@ pub fn ends_with<T>(expected: T) -> StrMatcher<T> {
 ///
 /// This can be used with the following matchers:
 ///
-///  * [`eq`][crate::matchers::eq_matcher::eq] when used with types which deref to `str`, including
-///    `String` and `&str`,
-///  * [`eq_deref_of`][crate::matchers::eq_deref_of_matcher::eq_deref_of] when used with types which
-///    deref to `str`,
+///  * [`eq`][crate::matchers::eq_matcher::eq] when used with types which deref
+///    to `str`, including `String` and `&str`,
+///  * [`eq_deref_of`][crate::matchers::eq_deref_of_matcher::eq_deref_of] when
+///    used with types which deref to `str`,
 ///  * [`contains_substring`],
 ///  * [`starts_with`],
 ///  * [`ends_with`].
@@ -286,8 +285,8 @@ pub trait StrMatcherConfigurator<ExpectedT> {
 /// A matcher which matches equality or containment of a string-like value in a
 /// configurable way.
 ///
-/// See [`StrMatcherConfigurator`] for methods which modify the behaviour of this
-/// matcher.
+/// See [`StrMatcherConfigurator`] for methods which modify the behaviour of
+/// this matcher.
 ///
 /// The following matcher functions instantiate this:
 ///

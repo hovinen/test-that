@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use alloc::string::{String, ToString};
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
+use alloc::string::{String, ToString};
 use core::{fmt::Debug, marker::PhantomData};
 
 /// Creates a matcher based on the predicate provided.

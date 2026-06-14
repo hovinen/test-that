@@ -38,9 +38,7 @@ pub mod __internal {
         }
     }
 
-    impl<T: Debug + ?Sized, M1: Matcher<T>, M2: Matcher<T>> Matcher<T>
-        for ConjunctionMatcher<M1, M2>
-    {
+    impl<T: Debug + ?Sized, M1: Matcher<T>, M2: Matcher<T>> Matcher<T> for ConjunctionMatcher<M1, M2> {
         fn matches(&self, actual: &T) -> MatcherResult {
             match (self.m1.matches(actual), self.m2.matches(actual)) {
                 (MatcherResult::Match, MatcherResult::Match) => MatcherResult::Match,

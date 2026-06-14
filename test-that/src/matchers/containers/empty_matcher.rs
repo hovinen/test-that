@@ -29,8 +29,8 @@
 /// # should_pass().unwrap();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information about
-/// what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information
+/// about what types this matcher can match.
 
 pub fn empty() -> __internal::EmptyMatcher {
     __internal::EmptyMatcher

@@ -31,6 +31,10 @@ authors = [
   "Martin Geisler <mgeisler@google.com>",
 ]
 
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
 [features]
 default = ["regex", "num-traits", "test-that-macro", "std"]
 std = []

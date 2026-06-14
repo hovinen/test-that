@@ -13,8 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use regex::Regex;
 use core::ops::Deref;
+use regex::Regex;
 
 /// Matches a string containing a substring which matches the given regular
 /// expression.
@@ -58,8 +58,8 @@ pub fn contains_regex<PatternT: Deref<Target = str>>(
 pub mod __internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
-    use regex::Regex;
     use core::fmt::Debug;
+    use regex::Regex;
 
     #[doc(hidden)]
     pub struct ContainsRegexMatcher {

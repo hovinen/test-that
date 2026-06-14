@@ -31,8 +31,8 @@ use crate::matcher::Matcher;
 /// # should_pass().unwrap();
 /// ```
 ///
-/// See [module documentation][crate::matchers::containers] for information about
-/// what types this matcher can match.
+/// See [module documentation][crate::matchers::containers] for information
+/// about what types this matcher can match.
 ///
 /// The parameter `expected` can be any integer numeric matcher.
 ///
@@ -87,11 +87,8 @@ pub mod __internal {
                         .into()
                 }
                 MatcherResult::NoMatch => {
-                    format!(
-                        "has length, which {}",
-                        self.expected.describe(MatcherResult::NoMatch)
-                    )
-                    .into()
+                    format!("has length, which {}", self.expected.describe(MatcherResult::NoMatch))
+                        .into()
                 }
             }
         }
@@ -104,12 +101,12 @@ mod tests {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::prelude::*;
+    use core::fmt::Debug;
+    use core::marker::PhantomData;
     use indoc::indoc;
     use std::collections::{
         BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, LinkedList, VecDeque,
     };
-    use core::fmt::Debug;
-    use core::marker::PhantomData;
 
     #[test]
     fn len_matcher_matches_vec() -> TestResult<()> {

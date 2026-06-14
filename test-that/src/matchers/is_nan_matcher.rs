@@ -23,8 +23,8 @@ pub mod __internal {
         description::Description,
         matcher::{Describable, Matcher, MatcherResult},
     };
-    use num_traits::float::Float;
     use core::fmt::Debug;
+    use num_traits::float::Float;
 
     #[doc(hidden)]
     pub struct IsNanMatcher;

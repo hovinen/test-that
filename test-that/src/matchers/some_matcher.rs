@@ -68,7 +68,8 @@ pub mod __internal {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             match matcher_result {
                 MatcherResult::Match => {
-                    format!("has a value which {}", self.inner.describe(MatcherResult::Match)).into()
+                    format!("has a value which {}", self.inner.describe(MatcherResult::Match))
+                        .into()
                 }
                 MatcherResult::NoMatch => format!(
                     "is None or has a value which {}",

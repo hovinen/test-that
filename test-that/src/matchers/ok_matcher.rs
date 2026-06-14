@@ -58,9 +58,9 @@ pub mod __internal {
 
         fn explain_match(&self, actual: &core::result::Result<T, E>) -> Description {
             match actual {
-                Ok(o) => {
-                    Description::new().text("which is a success").nested(self.inner.explain_match(o))
-                }
+                Ok(o) => Description::new()
+                    .text("which is a success")
+                    .nested(self.inner.explain_match(o)),
                 Err(_) => "which is an error".into(),
             }
         }

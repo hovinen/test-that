@@ -68,9 +68,9 @@ pub fn has_entry<KeyT, MatcherT>(
 pub mod __internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
-    use std::collections::HashMap;
     use core::fmt::Debug;
     use core::hash::Hash;
+    use std::collections::HashMap;
 
     #[doc(hidden)]
     pub struct HasEntryMatcher<KeyT, MatcherT> {

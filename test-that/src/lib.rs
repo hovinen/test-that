@@ -59,9 +59,6 @@ pub mod compat;
 /// }
 /// ```
 pub mod prelude {
-    pub use alloc::boxed::Box;
-    pub use alloc::string::{String, ToString};
-    pub use alloc::vec::Vec;
     pub use super::OrFailExt;
     #[cfg(feature = "googletest-compat")]
     #[allow(deprecated)]
@@ -75,13 +72,17 @@ pub mod prelude {
     pub use super::matcher::MatcherExt;
     pub use super::matchers::containers::*;
     pub use super::matchers::*;
-    pub use super::{assert_that, fail, verify_pred, verify_that};
     #[cfg(feature = "std")]
     pub use super::verify_current_test_outcome;
+    pub use super::{assert_that, fail, verify_pred, verify_that};
     #[cfg(all(feature = "std", feature = "test-that-macro"))]
     pub use super::{expect_pred, expect_that};
+    pub use alloc::boxed::Box;
+    pub use alloc::string::{String, ToString};
+    pub use alloc::vec::Vec;
 }
 
+use alloc::string::String;
 #[cfg(feature = "test-that-macro")]
 pub use test_that_macro::test;
 
@@ -216,7 +217,7 @@ pub trait TestResultExt {
     /// However, consider using [`TestResultExt::with_failure_message`]
     /// instead in that case to avoid unnecessary memory allocation when the
     /// message is not needed.
-    fn failure_message(self, message: impl Into<alloc::string::String>) -> Self;
+    fn failure_message(self, message: impl Into<String>) -> Self;
 
     /// Adds the output of the closure `provider` to the logged failure message
     /// if `self` is a `Result::Err`. Otherwise, does nothing.
@@ -236,7 +237,7 @@ pub trait TestResultExt {
     /// # verify_that!(should_fail(), err(displays_as(contains_substring("Actual 0 was wrong"))))
     /// #     .unwrap();
     /// ```
-    fn with_failure_message(self, provider: impl FnOnce() -> alloc::string::String) -> Self;
+    fn with_failure_message(self, provider: impl FnOnce() -> String) -> Self;
 }
 
 impl<T> TestResultExt for core::result::Result<T, TestAssertionFailure> {
@@ -247,14 +248,14 @@ impl<T> TestResultExt for core::result::Result<T, TestAssertionFailure> {
         }
     }
 
-    fn failure_message(mut self, message: impl Into<alloc::string::String>) -> Self {
+    fn failure_message(mut self, message: impl Into<String>) -> Self {
         if let Err(ref mut failure) = self {
             failure.custom_message = Some(message.into());
         }
         self
     }
 
-    fn with_failure_message(mut self, provider: impl FnOnce() -> alloc::string::String) -> Self {
+    fn with_failure_message(mut self, provider: impl FnOnce() -> String) -> Self {
         if let Err(ref mut failure) = self {
             failure.custom_message = Some(provider());
         }

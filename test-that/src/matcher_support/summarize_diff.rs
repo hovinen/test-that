@@ -14,10 +14,10 @@
 
 #![doc(hidden)]
 
-use alloc::string::String;
-use alloc::vec::Vec;
 use crate::matcher_support::edit_distance;
 use alloc::borrow::Cow;
+use alloc::string::String;
+use alloc::vec::Vec;
 use core::fmt::Display;
 
 /// Returns a string describing how the expected and actual lines differ.
@@ -414,9 +414,9 @@ impl SummaryBuilder {
 mod tests {
     use super::*;
     use crate::{matcher_support::edit_distance::Mode, prelude::*};
+    use core::fmt::Write;
     use indoc::indoc;
     use serial_test::{parallel, serial};
-    use core::fmt::Write;
 
     // Make a long text with each element of the iterator on one line.
     // `collection` must contains at least one element.

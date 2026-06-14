@@ -17,8 +17,8 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use num_traits::{Float, FloatConst};
 use core::fmt::Debug;
+use num_traits::{Float, FloatConst};
 
 /// Matches a value equal within `max_abs_error` of `expected`.
 ///

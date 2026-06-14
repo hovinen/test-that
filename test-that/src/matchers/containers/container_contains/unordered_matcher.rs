@@ -22,8 +22,6 @@
 /// **For internal use only. API stablility is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
-    use alloc::boxed::Box;
-    use alloc::vec::Vec;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matcher_support::count_elements::count_elements;
@@ -32,7 +30,9 @@ pub mod __internal {
         OwnedItems, RefItems,
         container_contains::{PairBorrow, Requirements},
     };
+    use alloc::boxed::Box;
     use alloc::collections::BTreeSet;
+    use alloc::vec::Vec;
     use core::borrow::Borrow;
     use core::fmt::Debug;
     use core::marker::PhantomData;

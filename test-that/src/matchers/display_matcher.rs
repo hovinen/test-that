@@ -25,9 +25,9 @@ pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> __internal::DisplayMatc
 }
 
 pub mod __internal {
-    use alloc::string::String;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
+    use alloc::string::String;
     use core::fmt::{Debug, Display};
 
     #[doc(hidden)]
@@ -43,11 +43,8 @@ pub mod __internal {
         }
 
         fn explain_match(&self, actual: &T) -> Description {
-            format!(
-                "which displays as a string {}",
-                self.inner.explain_match(&format!("{actual}"))
-            )
-            .into()
+            format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
+                .into()
         }
     }
 
@@ -73,9 +70,9 @@ pub mod __internal {
 mod tests {
     use super::displays_as;
     use crate::prelude::*;
+    use core::fmt::{Debug, Display, Error, Formatter};
     use indoc::indoc;
     use serial_test::serial;
-    use core::fmt::{Debug, Display, Error, Formatter};
 
     #[test]
     fn display_matches_i32() -> TestResult<()> {

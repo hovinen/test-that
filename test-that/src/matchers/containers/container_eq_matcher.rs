@@ -99,13 +99,13 @@ where
 }
 
 pub mod __internal {
-    use alloc::vec::Vec;
+    use super::build_explanation;
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matchers::containers::{OwnedItems, RefItems};
+    use alloc::vec::Vec;
     use core::fmt::Debug;
     use core::marker::PhantomData;
-    use super::build_explanation;
 
     #[doc(hidden)]
     pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {
