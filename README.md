@@ -8,7 +8,7 @@
 
 [crates-badge]: https://img.shields.io/crates/v/test-that.svg
 [crates-url]: https://crates.io/crates/test-that
-[docs-badge]: https://img.shields.io/badge/docs.rs-test-that-66c2a5
+[docs-badge]: https://img.shields.io/badge/docs.rs-test_that-66c2a5
 [docs-url]: https://docs.rs/test-that/*/test_that/
 [license-badge]: https://img.shields.io/badge/license-Apache-blue.svg
 [license-url]: https://github.com/hovinen/test-that/blob/main/LICENSE
