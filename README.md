@@ -6,12 +6,12 @@
 [![Build Status][actions-badge]][actions-url]
 ![Crates.io MSRV](https://img.shields.io/crates/msrv/test-that)
 
-[crates-badge]: https://img.shields.io/crates/v/test_that.svg
-[crates-url]: https://crates.io/crates/test_that
-[docs-badge]: https://img.shields.io/badge/docs.rs-test_that-66c2a5
-[docs-url]: https://docs.rs/test_that/*/test_that/
+[crates-badge]: https://img.shields.io/crates/v/test-that.svg
+[crates-url]: https://crates.io/crates/test-that
+[docs-badge]: https://img.shields.io/badge/docs.rs-test-that-66c2a5
+[docs-url]: https://docs.rs/test-that/*/test_that/
 [license-badge]: https://img.shields.io/badge/license-Apache-blue.svg
-[license-url]: https://github.com/hovinen/test_that/blob/main/LICENSE
+[license-url]: https://github.com/hovinen/test-that/blob/main/LICENSE
 [actions-badge]: https://github.com/hovinen/test-that/workflows/CI/badge.svg
 [actions-url]: https://github.com/hovinen/test-that/actions?query=workflow%3ACI+branch%3Amain
 
