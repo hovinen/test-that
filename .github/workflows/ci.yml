@@ -140,6 +140,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
+          override: true
       - name: cargo doc
         run: cargo doc --no-deps --all-features
         env:
