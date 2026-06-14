@@ -113,6 +113,8 @@ pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
     ///         .nested(self.expected.explain_match(actual.deref()))
     /// }
     /// ```
+    ///
+    /// [`String`]: alloc::string::String
     fn explain_match(&self, actual: &ActualT) -> Description {
         format!("which {}", self.describe(self.matches(actual))).into()
     }

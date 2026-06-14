@@ -32,6 +32,8 @@
 /// # }
 /// # should_pass().unwrap();
 /// ```
+///
+/// [`Matcher`]: crate::matcher::Matcher
 pub fn points_to<MatcherT>(expected: MatcherT) -> __internal::PointsToMatcher<MatcherT> {
     __internal::PointsToMatcher { expected }
 }

@@ -41,6 +41,7 @@
 //! first.
 //!
 //! [`points_to`]: crate::matchers::points_to
+//! [`Vec`]: alloc::vec::Vec
 
 pub(super) mod container_contains;
 pub(super) mod container_eq_matcher;

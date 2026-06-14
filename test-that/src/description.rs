@@ -13,10 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 use alloc::borrow::Cow;
 use core::fmt::{Display, Formatter, Result};
-
-use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 
 /// A structured description, either of a (composed) matcher or of an
 /// assertion failure.
@@ -84,6 +83,8 @@ use crate::internal::description_renderer::{INDENTATION_SIZE, List};
 ///
 /// No newline is added after the last element during rendering. This makes it
 /// easier to support single-line matcher descriptions and match explanations.
+///
+/// [`String`]: alloc::string::String
 #[derive(Debug, Default)]
 pub struct Description {
     elements: List,
