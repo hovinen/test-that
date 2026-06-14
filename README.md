@@ -4,6 +4,7 @@
 [![docs.rs][docs-badge]][docs-url]
 [![Apache licensed][license-badge]][license-url]
 [![Build Status][actions-badge]][actions-url]
+![Crates.io MSRV](https://img.shields.io/crates/msrv/test-that)
 
 [crates-badge]: https://img.shields.io/crates/v/test_that.svg
 [crates-url]: https://crates.io/crates/test_that
