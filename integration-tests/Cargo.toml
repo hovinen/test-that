@@ -106,8 +106,8 @@ path = "src/first_failure_aborts.rs"
 test = false
 
 [[bin]]
-name = "google_test_with_rstest"
-path = "src/google_test_with_rstest.rs"
+name = "test_that_test_with_rstest"
+path = "src/test_that_test_with_rstest.rs"
 test = false
 
 [[bin]]

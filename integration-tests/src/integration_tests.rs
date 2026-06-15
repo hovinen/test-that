@@ -564,7 +564,7 @@ mod tests {
     #[test]
     fn test_using_normal_test_attribute_macro_formats_failure_message_correctly() -> TestResult<()>
     {
-        let result = should_display_error_correctly_without_google_test_macro();
+        let result = should_display_error_correctly_without_test_that_test_macro();
 
         verify_that!(
             // We hereby assume that the Rust test harness uses std::fmt::Debug to output the Err
@@ -580,7 +580,7 @@ mod tests {
     }
 
     // This is not marked as a test since it deliberately fails.
-    fn should_display_error_correctly_without_google_test_macro() -> TestResult<()> {
+    fn should_display_error_correctly_without_test_that_test_macro() -> TestResult<()> {
         verify_that!(1, eq(2))
     }
 
@@ -606,8 +606,8 @@ mod tests {
     }
 
     #[test_that::test]
-    fn test_with_google_test_and_rstest_runs_only_once() -> TestResult<()> {
-        let output = run_external_process_in_tests_directory("google_test_with_rstest")?;
+    fn test_with_test_that_test_and_rstest_runs_only_once() -> TestResult<()> {
+        let output = run_external_process_in_tests_directory("test_that_test_with_rstest")?;
 
         expect_that!(
             output,
@@ -637,7 +637,7 @@ mod tests {
     }
 
     #[test_that::test]
-    fn async_test_with_google_test_runs_correctly() -> TestResult<()> {
+    fn async_test_with_test_that_test_runs_correctly() -> TestResult<()> {
         let output = run_external_process_in_tests_directory("async_test_with_expect_that")?;
 
         expect_that!(

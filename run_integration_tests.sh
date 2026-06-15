@@ -38,7 +38,7 @@ INTEGRATION_TEST_BINARIES=(
   "failure_due_to_returned_error"
   "fatal_and_non_fatal_failure"
   "first_failure_aborts"
-  "google_test_with_rstest"
+  "test_that_test_with_rstest"
   "non_fatal_failure_in_subroutine"
   "passing_test_with_should_panic"
   "simple_assertion_failure"
