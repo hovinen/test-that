@@ -66,7 +66,7 @@
 ///     `verify_that!(actual, contains_exactly![m1, m2, ...])`
 #[macro_export]
 macro_rules! verify_that {
-    ($actual:expr, $($expected:tt)+ $(,)?) => {
+    ($actual:expr, $($expected:tt)+) => {
         $crate::assertions::internal::check_matcher(
             &$actual,
             $crate::__matcher_expr!($($expected)+),
@@ -85,7 +85,7 @@ macro_rules! __matcher_expr {
     ({$($expecteds:expr),* $(,)?}) => {
         $crate::matchers::containers::contains_exactly![$($expecteds),*]
     };
-    ($expected:expr) => { $expected };
+    ($expected:expr $(,)?) => { $expected };
 }
 
 /// Asserts that the given predicate applied to the given arguments returns
