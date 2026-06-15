@@ -394,6 +394,14 @@ The following environment variables are supported:
 | NO_COLOR      | Disables colored output. See <https://no-color.org/>.   |
 | FORCE_COLOR   | Forces colors even when the output is piped to a file.  |
 
+## Dependencies and nostd
+
+That That! runs in nostd environments, though it does require an allocator.
+
+It also has no required dependencies. Regular expression matching, floating
+point matching and non-fatal assertions require features which are enabled by
+default.
+
 ## Porting from GoogleTest Rust
 
 GoogleTest Rust made major changes between versions 0.11 and 0.12, so there are

@@ -101,11 +101,11 @@ mod tests {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::prelude::*;
+    use alloc::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque};
     use alloc::vec::Vec;
     use core::fmt::Debug;
     use core::marker::PhantomData;
     use indoc::indoc;
-    use alloc::collections::{BTreeMap, BTreeSet, BinaryHeap, LinkedList, VecDeque};
 
     #[test]
     fn len_matcher_matches_vec() -> TestResult<()> {

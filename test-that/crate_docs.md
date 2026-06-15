@@ -652,6 +652,17 @@ can automatically be converted into Proptest
 [`TestCaseError`](https://docs.rs/proptest/latest/proptest/test_runner/enum.TestCaseError.html)
 through the `?` operator as the example above shows.
 
+## Features and dependencies
+
+All dependencies of Test That! are optional. The default features include:
+
+- Support for non-fatal assertions,
+- Support for matching against regular expressions,
+- Support for matching floating point numbers, and
+- Features requiring std.
+
+That That! also runs in nostd environments. It requires an allocator.
+
 ## Note on API stability
 
 This crate generally follows semantic versioning conventions. However, there are
