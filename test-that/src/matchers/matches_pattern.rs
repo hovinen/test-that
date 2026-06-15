@@ -287,6 +287,107 @@
 ///
 /// Trailing commas are allowed (but not required) in both ordinary and tuple
 /// structs.
+///
+/// ## Shorthand for matching against containers
+///
+/// One can use the same `[...]` and `{...}` as in [`verify_that!`] and fields to match against
+/// containers. Use `[...]` to enforce order. This is equivalent to
+/// [`contains_exactly!`] with [`in_order()`].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     a_vec: [eq(1), gt(1), le(4)],
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// Use `{...}` to match elements in any order. This is equivalent to [`contains_exactly!`].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     a_vec: {eq(3), gt(1), eq(1)},
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// This works for both fields and properties.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// impl MyStruct {
+///     fn get_a_vec(&self) -> Vec<u32> {
+///         self.a_vec.clone()
+///     }
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     get_a_vec(): [eq(1), gt(1), eq(3)],
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// It also works with the `*` notation for dereferencing a slice.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// impl MyStruct {
+///     fn get_a_slice(&self) -> &[u32] {
+///         &self.a_vec
+///     }
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     *get_a_slice(): [eq(1), gt(1), eq(3)],
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// This shorthand notation works _only_ for direct arguments in the macro. If the container matcher
+/// is nested inside another matcher, one must use `contains_exactly!`.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     maybe_a_vec: Option<Vec<u32>>,
+/// }
+///
+/// let my_struct = MyStruct { maybe_a_vec: Some(vec![1, 2, 3]) };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     maybe_a_vec: some(contains_exactly![eq(1), gt(1), eq(3)].in_order()),
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
+/// [`in_order()`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
+/// [`verify_that!`]: crate::verify_that
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __matches_pattern {
