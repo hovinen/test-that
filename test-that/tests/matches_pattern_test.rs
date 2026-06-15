@@ -2069,3 +2069,667 @@ fn matches_method_returning_array_slice_with_points_to_for_single_element() -> T
         })
     )
 }
+
+#[test]
+fn matches_vec_field_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(actual, matches_pattern!(AStruct { a_vec: [eq(1), eq(2), eq(3)] }))
+}
+
+#[test]
+fn matches_vec_field_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(actual, matches_pattern!(AStruct { a_vec: {eq(3), eq(2), eq(1)} }))
+}
+
+#[test]
+fn matches_slice_field_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_slice: &'a [u32],
+    }
+
+    let value = vec![1, 2, 3];
+    let actual = AStruct { a_slice: &value };
+
+    verify_that!(actual, matches_pattern!(AStruct { *a_slice: [eq(1), eq(2), eq(3)] }))
+}
+
+#[test]
+fn matches_slice_field_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_slice: &'a [u32],
+    }
+
+    let value = vec![1, 2, 3];
+    let actual = AStruct { a_slice: &value };
+
+    verify_that!(actual, matches_pattern!(AStruct { *a_slice: {eq(3), eq(2), eq(1)} }))
+}
+
+#[test]
+fn matches_method_returning_vec_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.a_vec.clone()
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(actual, matches_pattern!(AStruct { get_a_vec(): [eq(1), eq(2), eq(3)] }))
+}
+
+#[test]
+fn matches_method_returning_vec_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.a_vec.clone()
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(actual, matches_pattern!(AStruct { get_a_vec(): {eq(3), eq(2), eq(1)} }))
+}
+
+#[test]
+fn matches_method_returning_slice_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_slice(&self) -> &[u32] {
+            &self.a_vec
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(actual, matches_pattern!(AStruct { *get_a_slice(): [eq(1), eq(2), eq(3)] }))
+}
+
+#[test]
+fn matches_method_returning_slice_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_slice(&self) -> &[u32] {
+            &self.a_vec
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3] };
+
+    verify_that!(actual, matches_pattern!(AStruct { *get_a_slice(): {eq(3), eq(2), eq(1)} }))
+}
+
+// ── Container shorthand in multi-field structs ────────────────────────────────
+
+#[test]
+fn shorthand_array_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { a_vec: [eq(1), eq(2), eq(3)], another_field: eq(42) })
+    )
+}
+
+#[test]
+fn shorthand_set_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { a_vec: {eq(3), eq(1), eq(2)}, another_field: eq(42) })
+    )
+}
+
+#[test]
+fn shorthand_array_syntax_in_middle_position_of_three_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        first_field: u32,
+        a_vec: Vec<u32>,
+        last_field: u32,
+    }
+
+    let actual = AStruct { first_field: 10, a_vec: vec![1, 2, 3], last_field: 20 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            first_field: eq(10),
+            a_vec: [eq(1), eq(2), eq(3)],
+            last_field: eq(20)
+        })
+    )
+}
+
+#[test]
+fn shorthand_set_syntax_in_middle_position_of_three_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        first_field: u32,
+        a_vec: Vec<u32>,
+        last_field: u32,
+    }
+
+    let actual = AStruct { first_field: 10, a_vec: vec![1, 2, 3], last_field: 20 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            first_field: eq(10),
+            a_vec: {eq(3), eq(1), eq(2)},
+            last_field: eq(20)
+        })
+    )
+}
+
+#[test]
+fn shorthand_array_syntax_in_last_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        another_field: u32,
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { another_field: 42, a_vec: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { another_field: eq(42), a_vec: [eq(1), eq(2), eq(3)] })
+    )
+}
+
+#[test]
+fn shorthand_set_syntax_in_last_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        another_field: u32,
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { another_field: 42, a_vec: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { another_field: eq(42), a_vec: {eq(3), eq(1), eq(2)} })
+    )
+}
+
+#[test]
+fn deref_field_shorthand_array_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_slice: &'a [u32],
+        another_field: u32,
+    }
+
+    let value = vec![1, 2, 3];
+    let actual = AStruct { a_slice: &value, another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { *a_slice: [eq(1), eq(2), eq(3)], another_field: eq(42) })
+    )
+}
+
+#[test]
+fn deref_field_shorthand_set_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct<'a> {
+        a_slice: &'a [u32],
+        another_field: u32,
+    }
+
+    let value = vec![1, 2, 3];
+    let actual = AStruct { a_slice: &value, another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { *a_slice: {eq(3), eq(1), eq(2)}, another_field: eq(42) })
+    )
+}
+
+#[test]
+fn property_shorthand_array_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.a_vec.clone()
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { get_a_vec(): [eq(1), eq(2), eq(3)], another_field: eq(42) })
+    )
+}
+
+#[test]
+fn property_shorthand_set_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.a_vec.clone()
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { get_a_vec(): {eq(3), eq(1), eq(2)}, another_field: eq(42) })
+    )
+}
+
+#[test]
+fn deref_property_shorthand_array_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+    impl AStruct {
+        fn get_a_slice(&self) -> &[u32] {
+            &self.a_vec
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { *get_a_slice(): [eq(1), eq(2), eq(3)], another_field: eq(42) })
+    )
+}
+
+#[test]
+fn deref_property_shorthand_set_syntax_in_first_position_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+    impl AStruct {
+        fn get_a_slice(&self) -> &[u32] {
+            &self.a_vec
+        }
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { *get_a_slice(): {eq(3), eq(1), eq(2)}, another_field: eq(42) })
+    )
+}
+
+// ── Trailing comma ────────────────────────────────────────────────────────────
+
+#[test]
+#[rustfmt::skip]
+fn shorthand_array_syntax_with_trailing_comma_in_first_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            a_vec: [eq(1), eq(2), eq(3),],
+            another_field: eq(42),
+        })
+    )
+}
+
+#[test]
+#[rustfmt::skip]
+fn shorthand_set_syntax_with_trailing_comma_in_first_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+
+    let actual = AStruct { a_vec: vec![1, 2, 3], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            a_vec: {eq(3), eq(1), eq(2),},
+            another_field: eq(42),
+        })
+    )
+}
+
+#[test]
+#[rustfmt::skip]
+fn shorthand_array_syntax_without_trailing_comma_in_last_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        another_field: u32,
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { another_field: 42, a_vec: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            another_field: eq(42),
+            a_vec: [eq(1), eq(2), eq(3)]
+        })
+    )
+}
+
+#[test]
+#[rustfmt::skip]
+fn shorthand_set_syntax_without_trailing_comma_in_last_of_two_fields() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        another_field: u32,
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { another_field: 42, a_vec: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            another_field: eq(42),
+            a_vec: {eq(3), eq(1), eq(2)}
+        })
+    )
+}
+
+// ── Empty container shorthand ─────────────────────────────────────────────────
+
+#[test]
+fn empty_array_shorthand_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { a_vec: vec![] };
+
+    verify_that!(actual, matches_pattern!(AStruct { a_vec: [] }))
+}
+
+#[test]
+fn empty_set_shorthand_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { a_vec: vec![] };
+
+    verify_that!(actual, matches_pattern!(AStruct { a_vec: {} }))
+}
+
+#[test]
+#[rustfmt::skip]
+fn empty_array_shorthand_with_trailing_comma_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { a_vec: vec![] };
+
+    verify_that!(actual, matches_pattern!(AStruct { a_vec: [,] }))
+}
+
+#[test]
+#[rustfmt::skip]
+fn empty_set_shorthand_with_trailing_comma_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+    }
+
+    let actual = AStruct { a_vec: vec![] };
+
+    verify_that!(actual, matches_pattern!(AStruct { a_vec: {,} }))
+}
+
+#[test]
+fn empty_array_shorthand_in_first_of_two_fields_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        a_vec: Vec<u32>,
+        another_field: u32,
+    }
+
+    let actual = AStruct { a_vec: vec![], another_field: 42 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { a_vec: [], another_field: eq(42) })
+    )
+}
+
+// ── Tuple structs ─────────────────────────────────────────────────────────────
+
+#[test]
+fn tuple_struct_single_element_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(Vec<u32>);
+
+    let actual = ATupleStruct(vec![1, 2, 3]);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct([eq(1), eq(2), eq(3)])))
+}
+
+#[test]
+fn tuple_struct_single_element_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(Vec<u32>);
+
+    let actual = ATupleStruct(vec![1, 2, 3]);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct({eq(3), eq(1), eq(2)})))
+}
+
+#[test]
+fn tuple_struct_first_element_of_two_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(Vec<u32>, u32);
+
+    let actual = ATupleStruct(vec![1, 2, 3], 42);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct([eq(1), eq(2), eq(3)], eq(42))))
+}
+
+#[test]
+fn tuple_struct_first_element_of_two_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(Vec<u32>, u32);
+
+    let actual = ATupleStruct(vec![1, 2, 3], 42);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct({eq(3), eq(1), eq(2)}, eq(42))))
+}
+
+#[test]
+fn tuple_struct_last_element_of_two_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(u32, Vec<u32>);
+
+    let actual = ATupleStruct(42, vec![1, 2, 3]);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct(eq(42), [eq(1), eq(2), eq(3)])))
+}
+
+#[test]
+fn tuple_struct_last_element_of_two_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(u32, Vec<u32>);
+
+    let actual = ATupleStruct(42, vec![1, 2, 3]);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct(eq(42), {eq(3), eq(1), eq(2)})))
+}
+
+#[test]
+fn tuple_struct_middle_element_of_three_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(u32, Vec<u32>, u32);
+
+    let actual = ATupleStruct(10, vec![1, 2, 3], 20);
+
+    verify_that!(
+        actual,
+        matches_pattern!(ATupleStruct(eq(10), [eq(1), eq(2), eq(3)], eq(20)))
+    )
+}
+
+#[test]
+fn tuple_struct_middle_element_of_three_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(u32, Vec<u32>, u32);
+
+    let actual = ATupleStruct(10, vec![1, 2, 3], 20);
+
+    verify_that!(
+        actual,
+        matches_pattern!(ATupleStruct(eq(10), {eq(3), eq(1), eq(2)}, eq(20)))
+    )
+}
+
+#[test]
+fn tuple_struct_single_element_empty_array_shorthand_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(Vec<u32>);
+
+    let actual = ATupleStruct(vec![]);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct([])))
+}
+
+#[test]
+fn tuple_struct_single_element_empty_set_shorthand_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    struct ATupleStruct(Vec<u32>);
+
+    let actual = ATupleStruct(vec![]);
+
+    verify_that!(actual, matches_pattern!(ATupleStruct({})))
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────────────
+
+#[test]
+fn enum_tuple_variant_single_element_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    enum AnEnum {
+        A(Vec<u32>),
+    }
+
+    let actual = AnEnum::A(vec![1, 2, 3]);
+
+    verify_that!(actual, matches_pattern!(AnEnum::A([eq(1), eq(2), eq(3)])))
+}
+
+#[test]
+fn enum_tuple_variant_single_element_with_shorthand_set_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    enum AnEnum {
+        A(Vec<u32>),
+    }
+
+    let actual = AnEnum::A(vec![1, 2, 3]);
+
+    verify_that!(actual, matches_pattern!(AnEnum::A({eq(3), eq(1), eq(2)})))
+}
+
+#[test]
+fn enum_tuple_variant_first_element_of_two_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    enum AnEnum {
+        A(Vec<u32>, u32),
+    }
+
+    let actual = AnEnum::A(vec![1, 2, 3], 42);
+
+    verify_that!(actual, matches_pattern!(AnEnum::A([eq(1), eq(2), eq(3)], eq(42))))
+}
+
+#[test]
+fn enum_tuple_variant_last_element_of_two_with_shorthand_array_syntax() -> TestResult<()> {
+    #[derive(Debug)]
+    enum AnEnum {
+        A(u32, Vec<u32>),
+    }
+
+    let actual = AnEnum::A(42, vec![1, 2, 3]);
+
+    verify_that!(actual, matches_pattern!(AnEnum::A(eq(42), [eq(1), eq(2), eq(3)])))
+}
+
+#[test]
+fn enum_tuple_variant_empty_array_shorthand_matches_empty_vec() -> TestResult<()> {
+    #[derive(Debug)]
+    enum AnEnum {
+        A(Vec<u32>),
+    }
+
+    let actual = AnEnum::A(vec![]);
+
+    verify_that!(actual, matches_pattern!(AnEnum::A([])))
+}
