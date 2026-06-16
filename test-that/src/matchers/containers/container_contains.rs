@@ -77,14 +77,22 @@ use core::fmt::Display;
 /// #     .unwrap();
 /// ```
 ///
-/// **Note:** This only works as a top-level matcher in [`verify_that!`] and
-/// related macros. When nested inside other matchers, it is still necessary to
-/// use the [`contains_exactly!`][crate::matchers::containers::contains_exactly]
-/// macro.
+/// This also works inside other macros including [`matches_pattern!`],
+/// [`result_of!`], [`field!`], and the [`contains_exactly!`] family itself:
 ///
-/// ```compile_fail
+/// ```
 /// # use test_that::prelude::*;
-/// verify_that!(vec![vec![1,2], vec![3]], {{eq(2), eq(1)}, {eq(3)}})
+///  verify_that!(vec![vec![1, 2], vec![3, 4]], contains_exactly![{eq(1), eq(2)}, {eq(3), eq(4)}])
+/// #     .unwrap();
+/// ```
+///
+/// **Note:** This only works as a top-level matcher inside other macros. When
+/// the matcher is nested in another matcher created as a function, one must
+/// invoke `contains_exactly!` explicitly.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// verify_that!(Some(vec![1, 2]), some(contains_exactly![eq(2), eq(1)]))
 /// # .unwrap();
 /// ```
 ///
@@ -134,6 +142,15 @@ use core::fmt::Display;
 /// ```
 /// # use test_that::prelude::*;
 ///  verify_that!(vec![1, 2], [eq(1), eq(2)])
+/// #     .unwrap();
+/// ```
+///
+/// This also works inside other macros including [`matches_pattern!`],
+/// [`result_of!`], [`field!`], and the [`contains_exactly!`] family itself:
+///
+/// ```
+/// # use test_that::prelude::*;
+///  verify_that!(vec![vec![1, 2], vec![3, 4]], [[eq(1), eq(2)], [eq(3), eq(4)]])
 /// #     .unwrap();
 /// ```
 ///

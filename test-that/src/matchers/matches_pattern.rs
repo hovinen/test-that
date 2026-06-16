@@ -291,8 +291,10 @@
 /// ## Shorthand for matching against containers
 ///
 /// One can use the same `[...]` and `{...}` as in [`verify_that!`] and fields
-/// to match against containers. Use `[...]` to enforce order. This is
-/// equivalent to [`contains_exactly!`] with [`in_order()`].
+/// to match against containers.
+///
+/// Use `[...]` to enforce order. This is equivalent to [`contains_exactly!`]
+/// with [`in_order()`].
 ///
 /// ```
 /// # use test_that::prelude::*;

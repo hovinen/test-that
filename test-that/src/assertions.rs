@@ -79,11 +79,11 @@ macro_rules! verify_that {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __matcher_expr {
-    ([$($expecteds:expr),* $(,)?]) => {
-        $crate::matchers::containers::contains_exactly![$($expecteds),*].in_order()
+    ([$($m:tt)*]) => {
+        $crate::matchers::containers::contains_exactly![$($m)*].in_order()
     };
-    ({$($expecteds:expr),* $(,)?}) => {
-        $crate::matchers::containers::contains_exactly![$($expecteds),*]
+    ({$($m:tt)*}) => {
+        $crate::matchers::containers::contains_exactly![$($m)*]
     };
     ($expected:expr $(,)?) => { $expected };
 }

@@ -175,6 +175,60 @@
 /// verify_that!(value, result_of!(|s: &MyStruct| s.get_a_string(), eq("A string")))
 /// #    .unwrap();
 /// ```
+///
+/// ## Shorthand for matching against containers
+///
+/// One can use the same `[...]` and `{...}` as in [`verify_that!`] and fields
+/// to match against containers.
+///
+/// Use `[...]` to enforce order. This is equivalent to [`contains_exactly!`]
+/// with [`in_order()`].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, result_of!(|s: &MyStruct| s.a_vec, [eq(1), gt(1), le(4)]))
+/// #    .unwrap();
+/// ```
+///
+/// Use `{...}` to match elements in any order. This is equivalent to
+/// [`contains_exactly!`].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, result_of!(|s: &MyStruct| s.a_vec, {eq(3), gt(1), eq(1)}))
+/// #    .unwrap();
+/// ```
+///
+/// This shorthand notation works _only_ for direct arguments in the macro. If
+/// the container matcher is nested inside another matcher, one must use
+/// `contains_exactly!`.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     maybe_a_vec: Option<Vec<u32>>,
+/// }
+///
+/// let my_struct = MyStruct { maybe_a_vec: Some(vec![1, 2, 3]) };
+/// verify_that!(my_struct, result_of!(
+///     |s: &MyStruct| s.maybe_a_vec,
+///     some(contains_exactly![eq(1), gt(1), eq(3)].in_order())
+/// ))
+/// #    .unwrap();
+/// ```
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __result_of {
