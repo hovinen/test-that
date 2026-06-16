@@ -290,9 +290,9 @@
 ///
 /// ## Shorthand for matching against containers
 ///
-/// One can use the same `[...]` and `{...}` as in [`verify_that!`] and fields to match against
-/// containers. Use `[...]` to enforce order. This is equivalent to
-/// [`contains_exactly!`] with [`in_order()`].
+/// One can use the same `[...]` and `{...}` as in [`verify_that!`] and fields
+/// to match against containers. Use `[...]` to enforce order. This is
+/// equivalent to [`contains_exactly!`] with [`in_order()`].
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -308,7 +308,8 @@
 /// #    .unwrap();
 /// ```
 ///
-/// Use `{...}` to match elements in any order. This is equivalent to [`contains_exactly!`].
+/// Use `{...}` to match elements in any order. This is equivalent to
+/// [`contains_exactly!`].
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -368,8 +369,9 @@
 /// #    .unwrap();
 /// ```
 ///
-/// This shorthand notation works _only_ for direct arguments in the macro. If the container matcher
-/// is nested inside another matcher, one must use `contains_exactly!`.
+/// This shorthand notation works _only_ for direct arguments in the macro. If
+/// the container matcher is nested inside another matcher, one must use
+/// `contains_exactly!`.
 ///
 /// ```
 /// # use test_that::prelude::*;

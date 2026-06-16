@@ -2188,7 +2188,7 @@ fn matches_method_returning_slice_with_shorthand_set_syntax() -> TestResult<()> 
     verify_that!(actual, matches_pattern!(AStruct { *get_a_slice(): {eq(3), eq(2), eq(1)} }))
 }
 
-// ── Container shorthand in multi-field structs ────────────────────────────────
+// Container shorthand in multi-field structs
 
 #[test]
 fn shorthand_array_syntax_in_first_position_of_two_fields() -> TestResult<()> {
@@ -2414,7 +2414,7 @@ fn deref_property_shorthand_set_syntax_in_first_position_of_two_fields() -> Test
     )
 }
 
-// ── Trailing comma ────────────────────────────────────────────────────────────
+// Trailing comma
 
 #[test]
 #[rustfmt::skip]
@@ -2496,7 +2496,7 @@ fn shorthand_set_syntax_without_trailing_comma_in_last_of_two_fields() -> TestRe
     )
 }
 
-// ── Empty container shorthand ─────────────────────────────────────────────────
+// Empty container shorthand
 
 #[test]
 fn empty_array_shorthand_matches_empty_vec() -> TestResult<()> {
@@ -2558,13 +2558,10 @@ fn empty_array_shorthand_in_first_of_two_fields_matches_empty_vec() -> TestResul
 
     let actual = AStruct { a_vec: vec![], another_field: 42 };
 
-    verify_that!(
-        actual,
-        matches_pattern!(AStruct { a_vec: [], another_field: eq(42) })
-    )
+    verify_that!(actual, matches_pattern!(AStruct { a_vec: [], another_field: eq(42) }))
 }
 
-// ── Tuple structs ─────────────────────────────────────────────────────────────
+// Tuple structs
 
 #[test]
 fn tuple_struct_single_element_with_shorthand_array_syntax() -> TestResult<()> {
@@ -2633,10 +2630,7 @@ fn tuple_struct_middle_element_of_three_with_shorthand_array_syntax() -> TestRes
 
     let actual = ATupleStruct(10, vec![1, 2, 3], 20);
 
-    verify_that!(
-        actual,
-        matches_pattern!(ATupleStruct(eq(10), [eq(1), eq(2), eq(3)], eq(20)))
-    )
+    verify_that!(actual, matches_pattern!(ATupleStruct(eq(10), [eq(1), eq(2), eq(3)], eq(20))))
 }
 
 #[test]
@@ -2646,10 +2640,7 @@ fn tuple_struct_middle_element_of_three_with_shorthand_set_syntax() -> TestResul
 
     let actual = ATupleStruct(10, vec![1, 2, 3], 20);
 
-    verify_that!(
-        actual,
-        matches_pattern!(ATupleStruct(eq(10), {eq(3), eq(1), eq(2)}, eq(20)))
-    )
+    verify_that!(actual, matches_pattern!(ATupleStruct(eq(10), {eq(3), eq(1), eq(2)}, eq(20))))
 }
 
 #[test]
@@ -2732,4 +2723,46 @@ fn enum_tuple_variant_empty_array_shorthand_matches_empty_vec() -> TestResult<()
     let actual = AnEnum::A(vec![]);
 
     verify_that!(actual, matches_pattern!(AnEnum::A([])))
+}
+
+#[test]
+fn ordered_container_shorthand_notation_works_in_nested_matcher() -> TestResult<()> {
+    #[derive(Debug)]
+    struct InnerStruct {
+        vec: Vec<u32>,
+    }
+    #[derive(Debug)]
+    struct OuterStruct {
+        inner: InnerStruct,
+    }
+
+    let actual = OuterStruct { inner: InnerStruct { vec: vec![1, 2, 3] } };
+
+    verify_that!(
+        actual,
+        matches_pattern!(OuterStruct { inner: pat!(InnerStruct { vec: [eq(1), eq(2), eq(3)] }) })
+    )
+}
+
+#[test]
+fn unordered_container_shorthand_notation_works_in_nested_matcher() -> TestResult<()> {
+    #[derive(Debug)]
+    struct InnerStruct {
+        vec: Vec<u32>,
+    }
+    #[derive(Debug)]
+    struct OuterStruct {
+        inner: InnerStruct,
+    }
+
+    let actual = OuterStruct { inner: InnerStruct { vec: vec![1, 2, 3] } };
+
+    verify_that!(
+        actual,
+        matches_pattern!(OuterStruct {
+            inner: pat!(InnerStruct {
+                vec: {eq(3), eq(2), eq(1)},
+            })
+        })
+    )
 }
