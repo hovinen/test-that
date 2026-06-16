@@ -66,30 +66,26 @@
 ///     `verify_that!(actual, contains_exactly![m1, m2, ...])`
 #[macro_export]
 macro_rules! verify_that {
-    ($actual:expr, [$($expecteds:expr),+ $(,)?]) => {
+    ($actual:expr, $($expected:tt)+) => {
         $crate::assertions::internal::check_matcher(
             &$actual,
-            $crate::matchers::containers::contains_exactly![$($expecteds),+].in_order(),
+            $crate::__matcher_expr!($($expected)+),
             stringify!($actual),
             $crate::internal::source_location::SourceLocation::new(file!(), line!(), column!()),
         )
     };
-    ($actual:expr, {$($expecteds:expr),+ $(,)?}) => {
-        $crate::assertions::internal::check_matcher(
-            &$actual,
-            $crate::matchers::containers::contains_exactly![$($expecteds),+],
-            stringify!($actual),
-            $crate::internal::source_location::SourceLocation::new(file!(), line!(), column!()),
-        )
+}
+
+#[doc(hidden)]
+#[macro_export]
+macro_rules! __matcher_expr {
+    ([$($expecteds:expr),* $(,)?]) => {
+        $crate::matchers::containers::contains_exactly![$($expecteds),*].in_order()
     };
-    ($actual:expr, $expected:expr $(,)?) => {
-        $crate::assertions::internal::check_matcher(
-            &$actual,
-            $expected,
-            stringify!($actual),
-            $crate::internal::source_location::SourceLocation::new(file!(), line!(), column!()),
-        )
+    ({$($expecteds:expr),* $(,)?}) => {
+        $crate::matchers::containers::contains_exactly![$($expecteds),*]
     };
+    ($expected:expr $(,)?) => { $expected };
 }
 
 /// Asserts that the given predicate applied to the given arguments returns

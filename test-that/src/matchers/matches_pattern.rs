@@ -287,6 +287,109 @@
 ///
 /// Trailing commas are allowed (but not required) in both ordinary and tuple
 /// structs.
+///
+/// ## Shorthand for matching against containers
+///
+/// One can use the same `[...]` and `{...}` as in [`verify_that!`] and fields
+/// to match against containers. Use `[...]` to enforce order. This is
+/// equivalent to [`contains_exactly!`] with [`in_order()`].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     a_vec: [eq(1), gt(1), le(4)],
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// Use `{...}` to match elements in any order. This is equivalent to
+/// [`contains_exactly!`].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     a_vec: {eq(3), gt(1), eq(1)},
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// This works for both fields and properties.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// impl MyStruct {
+///     fn get_a_vec(&self) -> Vec<u32> {
+///         self.a_vec.clone()
+///     }
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     get_a_vec(): [eq(1), gt(1), eq(3)],
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// It also works with the `*` notation for dereferencing a slice.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     a_vec: Vec<u32>,
+/// }
+///
+/// impl MyStruct {
+///     fn get_a_slice(&self) -> &[u32] {
+///         &self.a_vec
+///     }
+/// }
+///
+/// let my_struct = MyStruct { a_vec: vec![1, 2, 3] };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     *get_a_slice(): [eq(1), gt(1), eq(3)],
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// This shorthand notation works _only_ for direct arguments in the macro. If
+/// the container matcher is nested inside another matcher, one must use
+/// `contains_exactly!`.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// #[derive(Debug)]
+/// struct MyStruct {
+///     maybe_a_vec: Option<Vec<u32>>,
+/// }
+///
+/// let my_struct = MyStruct { maybe_a_vec: Some(vec![1, 2, 3]) };
+/// verify_that!(my_struct, matches_pattern!(MyStruct {
+///     maybe_a_vec: some(contains_exactly![eq(1), gt(1), eq(3)].in_order()),
+/// }))
+/// #    .unwrap();
+/// ```
+///
+/// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
+/// [`in_order()`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
+/// [`verify_that!`]: crate::verify_that
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __matches_pattern {
@@ -298,237 +401,184 @@ macro_rules! __matches_pattern {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! matches_pattern_internal {
-    (
-        [$($struct_name:tt)*],
-        { $field_name:ident : $matcher:expr $(,)? }
-    ) => {
+    // Named struct fields: dispatch to @fwd accumulation.
+    // $first:tt requires at least one token, so empty {} falls through to the accumulator
+    // arm below, which handles patterns like AStruct {} (unit struct / enum variant).
+    ([$($struct_name:tt)*], { $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(@fwd [], [$($struct_name)*], { $first $($rest)* })
+    };
+
+    // @fwd: accumulate named-struct field matchers one at a time.
+    // Within each field kind, {}/[] arms precede $expr to prevent $expr committing to
+    // {expr, expr} as a block expression (which would be a hard parse error).
+    // "Last" arms: field with optional trailing comma and nothing else; produce the result.
+    // "Multi" arms: field followed by $first:tt $($rest:tt)* (requires non-empty remainder).
+
+    // Regular field, {} matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($crate::matchers::field!($($struct_name)*.$field_name, $matcher))
+            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!({$($matcher)*})),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!({$($matcher)*})),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        [$($struct_name:tt)*],
-        { *$field_name:ident : $matcher:expr $(,)? }
-    ) => {
+    // Regular field, [] matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher)))
+            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!([$($matcher)*])),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!([$($matcher)*])),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        [$($struct_name:tt)*],
-        { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }
-    ) => {
+    // Regular field, $expr matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($crate::matchers::result_of!(
-                |s: &$($struct_name)*| s.$property_name($($argument),*),
-                $matcher,
-            ))
+            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $matcher),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : $matcher:expr, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $matcher),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        [$($struct_name:tt)*],
-        { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }
-    ) => {
+    // Deref field, {} matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!(
-                $crate::matchers::result_of!(
-                    |s: &$($struct_name)*| s.$property_name($($argument),*),
-                    $crate::matchers::points_to($matcher),
-                )
-            )
+            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*}))),)
         )
     };
-
-    (
-        [$($struct_name:tt)*],
-        { $field_name:ident : $matcher:expr, $($rest:tt)* }
-    ) => {
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $crate::matchers::field!($($struct_name)*.$field_name, $matcher)
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
+            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*}))),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        [$($struct_name:tt)*],
-        { *$field_name:ident : $matcher:expr, $($rest:tt)* }
-    ) => {
-        $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher))
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
-        )
-    };
-
-    (
-        [$($struct_name:tt)*],
-        { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $($rest:tt)* }
-    ) => {
-        $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $crate::matchers::result_of!(
-                    |s: &$($struct_name)*| s.$property_name($($argument),*),
-                    $matcher,
-                )
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
-        )
-    };
-
-    (
-        [$($struct_name:tt)*],
-        { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $($rest:tt)* }
-    ) => {
-        $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $crate::matchers::result_of!(
-                    |s: &$($struct_name)*| s.$property_name($($argument),*),
-                    $crate::matchers::points_to($matcher),
-                )
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
-        )
-    };
-
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { $field_name:ident : $matcher:expr $(,)? }
-    ) => {
+    // Deref field, [] matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::field!($($struct_name)*.$field_name, $matcher)
-            ),
+            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*]))),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*]))),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { *$field_name:ident : $matcher:expr $(,)? }
-    ) => {
+    // Deref field, $expr matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher))
-            ),
+            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher)),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : $matcher:expr, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher)),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }
-    ) => {
+    // Property, {} matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::result_of!(
-                    |s: &$($struct_name)*| s.$property_name($($argument),*),
-                    $matcher,
-                )
-            ),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }
-    ) => {
+    // Property, [] matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::result_of!(
-                    |s: &$($struct_name)*| s.$property_name($($argument),*),
-                    $crate::matchers::points_to($matcher),
-                )
-            ),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { $field_name:ident : $matcher:expr, $($rest:tt)* }
-    ) => {
+    // Property, $expr matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $matcher,),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::field!($($struct_name)*.$field_name, $matcher)
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $matcher,),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { *$field_name:ident : $matcher:expr, $($rest:tt)* }
-    ) => {
+    // Deref property, {} matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher))
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $($rest:tt)* }
-    ) => {
+    // Deref property, [] matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::result_of!(
-                    |s: &$($struct_name)*| s.$property_name($($argument),*),
-                    $matcher,
-                )
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
-    (
-        $crate::matchers::all!($($processed:tt)*),
-        [$($struct_name:tt)*],
-        { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $($rest:tt)* }
-    ) => {
+    // Deref property, $expr matcher
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            $crate::matchers::all!(
-                $($processed)*,
-                $crate::matchers::result_of!(
-                    |s: &$($struct_name)*| s.$property_name($($argument),*),
-                    $crate::matchers::points_to($matcher),
-                )
-            ),
-            [$($struct_name)*],
-            { $($rest)* }
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),),],
+            [$($struct_name)*], { $first $($rest)* }
         )
     };
 
@@ -540,6 +590,54 @@ macro_rules! matches_pattern_internal {
                 concat!("is ", stringify!($($struct_name)*)),
                 concat!("is not ", stringify!($($struct_name)*)),
             )
+    };
+
+    (
+        [$($struct_name:tt)*],
+        ({$($matcher:tt)*} $(,)?)
+    ) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!($crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!({$($matcher)*})))
+        )
+    };
+
+    (
+        [$($struct_name:tt)*],
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            1,
+            ($($rest)*)
+        )
+    };
+
+    (
+        [$($struct_name:tt)*],
+        ([$($matcher:tt)*] $(,)?)
+    ) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!($crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!([$($matcher)*])))
+        )
+    };
+
+    (
+        [$($struct_name:tt)*],
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            1,
+            ($($rest)*)
+        )
     };
 
     (
@@ -570,6 +668,314 @@ macro_rules! matches_pattern_internal {
         $crate::matchers::all!($($processed:tt)*),
         [$($struct_name:tt)*],
         $field:tt,
+        ({$($matcher:tt)*} $(,)?)
+    ) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.$field, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        $field:tt,
+        ([$($matcher:tt)*] $(,)?)
+    ) => {
+        $crate::matchers::__internal::is(
+            stringify!($($struct_name)*),
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.$field, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+        )
+    };
+
+    // We need to repeat this once for every supported field position, unfortunately. There appears
+    // to be no way in declarative macros to compute $field + 1 and have the result evaluated to a
+    // token which can be used as a tuple index.
+    //
+    // The {}/[] multi arms must come before the generic $expr last arm to avoid
+    // $expr committing to parsing {expr, expr} as a block expression and failing.
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        1,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.1, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            2,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        1,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.1, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            2,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        2,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.2, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            3,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        2,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.2, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            3,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        3,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.3, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            4,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        3,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.3, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            4,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        4,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.4, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            5,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        4,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.4, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            5,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        5,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.5, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            6,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        5,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.5, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            6,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        6,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.6, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            7,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        6,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.6, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            7,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        7,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.7, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            8,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        7,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.7, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            8,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        8,
+        ({$($matcher:tt)*}, $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.8, $crate::__matcher_expr!({$($matcher)*}))
+            ),
+            [$($struct_name)*],
+            9,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        8,
+        ([$($matcher:tt)*], $($rest:tt)*)
+    ) => {
+        $crate::matches_pattern_internal!(
+            $crate::matchers::all!(
+                $($processed)*,
+                $crate::matchers::field!($($struct_name)*.8, $crate::__matcher_expr!([$($matcher)*]))
+            ),
+            [$($struct_name)*],
+            9,
+            ($($rest)*)
+        )
+    };
+
+    (
+        $crate::matchers::all!($($processed:tt)*),
+        [$($struct_name:tt)*],
+        $field:tt,
         ($matcher:expr $(,)?)
     ) => {
         $crate::matchers::__internal::is(
@@ -581,9 +987,6 @@ macro_rules! matches_pattern_internal {
         )
     };
 
-    // We need to repeat this once for every supported field position, unfortunately. There appears
-    // to be no way in declarative macros to compute $field + 1 and have the result evaluated to a
-    // token which can be used as a tuple index.
     (
         $crate::matchers::all!($($processed:tt)*),
         [$($struct_name:tt)*],
