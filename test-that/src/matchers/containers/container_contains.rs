@@ -160,12 +160,38 @@ macro_rules! __contains_exactly {
         )
     }};
 
-    ($($matcher:expr),* $(,)?) => {{
+    // Accumulator finalization.
+    (@acc [$($acc:tt)*]) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$($crate::__alloc::boxed::Box::new($matcher)),*],
+            [$($acc)*],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
+
+    // {}/[] arms must precede $expr to prevent $expr committing to {expr, expr} as a block.
+    // "Multi" arms require $first:tt to distinguish from the "last" arm's $(,)?.
+    (@acc [$($acc:tt)*], {$($m:tt)*}, $first:tt $($rest:tt)*) => {
+        $crate::__contains_exactly!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!({$($m)*})),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], {$($m:tt)*} $(,)?) => {
+        $crate::__contains_exactly!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!({$($m)*})),])
+    };
+    (@acc [$($acc:tt)*], [$($m:tt)*], $first:tt $($rest:tt)*) => {
+        $crate::__contains_exactly!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!([$($m)*])),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], [$($m:tt)*] $(,)?) => {
+        $crate::__contains_exactly!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!([$($m)*])),])
+    };
+    (@acc [$($acc:tt)*], $matcher:expr, $first:tt $($rest:tt)*) => {
+        $crate::__contains_exactly!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($matcher),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], $matcher:expr $(,)?) => {
+        $crate::__contains_exactly!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($matcher),])
+    };
+
+    ($first:tt $($rest:tt)*) => {
+        $crate::__contains_exactly!(@acc [], $first $($rest)*)
+    };
 }
 
 /// Matches a container containing elements matched by the given matchers.
@@ -278,12 +304,35 @@ macro_rules! __contains_each {
         )
     }};
 
-    ($($matcher:expr),* $(,)?) => {{
+    (@acc [$($acc:tt)*]) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$($crate::__alloc::boxed::Box::new($matcher)),*],
+            [$($acc)*],
             $crate::matchers::__internal::Requirements::Superset
         )
-    }}
+    }};
+
+    (@acc [$($acc:tt)*], {$($m:tt)*}, $first:tt $($rest:tt)*) => {
+        $crate::__contains_each!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!({$($m)*})),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], {$($m:tt)*} $(,)?) => {
+        $crate::__contains_each!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!({$($m)*})),])
+    };
+    (@acc [$($acc:tt)*], [$($m:tt)*], $first:tt $($rest:tt)*) => {
+        $crate::__contains_each!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!([$($m)*])),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], [$($m:tt)*] $(,)?) => {
+        $crate::__contains_each!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!([$($m)*])),])
+    };
+    (@acc [$($acc:tt)*], $matcher:expr, $first:tt $($rest:tt)*) => {
+        $crate::__contains_each!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($matcher),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], $matcher:expr $(,)?) => {
+        $crate::__contains_each!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($matcher),])
+    };
+
+    ($first:tt $($rest:tt)*) => {
+        $crate::__contains_each!(@acc [], $first $($rest)*)
+    };
 }
 
 /// Matches a container all of whose elements are matched by the given matchers.
@@ -400,12 +449,35 @@ macro_rules! __is_contained_in {
         )
     }};
 
-    ($($matcher:expr),* $(,)?) => {{
+    (@acc [$($acc:tt)*]) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$($crate::__alloc::boxed::Box::new($matcher)),*],
+            [$($acc)*],
             $crate::matchers::__internal::Requirements::Subset,
         )
-    }}
+    }};
+
+    (@acc [$($acc:tt)*], {$($m:tt)*}, $first:tt $($rest:tt)*) => {
+        $crate::__is_contained_in!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!({$($m)*})),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], {$($m:tt)*} $(,)?) => {
+        $crate::__is_contained_in!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!({$($m)*})),])
+    };
+    (@acc [$($acc:tt)*], [$($m:tt)*], $first:tt $($rest:tt)*) => {
+        $crate::__is_contained_in!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!([$($m)*])),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], [$($m:tt)*] $(,)?) => {
+        $crate::__is_contained_in!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($crate::__matcher_expr!([$($m)*])),])
+    };
+    (@acc [$($acc:tt)*], $matcher:expr, $first:tt $($rest:tt)*) => {
+        $crate::__is_contained_in!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($matcher),], $first $($rest)*)
+    };
+    (@acc [$($acc:tt)*], $matcher:expr $(,)?) => {
+        $crate::__is_contained_in!(@acc [$($acc)* $crate::__alloc::boxed::Box::new($matcher),])
+    };
+
+    ($first:tt $($rest:tt)*) => {
+        $crate::__is_contained_in!(@acc [], $first $($rest)*)
+    };
 }
 
 /// Abstracts over map iterator items, allowing both reference pairs `(&K, &V)`

@@ -177,3 +177,28 @@ fn matches_struct_like_enum_value() -> TestResult<()> {
 
     verify_that!(value, field!(AnEnum::AValue.a_field, eq(123)))
 }
+
+#[derive(Debug)]
+struct VecField {
+    items: Vec<u32>,
+}
+
+#[test]
+fn field_with_ordered_container_shorthand() -> TestResult<()> {
+    verify_that!(VecField { items: vec![1, 2, 3] }, field!(VecField.items, [eq(1), eq(2), eq(3)]))
+}
+
+#[test]
+fn field_with_ordered_container_shorthand_trailing_comma() -> TestResult<()> {
+    verify_that!(VecField { items: vec![1, 2, 3] }, field!(VecField.items, [eq(1), eq(2), eq(3),]))
+}
+
+#[test]
+fn field_with_unordered_container_shorthand() -> TestResult<()> {
+    verify_that!(VecField { items: vec![3, 1, 2] }, field!(VecField.items, {eq(1), eq(2), eq(3)}))
+}
+
+#[test]
+fn field_with_empty_container_shorthand() -> TestResult<()> {
+    verify_that!(VecField { items: vec![] }, field!(VecField.items, []))
+}

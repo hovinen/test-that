@@ -477,3 +477,27 @@ fn is_contained_in_in_order_matches_duplicate_actual_elements_consuming_two_matc
 -> TestResult<()> {
     verify_that!(vec![1, 1], is_contained_in![eq(1), eq(1), eq(2)].in_order())
 }
+
+#[test]
+fn contains_exactly_in_order_with_ordered_element_shorthand() -> TestResult<()> {
+    verify_that!(
+        vec![vec![1, 2], vec![3, 4]],
+        contains_exactly![[eq(1), eq(2)], [eq(3), eq(4)]].in_order()
+    )
+}
+
+#[test]
+fn contains_each_in_order_with_ordered_element_shorthand() -> TestResult<()> {
+    verify_that!(
+        vec![vec![1, 2], vec![3, 4], vec![5, 6]],
+        contains_each![[eq(1), eq(2)], [eq(3), eq(4)]].in_order()
+    )
+}
+
+#[test]
+fn is_contained_in_in_order_with_ordered_element_shorthand() -> TestResult<()> {
+    verify_that!(
+        vec![vec![1, 2]],
+        is_contained_in![[eq(1), eq(2)], [eq(3), eq(4)]].in_order()
+    )
+}

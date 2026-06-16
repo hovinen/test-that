@@ -361,3 +361,33 @@ fn matches_struct_with_vec_with_elements_are_value() -> TestResult<()> {
         )
     )
 }
+
+#[derive(Debug)]
+struct SomeStructWithVecMethod {
+    items: Vec<u32>,
+}
+
+impl SomeStructWithVecMethod {
+    fn get_items(&self) -> Vec<u32> {
+        self.items.clone()
+    }
+}
+
+#[test]
+fn result_of_with_ordered_container_shorthand() -> TestResult<()> {
+    let value = SomeStructWithVecMethod { items: vec![1, 2, 3] };
+    verify_that!(value, result_of!(|s: &SomeStructWithVecMethod| s.get_items(), [eq(1), eq(2), eq(3)]))
+}
+
+#[test]
+fn result_of_with_unordered_container_shorthand() -> TestResult<()> {
+    let value = SomeStructWithVecMethod { items: vec![3, 1, 2] };
+    verify_that!(value, result_of!(|s: &SomeStructWithVecMethod| s.get_items(), {eq(1), eq(2), eq(3)}))
+}
+
+#[test]
+fn result_of_with_empty_container_shorthand() -> TestResult<()> {
+    let value = SomeStructWithVecMethod { items: vec![] };
+    verify_that!(value, result_of!(|s: &SomeStructWithVecMethod| s.get_items(), []))
+}
+

@@ -119,6 +119,12 @@ macro_rules! __field {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! field_internal {
+    ($($t:ident)::+.$field:tt, {$($m:tt)*}) => {
+        $crate::field_internal!($($t)::+.$field, $crate::__matcher_expr!({$($m)*}))
+    };
+    ($($t:ident)::+.$field:tt, [$($m:tt)*]) => {
+        $crate::field_internal!($($t)::+.$field, $crate::__matcher_expr!([$($m)*]))
+    };
     ($($t:ident)::+.$field:tt, $m:expr) => {{
         $crate::matchers::__internal::field_matcher(
             |o| {
