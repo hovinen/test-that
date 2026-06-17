@@ -245,8 +245,8 @@ pub trait StrMatcherConfigurator<ExpectedT> {
 
     /// Configures the matcher to ignore Unicode case when comparing values.
     ///
-    /// This converts both the actual and expected values to Unicode lower case, then checks their
-    /// equality.
+    /// This converts both the actual and expected values to Unicode lower case,
+    /// then checks their equality.
     ///
     /// ```
     /// # use test_that::prelude::*;

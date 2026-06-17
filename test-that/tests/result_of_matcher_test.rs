@@ -376,13 +376,19 @@ impl SomeStructWithVecMethod {
 #[test]
 fn result_of_with_ordered_container_shorthand() -> TestResult<()> {
     let value = SomeStructWithVecMethod { items: vec![1, 2, 3] };
-    verify_that!(value, result_of!(|s: &SomeStructWithVecMethod| s.get_items(), [eq(1), eq(2), eq(3)]))
+    verify_that!(
+        value,
+        result_of!(|s: &SomeStructWithVecMethod| s.get_items(), [eq(1), eq(2), eq(3)])
+    )
 }
 
 #[test]
 fn result_of_with_unordered_container_shorthand() -> TestResult<()> {
     let value = SomeStructWithVecMethod { items: vec![3, 1, 2] };
-    verify_that!(value, result_of!(|s: &SomeStructWithVecMethod| s.get_items(), {eq(1), eq(2), eq(3)}))
+    verify_that!(
+        value,
+        result_of!(|s: &SomeStructWithVecMethod| s.get_items(), {eq(1), eq(2), eq(3)})
+    )
 }
 
 #[test]
@@ -390,4 +396,3 @@ fn result_of_with_empty_container_shorthand() -> TestResult<()> {
     let value = SomeStructWithVecMethod { items: vec![] };
     verify_that!(value, result_of!(|s: &SomeStructWithVecMethod| s.get_items(), []))
 }
-

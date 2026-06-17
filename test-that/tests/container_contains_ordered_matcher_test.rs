@@ -496,8 +496,5 @@ fn contains_each_in_order_with_ordered_element_shorthand() -> TestResult<()> {
 
 #[test]
 fn is_contained_in_in_order_with_ordered_element_shorthand() -> TestResult<()> {
-    verify_that!(
-        vec![vec![1, 2]],
-        is_contained_in![[eq(1), eq(2)], [eq(3), eq(4)]].in_order()
-    )
+    verify_that!(vec![vec![1, 2]], is_contained_in![[eq(1), eq(2)], [eq(3), eq(4)]].in_order())
 }

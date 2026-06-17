@@ -555,18 +555,12 @@ fn is_contained_in_explains_mismatch_due_to_no_graph_matching_found() -> TestRes
 
 #[test]
 fn contains_exactly_with_ordered_element_shorthand() -> TestResult<()> {
-    verify_that!(
-        vec![vec![1, 2], vec![3, 4]],
-        contains_exactly![[eq(1), eq(2)], [eq(3), eq(4)]]
-    )
+    verify_that!(vec![vec![1, 2], vec![3, 4]], contains_exactly![[eq(1), eq(2)], [eq(3), eq(4)]])
 }
 
 #[test]
 fn contains_exactly_with_unordered_element_shorthand() -> TestResult<()> {
-    verify_that!(
-        vec![vec![2, 1], vec![4, 3]],
-        contains_exactly![{eq(1), eq(2)}, {eq(3), eq(4)}]
-    )
+    verify_that!(vec![vec![2, 1], vec![4, 3]], contains_exactly![{eq(1), eq(2)}, {eq(3), eq(4)}])
 }
 
 #[test]
@@ -579,8 +573,5 @@ fn contains_each_with_ordered_element_shorthand() -> TestResult<()> {
 
 #[test]
 fn is_contained_in_with_ordered_element_shorthand() -> TestResult<()> {
-    verify_that!(
-        vec![vec![1, 2]],
-        is_contained_in![[eq(1), eq(2)], [eq(3), eq(4)]]
-    )
+    verify_that!(vec![vec![1, 2]], is_contained_in![[eq(1), eq(2)], [eq(3), eq(4)]])
 }
