@@ -243,6 +243,29 @@ pub trait StrMatcherConfigurator<ExpectedT> {
     /// case characters outside of the codepoints 0-127 covered by ASCII.
     fn ignoring_ascii_case(self) -> StrMatcher<ExpectedT>;
 
+    /// Configures the matcher to ignore Unicode case when comparing values.
+    ///
+    /// This converts both the actual and expected values to Unicode lower case, then checks their
+    /// equality.
+    ///
+    /// ```
+    /// # use test_that::prelude::*;
+    /// # fn should_pass() -> TestResult<()> {
+    /// verify_that!("Κάποια τιμή", eq("ΚΆΠΟΙΑ ΤΙΜΉ").ignoring_unicode_case())?;  // Passes
+    /// #     Ok(())
+    /// # }
+    /// # fn should_fail() -> TestResult<()> {
+    /// verify_that!("Άλλη τιμή", eq("Κάποια τιμή").ignoring_unicode_case())?;   // Fails
+    /// #     Ok(())
+    /// # }
+    /// # should_pass().unwrap();
+    /// # should_fail().unwrap_err();
+    /// ```
+    ///
+    /// This is **not guaranteed** to match strings with differing upper/lower
+    /// case characters outside of the codepoints 0-127 covered by ASCII.
+    fn ignoring_unicode_case(self) -> StrMatcher<ExpectedT>;
+
     /// Configures the matcher to match only strings which otherwise satisfy the
     /// conditions a number times matched by the matcher `times`.
     ///
@@ -345,6 +368,11 @@ impl<ExpectedT, MatcherT: Into<StrMatcher<ExpectedT>>> StrMatcherConfigurator<Ex
         StrMatcher { configuration: existing.configuration.ignoring_ascii_case(), ..existing }
     }
 
+    fn ignoring_unicode_case(self) -> StrMatcher<ExpectedT> {
+        let existing = self.into();
+        StrMatcher { configuration: existing.configuration.ignoring_unicode_case(), ..existing }
+    }
+
     fn times(self, times: impl Matcher<usize> + 'static) -> StrMatcher<ExpectedT> {
         let existing = self.into();
         if !matches!(existing.configuration.mode, MatchMode::Contains) {
@@ -412,6 +440,7 @@ impl MatchMode {
 enum CasePolicy {
     Respect,
     IgnoreAscii,
+    IgnoreUnicode,
 }
 
 impl Configuration {
@@ -429,12 +458,17 @@ impl Configuration {
             MatchMode::Equals => match self.case_policy {
                 CasePolicy::Respect => expected == actual,
                 CasePolicy::IgnoreAscii => expected.eq_ignore_ascii_case(actual),
+                CasePolicy::IgnoreUnicode => expected.to_lowercase() == actual.to_lowercase(),
             },
             MatchMode::Contains => match self.case_policy {
                 CasePolicy::Respect => self.does_containment_match(actual, expected),
                 CasePolicy::IgnoreAscii => self.does_containment_match(
                     actual.to_ascii_lowercase().as_str(),
                     expected.to_ascii_lowercase().as_str(),
+                ),
+                CasePolicy::IgnoreUnicode => self.does_containment_match(
+                    actual.to_lowercase().as_str(),
+                    expected.to_lowercase().as_str(),
                 ),
             },
             MatchMode::StartsWith => match self.case_policy {
@@ -443,12 +477,23 @@ impl Configuration {
                     actual.len() >= expected.len()
                         && actual[..expected.len()].eq_ignore_ascii_case(expected)
                 }
+                CasePolicy::IgnoreUnicode => {
+                    actual.len() >= expected.len()
+                        && actual.is_char_boundary(expected.len())
+                        && actual[..expected.len()].to_lowercase() == expected.to_lowercase()
+                }
             },
             MatchMode::EndsWith => match self.case_policy {
                 CasePolicy::Respect => actual.ends_with(expected),
                 CasePolicy::IgnoreAscii => {
                     actual.len() >= expected.len()
                         && actual[actual.len() - expected.len()..].eq_ignore_ascii_case(expected)
+                }
+                CasePolicy::IgnoreUnicode => {
+                    actual.len() >= expected.len()
+                        && actual.is_char_boundary(actual.len() - expected.len())
+                        && actual[actual.len() - expected.len()..].to_lowercase()
+                            == expected.to_lowercase()
                 }
             },
         }
@@ -479,6 +524,7 @@ impl Configuration {
         match self.case_policy {
             CasePolicy::Respect => {}
             CasePolicy::IgnoreAscii => addenda.push("ignoring ASCII case".into()),
+            CasePolicy::IgnoreUnicode => addenda.push("ignoring Unicode case".into()),
         }
         if let Some(times) = self.times.as_ref() {
             addenda.push(format!("count {}", times.describe(matcher_result)).into());
@@ -568,6 +614,10 @@ impl Configuration {
 
     fn ignoring_ascii_case(self) -> Self {
         Self { case_policy: CasePolicy::IgnoreAscii, ..self }
+    }
+
+    fn ignoring_unicode_case(self) -> Self {
+        Self { case_policy: CasePolicy::IgnoreUnicode, ..self }
     }
 
     fn times(self, times: impl Matcher<usize> + 'static) -> Self {
@@ -1230,5 +1280,49 @@ mod tests {
             result,
             err(displays_as(not(contains_substring("Difference(-actual / +expected):"))))
         )
+    }
+
+    #[test]
+    fn eq_ignoring_unicode_case_matches_string_with_non_unicode_different_case() -> TestResult<()> {
+        verify_that!("Κάποια τιμή", eq("ΚΆΠΟΙΑ ΤΙΜΉ").ignoring_unicode_case())
+    }
+
+    #[test]
+    fn eq_ignoring_unicode_case_does_not_match_different_string() -> TestResult<()> {
+        verify_that!("Κάποια τιμή", not(eq("Some Value").ignoring_unicode_case()))
+    }
+
+    #[test]
+    fn starts_with_ignoring_unicode_case_matches_string_with_non_unicode_different_case()
+    -> TestResult<()> {
+        verify_that!("Κάποια τιμή", starts_with("ΚΆΠΟΙΑ").ignoring_unicode_case())
+    }
+
+    #[test]
+    fn starts_with_ignoring_unicode_case_does_not_match_different_string() -> TestResult<()> {
+        verify_that!("Κάποια τιμή", not(starts_with("Some Value").ignoring_unicode_case()))
+    }
+
+    #[test]
+    fn ends_with_ignoring_unicode_case_matches_string_with_non_unicode_different_case()
+    -> TestResult<()> {
+        verify_that!("Κάποια τιμή", ends_with("ΤΙΜΉ").ignoring_unicode_case())
+    }
+
+    #[test]
+    fn ends_with_ignoring_unicode_case_does_not_match_different_string() -> TestResult<()> {
+        verify_that!("Κάποια τιμή", not(ends_with("Some Value").ignoring_unicode_case()))
+    }
+
+    #[test]
+    fn contains_substring_ignoring_unicode_case_matches_string_with_non_unicode_different_case()
+    -> TestResult<()> {
+        verify_that!("Κάποια τιμή", contains_substring("ΠΟΙΑ ").ignoring_unicode_case())
+    }
+
+    #[test]
+    fn contains_substring_ignoring_unicode_case_does_not_match_different_string() -> TestResult<()>
+    {
+        verify_that!("Κάποια τιμή", not(contains_substring("me Val").ignoring_unicode_case()))
     }
 }
