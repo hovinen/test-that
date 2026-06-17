@@ -235,19 +235,19 @@
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __result_of {
-    ($($t:tt)*) => { $crate::result_of_internal!($($t)*) }
+    ($($t:tt)*) => { $crate::__result_of_internal!($($t)*) }
 }
 
 // Internal-only macro created so that the macro definition does not appear in
 // generated documentation.
 #[doc(hidden)]
 #[macro_export]
-macro_rules! result_of_internal {
+macro_rules! __result_of_internal {
     (|$param:ident: $type:ty| $body:expr, {$($matcher:tt)*} $(,)?) => {
-        $crate::result_of_internal!(|$param: $type| $body, $crate::__matcher_expr!({$($matcher)*}),)
+        $crate::__result_of_internal!(|$param: $type| $body, $crate::__matcher_expr!({$($matcher)*}),)
     };
     (|$param:ident: $type:ty| $body:expr, [$($matcher:tt)*] $(,)?) => {
-        $crate::result_of_internal!(|$param: $type| $body, $crate::__matcher_expr!([$($matcher)*]),)
+        $crate::__result_of_internal!(|$param: $type| $body, $crate::__matcher_expr!([$($matcher)*]),)
     };
     (|$param:ident: $type:ty| $body:expr, $matcher:expr $(,)?) => {{
         $crate::matchers::__internal::result_of(
