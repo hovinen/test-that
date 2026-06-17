@@ -30,14 +30,36 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
           components: clippy
-      - name: cargo clippy
-        uses: actions-rs/clippy-check@v1.0.7
+      - name: Cache Cargo registry & build output
+        uses: Swatinem/rust-cache@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          workspaces: "./target -> target"
+      - name: cargo clippy
+        run: cargo clippy -- -D warnings
+
+  format:
+    runs-on: ubuntu-latest
+    name: clippy / ${{ matrix.toolchain }}
+    permissions:
+      contents: read
+      checks: write
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [nightly]
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install ${{ matrix.toolchain }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rustfmt
+      - name: cargo clippy
+        run: cargo +nightly fmt --check
 
   test-default-features:
     runs-on: ubuntu-latest
@@ -48,9 +70,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
+      - name: Cache Cargo registry & build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./target -> target"
       - name: cargo generate-lockfile
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
@@ -66,9 +92,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
+      - name: Cache Cargo registry & build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./target -> target"
       - name: cargo generate-lockfile
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
@@ -84,7 +114,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
       - name: cargo generate-lockfile
@@ -102,9 +132,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
+      - name: Cache Cargo registry & build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./target -> target"
       - name: cargo generate-lockfile
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
@@ -120,9 +154,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
+      - name: Cache Cargo registry & build output
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "./target -> target"
       - name: cargo generate-lockfile
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
@@ -137,7 +175,7 @@ jobs:
         with:
           submodules: true
       - name: Install nightly
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
           override: true
