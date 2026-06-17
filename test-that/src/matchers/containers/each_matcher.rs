@@ -173,7 +173,7 @@ pub mod __internal {
                 .join(", ");
             let element_explanations = non_matching_elements
                 .iter()
-                .map(|&(_, ref element, ref explanation)| format!("{element:?}, {explanation}"))
+                .map(|(_, element, explanation)| format!("{element:?}, {explanation}"))
                 .collect::<Description>()
                 .indent();
             format!("whose elements {failed_indexes} don't match\n{element_explanations}").into()

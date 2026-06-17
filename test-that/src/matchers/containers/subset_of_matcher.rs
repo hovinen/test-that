@@ -150,7 +150,7 @@ pub mod __internal {
             let unexpected_elements = actual
                 .into_iter()
                 .enumerate()
-                .filter(|&(_, ref actual_item)| self.expected_is_missing(actual_item))
+                .filter(|(_, actual_item)| self.expected_is_missing(actual_item))
                 .map(|(idx, actual_item)| format!("{actual_item:#?} at #{idx}"))
                 .collect::<Vec<_>>();
 

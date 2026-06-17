@@ -104,11 +104,11 @@ struct BufferedSummary<'a> {
 impl<'a> BufferedSummary<'a> {
     // Appends a new line which is common to both actual and expected.
     fn feed_common_lines(&mut self, common_line: &'a str) {
-        if let Buffer::CommonLineBuffer(ref mut common_lines) = self.buffer {
+        if let Buffer::CommonLine(ref mut common_lines) = self.buffer {
             common_lines.push(common_line);
         } else {
             self.flush_buffer();
-            self.buffer = Buffer::CommonLineBuffer(vec![common_line]);
+            self.buffer = Buffer::CommonLine(vec![common_line]);
         }
     }
 
@@ -226,9 +226,11 @@ impl<'a> Display for BufferedSummary<'a> {
     }
 }
 
+#[derive(Default)]
 enum Buffer<'a> {
+    #[default]
     Empty,
-    CommonLineBuffer(Vec<&'a str>),
+    CommonLine(Vec<&'a str>),
     ExtraActualLineChunk(&'a str),
     ExtraExpectedLineChunk(&'a str),
 }
@@ -237,7 +239,7 @@ impl<'a> Buffer<'a> {
     fn flush(&mut self, summary: &mut SummaryBuilder) {
         match self {
             Buffer::Empty => {}
-            Buffer::CommonLineBuffer(common_lines) => {
+            Buffer::CommonLine(common_lines) => {
                 Self::flush_common_lines(core::mem::take(common_lines), summary);
             }
             Buffer::ExtraActualLineChunk(extra_actual) => {
@@ -284,12 +286,6 @@ impl<'a> Buffer<'a> {
             summary.new_line();
             summary.push_str(line);
         }
-    }
-}
-
-impl<'a> Default for Buffer<'a> {
-    fn default() -> Self {
-        Self::Empty
     }
 }
 

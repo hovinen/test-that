@@ -32,7 +32,7 @@ pub enum TestOutcome {
 
 #[cfg(feature = "std")]
 std::thread_local! {
-    static CURRENT_TEST_OUTCOME: core::cell::RefCell<Option<TestOutcome>> = core::cell::RefCell::new(None);
+    static CURRENT_TEST_OUTCOME: core::cell::RefCell<Option<TestOutcome>> = const { core::cell::RefCell::new(None) };
 }
 
 impl TestOutcome {

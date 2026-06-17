@@ -68,7 +68,7 @@ pub mod __internal {
         pub(super) inner: InnerMatcherT,
     }
 
-    impl<'a, ActualT: AsRef<[u8]> + Debug + 'a, InnerMatcherT: Matcher<String>> Matcher<ActualT>
+    impl<ActualT: AsRef<[u8]> + Debug, InnerMatcherT: Matcher<String>> Matcher<ActualT>
         for IsEncodedStringMatcher<InnerMatcherT>
     {
         fn matches(&self, actual: &ActualT) -> MatcherResult {
