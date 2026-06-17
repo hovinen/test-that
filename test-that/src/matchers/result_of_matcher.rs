@@ -229,6 +229,9 @@
 /// ))
 /// #    .unwrap();
 /// ```
+///
+/// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
+/// [`in_order()`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __result_of {

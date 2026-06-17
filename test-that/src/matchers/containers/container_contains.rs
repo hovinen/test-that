@@ -78,7 +78,7 @@ use core::fmt::Display;
 /// ```
 ///
 /// This also works inside other macros including [`matches_pattern!`],
-/// [`result_of!`], [`field!`], and the [`contains_exactly!`] family itself:
+/// [`result_of!`], [`field!`], and the `contains_exactly!` family itself:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -146,7 +146,7 @@ use core::fmt::Display;
 /// ```
 ///
 /// This also works inside other macros including [`matches_pattern!`],
-/// [`result_of!`], [`field!`], and the [`contains_exactly!`] family itself:
+/// [`result_of!`], [`field!`], and the `contains_exactly!` family itself:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -160,6 +160,9 @@ use core::fmt::Display;
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect
 /// [`Vec`]: std::vec::Vec
+/// [`field!`]: crate::matchers::field
+/// [`matches_pattern!`]: crate::matchers::matches_pattern
+/// [`result_of!`]: crate::matchers::result_of
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __contains_exactly {
