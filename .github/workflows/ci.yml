@@ -122,10 +122,10 @@ jobs:
 
   test-googletest-compat:
     runs-on: ubuntu-latest
-    name: test (no default features) / ubuntu / ${{ matrix.toolchain }}
+    name: test (GoogleTest compat) / ubuntu / ${{ matrix.toolchain }}
     strategy:
       matrix:
-        toolchain: [stable, 1.81]
+        toolchain: [stable, 1.85]
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
