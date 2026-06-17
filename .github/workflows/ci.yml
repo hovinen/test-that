@@ -110,15 +110,15 @@ jobs:
     name: test (no default features) / ubuntu / ${{ matrix.toolchain }}
     strategy:
       matrix:
-        toolchain: [stable, 1.81]
+        toolchain: [stable, 1.85]
     steps:
       - uses: actions/checkout@v6
       - name: Install ${{ matrix.toolchain }}
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
-      - name: cargo test --locked
-        run: cargo test --locked --no-default-features
+      - name: cargo test
+        run: cargo test --no-default-features
 
   test-googletest-compat:
     runs-on: ubuntu-latest
