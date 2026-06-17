@@ -43,7 +43,7 @@ jobs:
 
   format:
     runs-on: ubuntu-latest
-    name: clippy / ${{ matrix.toolchain }}
+    name: format / ${{ matrix.toolchain }}
     permissions:
       contents: read
       checks: write
@@ -58,7 +58,7 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
           components: rustfmt
-      - name: cargo clippy
+      - name: cargo fmt
         run: cargo +nightly fmt --check
 
   test-default-features:
