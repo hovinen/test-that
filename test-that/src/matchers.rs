@@ -34,6 +34,10 @@ mod gt_matcher;
 #[cfg(feature = "std")]
 mod has_entry_matcher;
 mod is_encoded_string_matcher;
+#[cfg(feature = "num-traits")]
+mod is_finite_matcher;
+#[cfg(feature = "num-traits")]
+mod is_infinite_matcher;
 mod is_matcher;
 #[cfg(feature = "num-traits")]
 mod is_nan_matcher;
@@ -67,6 +71,10 @@ pub use gt_matcher::gt;
 #[cfg(feature = "std")]
 pub use has_entry_matcher::has_entry;
 pub use is_encoded_string_matcher::is_utf8_string;
+#[cfg(feature = "num-traits")]
+pub use is_finite_matcher::is_finite;
+#[cfg(feature = "num-traits")]
+pub use is_infinite_matcher::is_infinite;
 #[cfg(feature = "num-traits")]
 pub use is_nan_matcher::is_nan;
 pub use le_matcher::le;

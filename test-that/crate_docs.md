@@ -149,6 +149,8 @@ The following matchers are provided in Test That!:
 | [`gt`]               | A [`PartialOrd`] value strictly greater than the given value.            |
 | [`has_entry`]        | A [`HashMap`] containing a given key whose value the argument matches.   |
 | [`is_contained_in!`] | A container each of whose elements is matched by some given matcher.     |
+| [`is_finite`]        | A floating point number which is finite.                                 |
+| [`is_infinite`]      | A floating point number which is infinite.                               |
 | [`is_nan`]           | A floating point number which is NaN.                                    |
 | [`le`]               | A [`PartialOrd`] value less than or equal to the given value.            |
 | [`len`]              | A container whose number of elements the argument matches.               |
@@ -192,6 +194,8 @@ The following matchers are provided in Test That!:
 [`gt`]: matchers::gt
 [`has_entry`]: matchers::has_entry
 [`is_contained_in!`]: matchers::containers::is_contained_in
+[`is_finite`]: matchers::is_finite
+[`is_infinite`]: matchers::is_infinite
 [`is_nan`]: matchers::is_nan
 [`le`]: matchers::le
 [`len`]: matchers::containers::len
