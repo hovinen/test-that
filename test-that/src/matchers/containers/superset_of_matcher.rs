@@ -123,7 +123,7 @@ pub mod __internal {
                 .collect();
             match missing_items.len() {
                 0 => "whose no element is missing".into(),
-                1 => format!("whose element {} is missing", &missing_items[0]).into(),
+                1 => format!("whose element {} is missing", missing_items[0]).into(),
                 _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
             }
         }
@@ -165,7 +165,7 @@ pub mod __internal {
                 .collect();
             match missing_items.len() {
                 0 => "whose no element is missing".into(),
-                1 => format!("whose element {} is missing", &missing_items[0]).into(),
+                1 => format!("whose element {} is missing", missing_items[0]).into(),
                 _ => format!("whose elements {} are missing", missing_items.join(", ")).into(),
             }
         }

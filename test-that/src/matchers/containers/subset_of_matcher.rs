@@ -124,7 +124,7 @@ pub mod __internal {
 
             match unexpected_elements.len() {
                 0 => "which no element is unexpected".into(),
-                1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
+                1 => format!("whose element {} is unexpected", unexpected_elements[0]).into(),
                 _ => format!("whose elements {} are unexpected", unexpected_elements.join(", "))
                     .into(),
             }
@@ -156,7 +156,7 @@ pub mod __internal {
 
             match unexpected_elements.len() {
                 0 => "which no element is unexpected".into(),
-                1 => format!("whose element {} is unexpected", &unexpected_elements[0]).into(),
+                1 => format!("whose element {} is unexpected", unexpected_elements[0]).into(),
                 _ => format!("whose elements {} are unexpected", unexpected_elements.join(", "))
                     .into(),
             }

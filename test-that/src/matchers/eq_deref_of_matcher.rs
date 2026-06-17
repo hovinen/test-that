@@ -77,7 +77,7 @@ pub mod __internal {
         fn explain_match(&self, actual: &ActualT) -> Description {
             format!(
                 "which {}{}",
-                &self.describe(self.matches(actual)),
+                self.describe(self.matches(actual)),
                 create_diff(
                     &format!("{:#?}", actual),
                     &format!("{:#?}", self.expected.deref()),

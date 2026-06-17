@@ -223,7 +223,7 @@ pub mod __internal {
             format!(
                 "{} elements:\n{}",
                 if matcher_result.into() { "has" } else { "doesn't have" },
-                &self
+                self
                     .elements
                     .iter()
                     .map(|matcher| matcher.describe(MatcherResult::Match))
