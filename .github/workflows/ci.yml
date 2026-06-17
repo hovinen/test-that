@@ -175,7 +175,6 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
-          override: true
       - name: cargo doc
         run: cargo doc --no-deps --all-features
         env:
