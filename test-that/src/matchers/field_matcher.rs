@@ -181,6 +181,18 @@ macro_rules! field_internal {
     (:: $($rest:tt)*) => {
         $crate::field_internal!($($rest)*)
     };
+    // Type-parameterized paths: strip the type params for the match pattern — Rust infers the
+    // concrete type from the value being matched. Using $(:ty),* stops at > without ambiguity
+    // because `ty` cannot begin with `>`.
+    ($($t:ident)::+ < $($type_params:ty),* $(,)? > . $field:tt, {$($m:tt)*}) => {
+        $crate::field_internal!($($t)::+.$field, $crate::__matcher_expr!({$($m)*}))
+    };
+    ($($t:ident)::+ < $($type_params:ty),* $(,)? > . $field:tt, [$($m:tt)*]) => {
+        $crate::field_internal!($($t)::+.$field, $crate::__matcher_expr!([$($m)*]))
+    };
+    ($($t:ident)::+ < $($type_params:ty),* $(,)? > . $field:tt, $m:expr) => {
+        $crate::field_internal!($($t)::+.$field, $m)
+    };
     ($($t:ident)::+.$field:tt, {$($m:tt)*}) => {
         $crate::field_internal!($($t)::+.$field, $crate::__matcher_expr!({$($m)*}))
     };

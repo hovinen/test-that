@@ -2791,3 +2791,149 @@ fn matches_pattern_supports_leading_module_separator_for_property() -> TestResul
 
     verify_that!(actual, matches_pattern!(::AStruct { get_value(): eq(123) }))
 }
+
+#[test]
+fn matches_pattern_supports_matching_against_generic_struct_with_type_parameters() -> TestResult<()>
+{
+    #[derive(Debug)]
+    struct AGenericStruct<T: PartialEq> {
+        value: T,
+    }
+    let actual = AGenericStruct { value: 123 };
+
+    verify_that!(actual, matches_pattern!(AGenericStruct<u32> { value: eq(123) }))
+}
+
+#[test]
+fn matches_pattern_supports_matching_against_struct_with_generic_method_with_type_parameters()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        value: u32,
+    }
+    impl AStruct {
+        fn a_generic_method<T: PartialEq<u32>>(&self, other: T) -> bool {
+            other == self.value
+        }
+    }
+    let actual = AStruct { value: 123 };
+
+    verify_that!(actual, matches_pattern!(AStruct { a_generic_method::<u32>(123): eq(true) }))
+}
+
+#[test]
+fn matches_pattern_supports_turbofish_method_with_unordered_container_shorthand() -> TestResult<()>
+{
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items<T: PartialEq<u32>>(&self, _filter: T) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { get_items::<u32>(0): {eq(1), eq(2), eq(3)} })
+    )
+}
+
+#[test]
+fn matches_pattern_supports_turbofish_method_with_ordered_container_shorthand() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items<T: PartialEq<u32>>(&self, _filter: T) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { get_items::<u32>(0): [eq(1), eq(2), eq(3)] })
+    )
+}
+
+#[test]
+fn matches_pattern_supports_turbofish_method_not_as_last_field() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        value: u32,
+    }
+    impl AStruct {
+        fn a_generic_method<T: PartialEq<u32>>(&self, other: T) -> bool {
+            other == self.value
+        }
+    }
+    let actual = AStruct { value: 123 };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct {
+            a_generic_method::<u32>(123): eq(true),
+            value: eq(123),
+        })
+    )
+}
+
+#[test]
+fn matches_pattern_supports_deref_turbofish_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        value: u32,
+    }
+    impl AStruct {
+        fn get_value_ref<T: PartialEq<u32>>(&self, _other: T) -> &u32 {
+            &self.value
+        }
+    }
+    let actual = AStruct { value: 123 };
+
+    verify_that!(actual, matches_pattern!(AStruct { *get_value_ref::<u32>(0): eq(123) }))
+}
+
+#[test]
+fn matches_pattern_supports_deref_turbofish_method_with_unordered_container_shorthand()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items_ref<T: PartialEq<u32>>(&self, _filter: T) -> &Vec<u32> {
+            &self.items
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { *get_items_ref::<u32>(0): {eq(1), eq(2), eq(3)} })
+    )
+}
+
+#[test]
+fn matches_pattern_supports_deref_turbofish_method_with_ordered_container_shorthand()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items_ref<T: PartialEq<u32>>(&self, _filter: T) -> &Vec<u32> {
+            &self.items
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    verify_that!(
+        actual,
+        matches_pattern!(AStruct { *get_items_ref::<u32>(0): [eq(1), eq(2), eq(3)] })
+    )
+}
