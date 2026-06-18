@@ -403,6 +403,13 @@ macro_rules! __matches_pattern {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! matches_pattern_internal {
+    // Normalize: strip a leading :: path separator. In Rust 2021, ::Name means "extern crate
+    // named Name", not "crate-root Name". Stripping :: lets the remaining path resolve in the
+    // caller's scope, which is the correct behaviour for both local and extern-crate types.
+    (:: $first:tt $($rest:tt)*) => {
+        $crate::matches_pattern_internal!($first $($rest)*)
+    };
+
     // Named struct fields: dispatch to @fwd accumulation.
     // $first:tt requires at least one token, so empty {} falls through to the accumulator
     // arm below, which handles patterns like AStruct {} (unit struct / enum variant).

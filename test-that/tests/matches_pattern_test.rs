@@ -2766,3 +2766,28 @@ fn unordered_container_shorthand_notation_works_in_nested_matcher() -> TestResul
         })
     )
 }
+
+#[derive(Debug)]
+struct AStruct {
+    value: u32,
+}
+
+impl AStruct {
+    fn get_value(&self) -> u32 {
+        self.value
+    }
+}
+
+#[test]
+fn matches_pattern_supports_leading_module_separator_for_field() -> TestResult<()> {
+    let actual = AStruct { value: 123 };
+
+    verify_that!(actual, matches_pattern!(::AStruct { value: eq(123) }))
+}
+
+#[test]
+fn matches_pattern_supports_leading_module_separator_for_property() -> TestResult<()> {
+    let actual = AStruct { value: 123 };
+
+    verify_that!(actual, matches_pattern!(::AStruct { get_value(): eq(123) }))
+}

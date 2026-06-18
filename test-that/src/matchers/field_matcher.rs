@@ -176,6 +176,11 @@ macro_rules! __field {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! field_internal {
+    // Strip leading :: (Rust 2021: ::Name means extern crate, not crate root; strip to use the
+    // plain path which resolves correctly in the caller's scope).
+    (:: $($rest:tt)*) => {
+        $crate::field_internal!($($rest)*)
+    };
     ($($t:ident)::+.$field:tt, {$($m:tt)*}) => {
         $crate::field_internal!($($t)::+.$field, $crate::__matcher_expr!({$($m)*}))
     };
