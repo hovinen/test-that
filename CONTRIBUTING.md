@@ -10,6 +10,19 @@ use GitHub pull requests for this purpose. Consult
 [GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
 information on using pull requests.
 
+## Setting up commit hooks
+
+This repository includes a pre-commit hook that runs the formatter and linter
+automatically. Activate it once after cloning:
+
+```
+git config core.hooksPath .githooks
+```
+
+The hook runs:
+- `cargo +nightly fmt -- --check` — fails if any file needs reformatting
+- `cargo +nightly clippy -- -D warnings` — fails on any Clippy warning
+
 ## Running the autoformatter rustfmt
 
 This repository uses a custom configuration for rustfmt which currently requires
