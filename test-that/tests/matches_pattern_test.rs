@@ -14,7 +14,7 @@
 // limitations under the License.
 
 use indoc::indoc;
-use std::{convert::Infallible, ops::Deref};
+use std::{convert::Infallible, marker::PhantomData, ops::Deref};
 use test_that::prelude::*;
 
 #[test]
@@ -2796,12 +2796,17 @@ fn matches_pattern_supports_leading_module_separator_for_property() -> TestResul
 fn matches_pattern_supports_matching_against_generic_struct_with_type_parameters() -> TestResult<()>
 {
     #[derive(Debug)]
-    struct AGenericStruct<T: PartialEq> {
-        value: T,
+    struct AGenericStruct<T> {
+        phantom: PhantomData<T>,
     }
-    let actual = AGenericStruct { value: 123 };
+    impl<T: Default> AGenericStruct<T> {
+        fn get_value(&self) -> T {
+            T::default()
+        }
+    }
+    let actual = AGenericStruct { phantom: PhantomData };
 
-    verify_that!(actual, matches_pattern!(AGenericStruct<u32> { value: eq(123) }))
+    verify_that!(actual, matches_pattern!(AGenericStruct<u32> { get_value(): eq(0) }))
 }
 
 #[test]
@@ -2835,10 +2840,7 @@ fn matches_pattern_supports_turbofish_method_with_unordered_container_shorthand(
     }
     let actual = AStruct { items: vec![1, 2, 3] };
 
-    verify_that!(
-        actual,
-        matches_pattern!(AStruct { get_items::<u32>(0): {eq(1), eq(2), eq(3)} })
-    )
+    verify_that!(actual, matches_pattern!(AStruct { get_items::<u32>(0): {eq(1), eq(2), eq(3)} }))
 }
 
 #[test]
@@ -2854,10 +2856,7 @@ fn matches_pattern_supports_turbofish_method_with_ordered_container_shorthand() 
     }
     let actual = AStruct { items: vec![1, 2, 3] };
 
-    verify_that!(
-        actual,
-        matches_pattern!(AStruct { get_items::<u32>(0): [eq(1), eq(2), eq(3)] })
-    )
+    verify_that!(actual, matches_pattern!(AStruct { get_items::<u32>(0): [eq(1), eq(2), eq(3)] }))
 }
 
 #[test]
