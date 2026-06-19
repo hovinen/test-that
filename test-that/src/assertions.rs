@@ -245,7 +245,7 @@ macro_rules! fail {
         create_fail_result($crate::__alloc::format!($($message),*))
     }};
 
-    () => { fail!("Test failed") };
+    () => { $crate::fail!("Test failed") };
 }
 
 /// Matches the given value against the given matcher, panicking if it does not
@@ -304,9 +304,10 @@ macro_rules! assert_that {
         }
     };
 
-    ($actual:expr, $expected:expr, $($format_args:expr),* $(,)?) => {
+    ($actual:expr, $expected:expr, $($format_args:expr),* $(,)?) => {{
+        use $crate::TestResultExt;
         match $crate::verify_that!($actual, $expected)
-            .with_failure_message(|| format!($($format_args),*))
+            .with_failure_message(|| $crate::__alloc::format!($($format_args),*))
         {
             Ok(_) => {}
             Err(e) => {
@@ -315,7 +316,7 @@ macro_rules! assert_that {
                 panic!("\n{}", e);
             }
         }
-    };
+    }};
 }
 
 /// Asserts that the given predicate applied to the given arguments returns
@@ -390,11 +391,12 @@ macro_rules! expect_that {
         $crate::verify_that!($actual, $expected).and_log_failure();
     }};
 
-    ($actual:expr, $expected:expr, $($format_args:expr),* $(,)?) => {
+    ($actual:expr, $expected:expr, $($format_args:expr),* $(,)?) => {{
+        use $crate::TestResultExt;
         $crate::verify_that!($actual, $expected)
-            .with_failure_message(|| format!($($format_args),*))
+            .with_failure_message(|| $crate::__alloc::format!($($format_args),*))
             .and_log_failure()
-    };
+    }};
 }
 
 /// Asserts that the given predicate applied to the given arguments returns

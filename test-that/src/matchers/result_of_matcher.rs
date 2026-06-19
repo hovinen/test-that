@@ -256,7 +256,7 @@ macro_rules! __result_of_internal {
             |$param: $type, matcher| $crate::matcher::Matcher::matches(matcher, &$body),
             |result, matcher| $crate::matcher::Describable::describe(matcher, result),
             |$param: $type, matcher| {
-                ::core::convert::Into::into(format!(
+                ::core::convert::Into::into($crate::__alloc::format!(
                     concat!(
                         "which after applying `|",
                         stringify!($param),
