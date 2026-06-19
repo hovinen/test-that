@@ -14,9 +14,9 @@
 
 edition = "2021"
 
-# Because of this, one must use the *nightly* version of rustfmt, e.g.
+# style_edition = "2024" requires the nightly version of rustfmt:
 #   cargo +nightly fmt
-version = "Two"
+style_edition = "2024"
 
 use_small_heuristics = "Max"
 
