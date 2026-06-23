@@ -287,7 +287,7 @@ fn contains_exactly_matches_container_a_ref_of_which_produces_owned_items() -> T
 fn contains_exactly_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
-        contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
+        contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")]
     )
 }
 
@@ -295,7 +295,7 @@ fn contains_exactly_matches_hash_map() -> TestResult<()> {
 fn contains_exactly_matches_hash_map_with_trailing_comma() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
-        contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three")),]
+        contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three"),]
     )
 }
 
@@ -303,7 +303,7 @@ fn contains_exactly_matches_hash_map_with_trailing_comma() -> TestResult<()> {
 fn contains_exactly_does_not_match_hash_map_with_wrong_key() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (4, "Three")]),
-        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
+        not(contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")])
     )
 }
 
@@ -311,7 +311,7 @@ fn contains_exactly_does_not_match_hash_map_with_wrong_key() -> TestResult<()> {
 fn contains_exactly_does_not_match_hash_map_with_wrong_value() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Four")]),
-        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
+        not(contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")])
     )
 }
 
@@ -319,7 +319,7 @@ fn contains_exactly_does_not_match_hash_map_with_wrong_value() -> TestResult<()>
 fn contains_exactly_does_not_match_hash_map_missing_element() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two")]),
-        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
+        not(contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")])
     )
 }
 
@@ -327,7 +327,7 @@ fn contains_exactly_does_not_match_hash_map_missing_element() -> TestResult<()> 
 fn contains_exactly_does_not_match_hash_map_with_extra_element() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
-        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One"))])
+        not(contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One")])
     )
 }
 
@@ -335,7 +335,7 @@ fn contains_exactly_does_not_match_hash_map_with_extra_element() -> TestResult<(
 fn contains_exactly_does_not_match_hash_map_with_mismatched_key_and_value() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Three"), (3, "Two")]),
-        not(contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))])
+        not(contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")])
     )
 }
 
@@ -346,14 +346,14 @@ fn contains_exactly_with_map_admits_matchers_without_static_lifetime() -> TestRe
     let expected_value = AStruct(123);
     verify_that!(
         HashMap::from([(1, AStruct(123))]),
-        contains_exactly![(eq(1) => eq_deref_of(&expected_value))]
+        contains_exactly![eq(1) => eq_deref_of(&expected_value)]
     )
 }
 
 #[test]
 fn contains_exactly_works_when_matcher_for_maps_is_created_in_subroutine() -> TestResult<()> {
     fn create_matcher() -> impl Matcher<HashMap<i32, i32>> {
-        contains_exactly![(eq(1) => eq(1))]
+        contains_exactly![eq(1) => eq(1)]
     }
     verify_that!(HashMap::from([(1, 1)]), create_matcher())
 }
@@ -372,7 +372,7 @@ fn contains_each_supports_trailing_comma() -> TestResult<()> {
 fn contains_each_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
-        contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One"))]
+        contains_each![eq(2) => eq("Two"), eq(1) => eq("One")]
     )
 }
 
@@ -380,7 +380,7 @@ fn contains_each_matches_hash_map() -> TestResult<()> {
 fn contains_each_matches_hash_map_with_trailing_comma() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
-        contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One")),]
+        contains_each![eq(2) => eq("Two"), eq(1) => eq("One"),]
     )
 }
 
@@ -480,7 +480,7 @@ fn is_contained_supports_trailing_comma() -> TestResult<()> {
 fn is_contained_in_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two")]),
-        is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
+        is_contained_in![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")]
     )
 }
 
@@ -488,7 +488,7 @@ fn is_contained_in_matches_hash_map() -> TestResult<()> {
 fn is_contained_in_matches_hash_map_with_trailing_comma() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two")]),
-        is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three")),]
+        is_contained_in![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three"),]
     )
 }
 
@@ -572,6 +572,19 @@ fn contains_each_with_ordered_element_shorthand() -> TestResult<()> {
 }
 
 #[test]
+fn contains_each_with_unordered_element_shorthand() -> TestResult<()> {
+    verify_that!(
+        vec![vec![2, 1], vec![4, 3], vec![5, 6]],
+        contains_each![{eq(1), eq(2)}, {eq(3), eq(4)}]
+    )
+}
+
+#[test]
 fn is_contained_in_with_ordered_element_shorthand() -> TestResult<()> {
     verify_that!(vec![vec![1, 2]], is_contained_in![[eq(1), eq(2)], [eq(3), eq(4)]])
+}
+
+#[test]
+fn is_contained_in_with_unordered_element_shorthand() -> TestResult<()> {
+    verify_that!(vec![vec![2, 1]], is_contained_in![{eq(1), eq(2)}, {eq(3), eq(4)}])
 }

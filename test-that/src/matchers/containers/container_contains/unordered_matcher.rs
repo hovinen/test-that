@@ -781,9 +781,9 @@ mod tests {
         let result = verify_that!(
             HashMap::from([(1, "one")]),
             contains_exactly![
-                (matchers.0.0 => matchers.0.1),
-                (matchers.1.0 => matchers.1.1),
-                (matchers.2.0 => matchers.2.1)
+                matchers.0.0 => matchers.0.1,
+                matchers.1.0 => matchers.1.1,
+                matchers.2.0 => matchers.2.1
             ]
         );
         verify_that!(
@@ -808,9 +808,9 @@ mod tests {
         // so that they aren't dropped too early.
         let matchers = ((anything(), eq(1)), (anything(), eq(2)), (anything(), eq(2)));
         let matcher: MapContainsMatcher<HashMap<u32, u32>, _, _, RefItems, 3> = contains_exactly![
-            (matchers.0.0 => matchers.0.1),
-            (matchers.1.0 => matchers.1.1),
-            (matchers.2.0 => matchers.2.1),
+            matchers.0.0 => matchers.0.1,
+            matchers.1.0 => matchers.1.1,
+            matchers.2.0 => matchers.2.1,
         ];
         let value: HashMap<u32, u32> = HashMap::from_iter([(0, 1), (1, 1), (2, 2)]);
         verify_that!(

@@ -63,7 +63,7 @@ use core::fmt::Display;
 /// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
 /// verify_that!(
 ///     value,
-///     contains_exactly![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
+///     contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")]
 /// )
 /// #     .unwrap();
 /// ```
@@ -173,7 +173,15 @@ macro_rules! __contains_exactly {
         )
     }};
 
-    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
+    // {}/[] must be dispatched before $expr to prevent $expr committing to {expr, expr} as a block.
+    ({$($first_m:tt)*} $($rest:tt)*) => {
+        $crate::__contains_exactly!(@acc [], {$($first_m)*} $($rest)*)
+    };
+    ([$($first_m:tt)*] $($rest:tt)*) => {
+        $crate::__contains_exactly!(@acc [], [$($first_m)*] $($rest)*)
+    };
+
+    ($($key_matcher:expr => $value_matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::MapContainsMatcher::new(
             [$(($crate::__alloc::boxed::Box::new($key_matcher), $crate::__alloc::boxed::Box::new($value_matcher))),*],
             $crate::matchers::__internal::Requirements::PerfectMatch
@@ -262,7 +270,7 @@ macro_rules! __contains_exactly {
 /// # use test_that::prelude::*;
 /// # use std::collections::HashMap;
 /// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two"), (3, "Three")].into();
-/// verify_that!(value, contains_each![(eq(2) => eq("Two")), (eq(1) => eq("One"))])
+/// verify_that!(value, contains_each![eq(2) => eq("Two"), eq(1) => eq("One")])
 /// #     .unwrap();
 /// ```
 ///
@@ -317,7 +325,14 @@ macro_rules! __contains_each {
         )
     }};
 
-    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
+    ({$($first_m:tt)*} $($rest:tt)*) => {
+        $crate::__contains_each!(@acc [], {$($first_m)*} $($rest)*)
+    };
+    ([$($first_m:tt)*] $($rest:tt)*) => {
+        $crate::__contains_each!(@acc [], [$($first_m)*] $($rest)*)
+    };
+
+    ($($key_matcher:expr => $value_matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::MapContainsMatcher::new(
             [$(($crate::__alloc::boxed::Box::new($key_matcher), $crate::__alloc::boxed::Box::new($value_matcher))),*],
             $crate::matchers::__internal::Requirements::Superset
@@ -406,7 +421,7 @@ macro_rules! __contains_each {
 /// let value: HashMap<u32, &'static str> = [(1, "One"), (2, "Two")].into();
 /// verify_that!(
 ///     value,
-///     is_contained_in![(eq(2) => eq("Two")), (eq(1) => eq("One")), (eq(3) => eq("Three"))]
+///     is_contained_in![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")]
 /// )
 /// #     .unwrap();
 /// ```
@@ -462,7 +477,14 @@ macro_rules! __is_contained_in {
         )
     }};
 
-    ($(($key_matcher:expr => $value_matcher:expr)),* $(,)?) => {{
+    ({$($first_m:tt)*} $($rest:tt)*) => {
+        $crate::__is_contained_in!(@acc [], {$($first_m)*} $($rest)*)
+    };
+    ([$($first_m:tt)*] $($rest:tt)*) => {
+        $crate::__is_contained_in!(@acc [], [$($first_m)*] $($rest)*)
+    };
+
+    ($($key_matcher:expr => $value_matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::MapContainsMatcher::new(
             [$(($crate::__alloc::boxed::Box::new($key_matcher), $crate::__alloc::boxed::Box::new($value_matcher))),*],
             $crate::matchers::__internal::Requirements::Subset,
