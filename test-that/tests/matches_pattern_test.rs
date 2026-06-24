@@ -181,10 +181,10 @@ fn has_correct_assertion_failure_message_for_field_and_property() -> TestResult<
             "
             Value of: actual
             Expected: is AStruct which has all the following properties:
-              * result of applying `|s: & AStruct| s.get_field ()` is equal to 234
+              * result of applying `get_field ()` is equal to 234
               * has field `another_field`, which is equal to 123
             Actual: AStruct { a_field: 123, another_field: 234 },
-              * which after applying `|s: & AStruct| s.get_field ()` results in `123`, which isn't equal to 234
+              * which after applying `get_field ()` results in `123`, which isn't equal to 234
               * which has field `another_field`, which isn't equal to 123"
         ))))
     )
@@ -582,9 +582,7 @@ fn includes_struct_name_in_description_with_property() -> TestResult<()> {
 
     verify_that!(
         result,
-        err(displays_as(contains_substring(
-            "which after applying `|s: & AStruct| s.get_field ()` results in"
-        )))
+        err(displays_as(contains_substring("which after applying `get_field ()` results in")))
     )
 }
 
@@ -605,9 +603,7 @@ fn includes_struct_name_in_description_with_ref_property() -> TestResult<()> {
 
     verify_that!(
         result,
-        err(displays_as(contains_substring(
-            "which after applying `|s: & AStruct| s.get_field ()` results in"
-        )))
+        err(displays_as(contains_substring("which after applying `get_field ()` results in")))
     )
 }
 
@@ -2934,5 +2930,331 @@ fn matches_pattern_supports_deref_turbofish_method_with_ordered_container_shorth
     verify_that!(
         actual,
         matches_pattern!(AStruct { *get_items_ref::<u32>(0): [eq(1), eq(2), eq(3)] })
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_set_shorthand_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { get_a_vec(): {eq(999)} }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_a_vec ()` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_description_for_set_shorthand_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { get_a_vec(): {eq(999)} }));
+
+    verify_that!(result, err(displays_as(contains_substring("result of applying `get_a_vec ()`"))))
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_array_shorthand_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { get_a_vec(): [eq(999)] }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_a_vec ()` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_description_for_array_shorthand_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { get_a_vec(): [eq(999)] }));
+
+    verify_that!(result, err(displays_as(contains_substring("result of applying `get_a_vec ()`"))))
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_deref_method_with_set_shorthand() -> TestResult<()>
+{
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_slice(&self) -> &[u32] {
+            &self.items
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { *get_a_slice(): {eq(999)} }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_a_slice ()` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_deref_method_with_array_shorthand()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_a_slice(&self) -> &[u32] {
+            &self.items
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { *get_a_slice(): [eq(999)] }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_a_slice ()` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_description_for_deref_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        field: u32,
+    }
+    impl AStruct {
+        fn get_field(&self) -> &u32 {
+            &self.field
+        }
+    }
+    let actual = AStruct { field: 123 };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { *get_field(): eq(999) }));
+
+    verify_that!(result, err(displays_as(contains_substring("result of applying `get_field ()`"))))
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_method_with_arguments() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        field: u32,
+    }
+    impl AStruct {
+        fn add_to_field(&self, a: u32) -> u32 {
+            self.field + a
+        }
+    }
+    let actual = AStruct { field: 1 };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { add_to_field(5): eq(999) }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `add_to_field (5)` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_turbofish_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        value: u32,
+    }
+    impl AStruct {
+        fn a_generic_method<T: PartialEq<u32>>(&self, other: T) -> bool {
+            other == self.value
+        }
+    }
+    let actual = AStruct { value: 123 };
+
+    let result =
+        verify_that!(actual, matches_pattern!(AStruct { a_generic_method::<u32>(5): eq(true) }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring(
+            "which after applying `a_generic_method (5)` results in"
+        )))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_turbofish_method_with_set_shorthand()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items<T: PartialEq<u32>>(&self, _filter: T) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { get_items::<u32>(0): {eq(999)} }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_items (0)` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_turbofish_method_with_array_shorthand()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items<T: PartialEq<u32>>(&self, _filter: T) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result = verify_that!(actual, matches_pattern!(AStruct { get_items::<u32>(0): [eq(999)] }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_items (0)` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_deref_turbofish_method() -> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        value: u32,
+    }
+    impl AStruct {
+        fn get_value_ref<T: PartialEq<u32>>(&self, _other: T) -> &u32 {
+            &self.value
+        }
+    }
+    let actual = AStruct { value: 123 };
+
+    let result =
+        verify_that!(actual, matches_pattern!(AStruct { *get_value_ref::<u32>(5): eq(999) }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_value_ref (5)` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_deref_turbofish_method_with_set_shorthand()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items_ref<T: PartialEq<u32>>(&self, _filter: T) -> &Vec<u32> {
+            &self.items
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result =
+        verify_that!(actual, matches_pattern!(AStruct { *get_items_ref::<u32>(0): {eq(999)} }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_items_ref (0)` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_deref_turbofish_method_with_array_shorthand()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+    }
+    impl AStruct {
+        fn get_items_ref<T: PartialEq<u32>>(&self, _filter: T) -> &Vec<u32> {
+            &self.items
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3] };
+
+    let result =
+        verify_that!(actual, matches_pattern!(AStruct { *get_items_ref::<u32>(0): [eq(999)] }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which after applying `get_items_ref (0)` results in")))
+    )
+}
+
+#[test]
+fn includes_correct_definition_in_explanation_for_set_shorthand_method_not_in_last_position()
+-> TestResult<()> {
+    #[derive(Debug)]
+    struct AStruct {
+        items: Vec<u32>,
+        another_field: u32,
+    }
+    impl AStruct {
+        fn get_a_vec(&self) -> Vec<u32> {
+            self.items.clone()
+        }
+    }
+    let actual = AStruct { items: vec![1, 2, 3], another_field: 42 };
+
+    let result = verify_that!(
+        actual,
+        matches_pattern!(AStruct { get_a_vec(): {eq(999)}, another_field: eq(42) })
+    );
+
+    verify_that!(
+        result,
+        err(displays_as(all!(
+            contains_substring("result of applying `get_a_vec ()`"),
+            contains_substring("which after applying `get_a_vec ()` results in"),
+        )))
     )
 }

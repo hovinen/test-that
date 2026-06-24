@@ -511,12 +511,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -525,12 +525,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -539,12 +539,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $matcher,),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $matcher,).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $matcher,),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $matcher,).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -553,12 +553,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -567,12 +567,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -581,12 +581,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -595,12 +595,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!({$($matcher)*}),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!({$($matcher)*}),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!({$($matcher)*}),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!({$($matcher)*}),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -609,12 +609,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!([$($matcher)*]),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!([$($matcher)*]),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!([$($matcher)*]),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::__matcher_expr!([$($matcher)*]),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -623,12 +623,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $matcher,),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $matcher,).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $matcher,),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $matcher,).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -637,12 +637,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -651,12 +651,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -665,12 +665,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($matcher),),)
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($matcher),).with_custom_definition(stringify!($property_name($($argument),*))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { * $property_name:ident :: < $($turbofish:ty),* $(,)? > ($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($matcher),),],
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &$($struct_name)*| s.$property_name::<$($turbofish),*>($($argument),*), $crate::matchers::points_to($matcher),).with_custom_definition(stringify!($property_name($($argument),*))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };

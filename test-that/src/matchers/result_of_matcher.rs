@@ -250,22 +250,15 @@ macro_rules! __result_of_internal {
         $crate::__result_of_internal!(|$param: $type| $body, $crate::__matcher_expr!([$($matcher)*]),)
     };
     (|$param:ident: $type:ty| $body:expr, $matcher:expr $(,)?) => {{
-        $crate::matchers::__internal::result_of(
+        $crate::matchers::__internal::ResultOfMatcher::new(
             concat!("|", stringify!($param), ": ", stringify!($type), "| ", stringify!($body)),
             $matcher,
             |$param: $type, matcher| $crate::matcher::Matcher::matches(matcher, &$body),
             |result, matcher| $crate::matcher::Describable::describe(matcher, result),
-            |$param: $type, matcher| {
+            |$param: $type, definition, matcher| {
                 ::core::convert::Into::into($crate::__alloc::format!(
-                    concat!(
-                        "which after applying `|",
-                        stringify!($param),
-                        ": ",
-                        stringify!($type),
-                        "| ",
-                        stringify!($body),
-                        "` results in `{:#?}`, {}"
-                    ),
+                    "which after applying `{}` results in `{:#?}`, {}",
+                    definition,
                     &$body,
                     $crate::matcher::Matcher::explain_match(matcher, &$body)
                 ))
@@ -285,34 +278,50 @@ pub mod __internal {
     };
     use core::{fmt::Debug, marker::PhantomData};
 
-    pub fn result_of<Input, InnerMatcher, ApplyFn, DescribeFn, ExplainFn>(
-        definition: &'static str,
-        matcher: InnerMatcher,
-        apply: ApplyFn,
-        describe: DescribeFn,
-        explain: ExplainFn,
-    ) -> ResultOfMatcher<Input, InnerMatcher, ApplyFn, DescribeFn, ExplainFn>
-    where
-        Input: Debug + ?Sized,
-        ApplyFn: Fn(&Input, &InnerMatcher) -> MatcherResult,
-        DescribeFn: Fn(MatcherResult, &InnerMatcher) -> Description,
-        ExplainFn: Fn(&Input, &InnerMatcher) -> Description,
-    {
-        ResultOfMatcher { definition, matcher, apply, describe, explain, phantom_1: PhantomData }
-    }
-
     pub struct ResultOfMatcher<Input: ?Sized, InnerMatcher, ApplyFn, DescribeFn, ExplainFn>
     where
         ApplyFn: Fn(&Input, &InnerMatcher) -> MatcherResult,
         DescribeFn: Fn(MatcherResult, &InnerMatcher) -> Description,
-        ExplainFn: Fn(&Input, &InnerMatcher) -> Description,
+        ExplainFn: Fn(&Input, &'static str, &InnerMatcher) -> Description,
     {
-        definition: &'static str,
+        pub definition: &'static str,
         matcher: InnerMatcher,
         apply: ApplyFn,
         describe: DescribeFn,
         explain: ExplainFn,
         phantom_1: PhantomData<Input>,
+    }
+
+    impl<Input, InnerMatcher, ApplyFn, DescribeFn, ExplainFn>
+        ResultOfMatcher<Input, InnerMatcher, ApplyFn, DescribeFn, ExplainFn>
+    where
+        Input: ?Sized + Debug,
+        ApplyFn: Fn(&Input, &InnerMatcher) -> MatcherResult,
+        DescribeFn: Fn(MatcherResult, &InnerMatcher) -> Description,
+        ExplainFn: Fn(&Input, &'static str, &InnerMatcher) -> Description,
+    {
+        pub fn new(
+            definition: &'static str,
+            matcher: InnerMatcher,
+            apply: ApplyFn,
+            describe: DescribeFn,
+            explain: ExplainFn,
+        ) -> Self {
+            ResultOfMatcher {
+                definition,
+                matcher,
+                apply,
+                describe,
+                explain,
+                phantom_1: PhantomData,
+            }
+        }
+
+        /// Overrides the default depiction of the closure in the description
+        /// and explanation with the given string.
+        pub fn with_custom_definition(self, definition: &'static str) -> Self {
+            Self { definition, ..self }
+        }
     }
 
     impl<Input, InnerMatcher, ApplyFn, DescribeFn, ExplainFn> Matcher<Input>
@@ -321,14 +330,14 @@ pub mod __internal {
         Input: Debug + ?Sized,
         ApplyFn: Fn(&Input, &InnerMatcher) -> MatcherResult,
         DescribeFn: Fn(MatcherResult, &InnerMatcher) -> Description,
-        ExplainFn: Fn(&Input, &InnerMatcher) -> Description,
+        ExplainFn: Fn(&Input, &'static str, &InnerMatcher) -> Description,
     {
         fn matches(&self, actual: &Input) -> MatcherResult {
             (self.apply)(actual, &self.matcher)
         }
 
         fn explain_match(&self, actual: &Input) -> Description {
-            (self.explain)(actual, &self.matcher)
+            (self.explain)(actual, self.definition, &self.matcher)
         }
     }
 
@@ -337,7 +346,7 @@ pub mod __internal {
     where
         ApplyFn: Fn(&Input, &InnerMatcher) -> MatcherResult,
         DescribeFn: Fn(MatcherResult, &InnerMatcher) -> Description,
-        ExplainFn: Fn(&Input, &InnerMatcher) -> Description,
+        ExplainFn: Fn(&Input, &'static str, &InnerMatcher) -> Description,
     {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(
