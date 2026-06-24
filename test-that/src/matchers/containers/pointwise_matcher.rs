@@ -159,6 +159,59 @@ pub mod __internal {
         pub fn new(matchers: Vec<MatcherT>) -> Self {
             Self { matchers, phantom: Default::default() }
         }
+
+        fn matches_impl<T: Debug, Item>(
+            &self,
+            iter: impl Iterator<Item = Item>,
+            to_ref: impl Fn(&Item) -> &T,
+        ) -> MatcherResult
+        where
+            MatcherT: Matcher<T>,
+        {
+            let mut zipped = zip(iter, self.matchers.iter());
+            for (element, matcher) in zipped.by_ref() {
+                if matcher.matches(to_ref(&element)).is_no_match() {
+                    return MatcherResult::NoMatch;
+                }
+            }
+            if zipped.has_size_mismatch() { MatcherResult::NoMatch } else { MatcherResult::Match }
+        }
+
+        fn explain_match_impl<T: Debug, Item>(
+            &self,
+            iter: impl Iterator<Item = Item>,
+            to_ref: impl Fn(&Item) -> &T,
+        ) -> Description
+        where
+            MatcherT: Matcher<T>,
+        {
+            let mut zipped = zip(iter, self.matchers.iter());
+            let mut mismatches = Vec::new();
+            for (idx, (a, e)) in zipped.by_ref().enumerate() {
+                let a_ref = to_ref(&a);
+                if e.matches(a_ref).is_no_match() {
+                    mismatches
+                        .push(format!("element #{idx} is {a_ref:?}, {}", e.explain_match(a_ref)));
+                }
+            }
+            if mismatches.is_empty() {
+                if !zipped.has_size_mismatch() {
+                    "which matches all elements".into()
+                } else {
+                    format!(
+                        "which has size {} (expected {})",
+                        zipped.left_size(),
+                        self.matchers.len()
+                    )
+                    .into()
+                }
+            } else if mismatches.len() == 1 {
+                format!("where {}", mismatches[0]).into()
+            } else {
+                let mismatches = mismatches.into_iter().collect::<Description>();
+                format!("where:\n{}", mismatches.bullet_list().indent()).into()
+            }
+        }
     }
 
     impl<T: Debug, MatcherT: Matcher<T>, ContainerT: ?Sized + Debug> Matcher<ContainerT>
@@ -167,100 +220,25 @@ pub mod __internal {
         for<'b> &'b ContainerT: IntoIterator<Item = &'b T>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let mut zipped_iterator = zip(actual.into_iter(), self.matchers.iter());
-            for (element, matcher) in zipped_iterator.by_ref() {
-                if matcher.matches(element).is_no_match() {
-                    return MatcherResult::NoMatch;
-                }
-            }
-            if zipped_iterator.has_size_mismatch() {
-                MatcherResult::NoMatch
-            } else {
-                MatcherResult::Match
-            }
+            self.matches_impl(actual.into_iter(), |x| *x)
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            // TODO(b/260819741) This code duplicates elements_are_matcher.rs. Consider
-            // extract as a separate library. (or implement pointwise! with
-            // elements_are)
-            let actual_iterator = actual.into_iter();
-            let mut zipped_iterator = zip(actual_iterator, self.matchers.iter());
-            let mut mismatches = Vec::new();
-            for (idx, (a, e)) in zipped_iterator.by_ref().enumerate() {
-                if e.matches(a).is_no_match() {
-                    mismatches.push(format!("element #{idx} is {a:?}, {}", e.explain_match(a)));
-                }
-            }
-            if mismatches.is_empty() {
-                if !zipped_iterator.has_size_mismatch() {
-                    "which matches all elements".into()
-                } else {
-                    format!(
-                        "which has size {} (expected {})",
-                        zipped_iterator.left_size(),
-                        self.matchers.len()
-                    )
-                    .into()
-                }
-            } else if mismatches.len() == 1 {
-                format!("where {}", mismatches[0]).into()
-            } else {
-                let mismatches = mismatches.into_iter().collect::<Description>();
-                format!("where:\n{}", mismatches.bullet_list().indent()).into()
-            }
+            self.explain_match_impl(actual.into_iter(), |x| *x)
         }
     }
 
-    // TODO: Try to reduce the code duplication here.
     impl<T: Debug, MatcherT: Matcher<T>, ContainerT: ?Sized + Debug> Matcher<ContainerT>
         for PointwiseMatcher<MatcherT, OwnedItems>
     where
         for<'b> &'b ContainerT: IntoIterator<Item = T>,
     {
         fn matches(&self, actual: &ContainerT) -> MatcherResult {
-            let mut zipped_iterator = zip(actual.into_iter(), self.matchers.iter());
-            for (element, matcher) in zipped_iterator.by_ref() {
-                if matcher.matches(&element).is_no_match() {
-                    return MatcherResult::NoMatch;
-                }
-            }
-            if zipped_iterator.has_size_mismatch() {
-                MatcherResult::NoMatch
-            } else {
-                MatcherResult::Match
-            }
+            self.matches_impl(actual.into_iter(), |x| x)
         }
 
         fn explain_match(&self, actual: &ContainerT) -> Description {
-            // TODO(b/260819741) This code duplicates elements_are_matcher.rs. Consider
-            // extract as a separate library. (or implement pointwise! with
-            // elements_are)
-            let actual_iterator = actual.into_iter();
-            let mut zipped_iterator = zip(actual_iterator, self.matchers.iter());
-            let mut mismatches = Vec::new();
-            for (idx, (a, e)) in zipped_iterator.by_ref().enumerate() {
-                if e.matches(&a).is_no_match() {
-                    mismatches.push(format!("element #{idx} is {a:?}, {}", e.explain_match(&a)));
-                }
-            }
-            if mismatches.is_empty() {
-                if !zipped_iterator.has_size_mismatch() {
-                    "which matches all elements".into()
-                } else {
-                    format!(
-                        "which has size {} (expected {})",
-                        zipped_iterator.left_size(),
-                        self.matchers.len()
-                    )
-                    .into()
-                }
-            } else if mismatches.len() == 1 {
-                format!("where {}", mismatches[0]).into()
-            } else {
-                let mismatches = mismatches.into_iter().collect::<Description>();
-                format!("where:\n{}", mismatches.bullet_list().indent()).into()
-            }
+            self.explain_match_impl(actual.into_iter(), |x| x)
         }
     }
 
