@@ -257,7 +257,7 @@ assert_that!(value, matches_pattern!(StructWithRef {
 }));
 ```
 
-The assertion macros as well as the matcher [`matches_pattern!`] (and it's alias
+The assertion macros as well as the matcher [`matches_pattern!`] (and its alias
 [`pat!`]) support a shorthand notation for this using the `*` sigil:
 
 ```rust
@@ -273,7 +273,7 @@ assert_that!(value, matches_pattern!(StructWithRef {
 }));
 ```
 
-One does _not_ derefernce string slices when matching against them.
+One does _not_ dereference string slices when matching against them.
 
 ```rust
 # use test_that::prelude::*;
@@ -567,7 +567,7 @@ stuff_is_correct(x, y) was false with
 
 The `verify_pred!` invocation evaluates to a [`TestResult<()>`] just like
 [`verify_that!`]. There is also a macro [`expect_pred!`] to make a non-fatal
-predicaticate assertion.
+predicate assertion.
 
 ## Unconditionally generating a test failure
 
@@ -665,7 +665,7 @@ All dependencies of Test That! are optional. The default features include:
 - Support for matching floating point numbers, and
 - Features requiring std.
 
-That That! also runs in nostd environments. It requires an allocator.
+Test That! also runs in nostd environments. It requires an allocator.
 
 ## Note on API stability
 

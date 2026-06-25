@@ -19,7 +19,7 @@ use core::fmt::{Display, Error, Formatter};
 /// This is intended to report the location of an assertion which failed to
 /// stdout.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub struct SourceLocation {
     file: &'static str,
@@ -30,7 +30,7 @@ pub struct SourceLocation {
 impl SourceLocation {
     /// Constructs a new [`SourceLocation`].
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub fn new(file: &'static str, line: u32, column: u32) -> Self {
         Self { file, line, column }

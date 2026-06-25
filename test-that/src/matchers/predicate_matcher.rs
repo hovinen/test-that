@@ -36,7 +36,7 @@ use core::{fmt::Debug, marker::PhantomData};
 ///
 /// Note: even if the Rust compiler should be able to infer the type of
 /// the closure argument, it is likely that it won't.
-/// See <https://github.com/rust-lang/rust/issues/12679> for update on this issue.
+/// See <https://github.com/rust-lang/rust/issues/12679> for an update on this issue.
 /// This is easily fixed by explicitly declaring the type of the argument
 pub fn predicate<T: Debug + ?Sized, P>(
     predicate: P,

@@ -98,7 +98,7 @@ I started Test That! as a fork of the crate
 while working at Google. The goal of the fork is to provide a more ergonomic
 developer experience than GoogleTest Rust does.
 
-The GoogleTest Rust was in turned inspired by Google's C++ testing library
+The GoogleTest Rust was in turn inspired by Google's C++ testing library
 [GoogleTest](https://github.com/google/googletest). Its goal was to bring the
 powerful assertions and matchers of GoogleTest to the Rust world.
 
@@ -365,7 +365,7 @@ stuff_is_correct(x, y) was false with
 
 The `verify_pred!` invocation evaluates to a [`Result`] just like
 [`verify_that!`]. There is also a macro [`expect_pred!`] to make a non-fatal
-predicaticate assertion.
+predicate assertion.
 
 ### Unconditionally generating a test failure
 
@@ -396,7 +396,7 @@ The following environment variables are supported:
 
 ## Dependencies and nostd
 
-That That! runs in nostd environments, though it does require an allocator.
+Test That! runs in nostd environments, though it does require an allocator.
 
 It also has no required dependencies. Regular expression matching, floating
 point matching and non-fatal assertions require features which are enabled by

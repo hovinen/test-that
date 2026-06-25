@@ -61,7 +61,7 @@ macro_rules! __all {
 
 /// Functionality needed by the [`all`] macro.
 ///
-/// For internal use only. API stablility is not guaranteed!
+/// For internal use only. API stability is not guaranteed!
 #[doc(hidden)]
 pub mod __internal {
     use crate::description::Description;
@@ -74,7 +74,7 @@ pub mod __internal {
     /// A matcher which matches an input value matched by all matchers in the
     /// array `components`.
     ///
-    /// For internal use only. API stablility is not guaranteed!
+    /// For internal use only. API stability is not guaranteed!
     #[doc(hidden)]
     pub struct AllMatcher<'a, T: Debug + ?Sized, const N: usize> {
         components: [Box<dyn Matcher<T> + 'a>; N],

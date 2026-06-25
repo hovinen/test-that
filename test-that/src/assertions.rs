@@ -59,7 +59,7 @@
 /// #     .unwrap();
 /// ```
 ///
-/// This macro has special support for matching against container. Namely:
+/// This macro has special support for matching against containers. Namely:
 ///   * `verify_that!(actual, [m1, m2, ...])` is equivalent to
 ///     `verify_that!(actual, contains_exactly![m1, m2, ...].in_order())`
 ///   * `verify_that!(actual, {m1, m2, ...})` is equivalent to
@@ -145,7 +145,7 @@ macro_rules! __matcher_expr {
 ///
 /// **Warning:** This macro assumes that the arguments passed to the predicate
 /// are either *variables* or *calls to pure functions*. If two subsequent
-/// invocations to any of the expresssions passed as arguments result in
+/// invocations to any of the expressions passed as arguments result in
 /// different values, then the output message of a test failure will deviate
 /// from the values actually passed to the predicate. For this reason, *always
 /// assign the outputs of non-pure functions to variables before using them in
@@ -426,7 +426,7 @@ macro_rules! expect_pred {
 
 /// Functions for use only by the procedural macros in this module.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub mod internal {
     use crate::{
@@ -441,7 +441,7 @@ pub mod internal {
     /// Returns `Ok(())` if the value matches and `Err(())` if it does not
     /// match.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[must_use = "The assertion result must be evaluated to affect the test result."]
     pub fn check_matcher<T: Debug + ?Sized>(
         actual: &T,
@@ -462,7 +462,7 @@ pub mod internal {
     ///
     /// This intended only for use by the macro [`crate::verify_pred`].
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[must_use = "The assertion result must be evaluated to affect the test result."]
     pub fn report_failed_predicate(
         actual_expr: &'static str,

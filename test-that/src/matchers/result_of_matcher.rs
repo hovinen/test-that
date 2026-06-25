@@ -58,7 +58,7 @@
 /// #    .unwrap();
 /// ```
 ///
-/// **Important**: The closure should be pure function with a deterministic
+/// **Important**: The closure should be a pure function with a deterministic
 /// output and no side effects. In particular, in the event of an assertion
 /// failure, it will be invoked a second time, with the assertion failure output
 /// reflecting the *second* invocation.
@@ -269,7 +269,7 @@ macro_rules! __result_of_internal {
 
 /// Items for use only by the declarative macros in this module.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
     use crate::{
@@ -284,7 +284,7 @@ pub mod __internal {
         DescribeFn: Fn(MatcherResult, &InnerMatcher) -> Description,
         ExplainFn: Fn(&Input, &'static str, &InnerMatcher) -> Description,
     {
-        pub definition: &'static str,
+        definition: &'static str,
         matcher: InnerMatcher,
         apply: ApplyFn,
         describe: DescribeFn,

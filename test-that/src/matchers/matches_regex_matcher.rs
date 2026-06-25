@@ -16,7 +16,7 @@
 use core::ops::Deref;
 use regex::Regex;
 
-/// Matches a string the entirety of which which matches the given regular
+/// Matches a string the entirety of which matches the given regular
 /// expression.
 ///
 /// This is similar to [`contains_regex`][crate::matchers::contains_regex],

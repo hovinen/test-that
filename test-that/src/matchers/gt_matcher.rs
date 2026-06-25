@@ -34,7 +34,7 @@
 /// # should_fail().unwrap_err();
 /// ```
 ///
-/// In most cases the params neeed to be the same type or they need to be cast
+/// In most cases the params need to be the same type or they need to be cast
 /// explicitly. This can be surprising when comparing integer types or
 /// references:
 ///
