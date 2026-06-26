@@ -13,6 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::description::Description;
+use crate::matcher::{Describable, Matcher, MatcherResult};
+use alloc::string::String;
+use core::fmt::{Debug, Display};
+
 /// Matches the string representation of types that implement `Display`.
 ///
 /// ```
@@ -20,48 +25,53 @@
 /// let result = "Hello, world!";
 /// assert_that!(result, displays_as(eq("Hello, world!")));
 /// ```
-pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> __internal::DisplayMatcher<InnerMatcher> {
-    __internal::DisplayMatcher { inner }
+pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> DisplayMatcher<InnerMatcher> {
+    DisplayMatcher { inner, alternate: false }
 }
 
-pub mod __internal {
-    use crate::description::Description;
-    use crate::matcher::{Describable, Matcher, MatcherResult};
-    use alloc::string::String;
-    use core::fmt::{Debug, Display};
+/// A matcher which renders the actual value as a `String` with `Display` and
+/// matches the result against the given inner matcher.
+pub struct DisplayMatcher<InnerMatcher> {
+    inner: InnerMatcher,
+    alternate: bool,
+}
 
-    #[doc(hidden)]
-    pub struct DisplayMatcher<InnerMatcher> {
-        pub(super) inner: InnerMatcher,
+impl<InnerMatcher> DisplayMatcher<InnerMatcher> {
+    /// Indicates that the match should be made against the alternate rendering
+    /// of the actual value. That is the result of formatting it with
+    /// `{:#}`.
+    pub fn alternate(mut self) -> Self {
+        self.alternate = true;
+        self
+    }
+}
+
+impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
+    for DisplayMatcher<InnerMatcher>
+{
+    fn matches(&self, actual: &T) -> MatcherResult {
+        let rendered = if self.alternate { format!("{actual:#}") } else { format!("{actual}") };
+        self.inner.matches(&rendered)
     }
 
-    impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
-        for DisplayMatcher<InnerMatcher>
-    {
-        fn matches(&self, actual: &T) -> MatcherResult {
-            self.inner.matches(&format!("{actual}"))
-        }
-
-        fn explain_match(&self, actual: &T) -> Description {
-            format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
-                .into()
-        }
+    fn explain_match(&self, actual: &T) -> Description {
+        format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
+            .into()
     }
+}
 
-    impl<InnerMatcher: Describable> Describable for DisplayMatcher<InnerMatcher> {
-        fn describe(&self, matcher_result: MatcherResult) -> Description {
-            match matcher_result {
-                MatcherResult::Match => format!(
-                    "displays as a string which {}",
-                    self.inner.describe(MatcherResult::Match)
-                )
-                .into(),
-                MatcherResult::NoMatch => format!(
-                    "doesn't display as a string which {}",
-                    self.inner.describe(MatcherResult::Match)
-                )
-                .into(),
+impl<InnerMatcher: Describable> Describable for DisplayMatcher<InnerMatcher> {
+    fn describe(&self, matcher_result: MatcherResult) -> Description {
+        match matcher_result {
+            MatcherResult::Match => {
+                format!("displays as a string which {}", self.inner.describe(MatcherResult::Match))
+                    .into()
             }
+            MatcherResult::NoMatch => format!(
+                "doesn't display as a string which {}",
+                self.inner.describe(MatcherResult::Match)
+            )
+            .into(),
         }
     }
 }
@@ -103,6 +113,19 @@ mod tests {
         }
         verify_that!(Struct { a: 123, b: 321 }, displays_as(eq("Struct { a: 123, b: 321 }")))?;
         Ok(())
+    }
+
+    #[test]
+    fn display_matches_struct_with_alternate_rendering() -> TestResult<()> {
+        #[derive(Debug)]
+        struct Struct;
+        impl Display for Struct {
+            fn fmt(&self, f: &mut Formatter<'_>) -> core::result::Result<(), Error> {
+                if f.alternate() { write!(f, "Correct") } else { write!(f, "Not correct") }
+            }
+        }
+
+        verify_that!(Struct, displays_as(eq("Correct")).alternate())
     }
 
     #[cfg(feature = "std")]
