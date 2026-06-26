@@ -19,28 +19,28 @@ use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
 };
-use core::{fmt::Debug, marker::PhantomData};
+use core::fmt::Debug;
 
 /// Matches precisely values matched by `inner`.
 ///
 /// The returned matcher produces a description prefixed by the string
 /// `description`. This is useful in contexts where the test assertion failure
 /// output must include the additional description.
-pub fn is<'a, ActualT: Debug + 'a, InnerMatcherT: Matcher<ActualT> + 'a>(
+pub fn is<'a, InnerMatcherT>(
     description: &'a str,
     inner: InnerMatcherT,
-) -> impl Matcher<ActualT> + 'a {
-    IsMatcher { description, inner, phantom: Default::default() }
+) -> IsMatcher<'a, InnerMatcherT> {
+    IsMatcher { description, inner }
 }
 
-struct IsMatcher<'a, ActualT, InnerMatcherT> {
+#[doc(hidden)]
+pub struct IsMatcher<'a, InnerMatcherT> {
     description: &'a str,
     inner: InnerMatcherT,
-    phantom: PhantomData<ActualT>,
 }
 
-impl<'a, ActualT: Debug, InnerMatcherT: Matcher<ActualT>> Matcher<ActualT>
-    for IsMatcher<'a, ActualT, InnerMatcherT>
+impl<'a, ActualT: Debug + ?Sized, InnerMatcherT: Matcher<ActualT>> Matcher<ActualT>
+    for IsMatcher<'a, InnerMatcherT>
 {
     fn matches(&self, actual: &ActualT) -> MatcherResult {
         self.inner.matches(actual)
@@ -51,9 +51,7 @@ impl<'a, ActualT: Debug, InnerMatcherT: Matcher<ActualT>> Matcher<ActualT>
     }
 }
 
-impl<'a, ActualT, InnerMatcherT: Describable> Describable
-    for IsMatcher<'a, ActualT, InnerMatcherT>
-{
+impl<'a, InnerMatcherT: Describable> Describable for IsMatcher<'a, InnerMatcherT> {
     fn describe(&self, matcher_result: MatcherResult) -> Description {
         match matcher_result {
             MatcherResult::Match => format!(
