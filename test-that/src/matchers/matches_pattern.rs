@@ -507,6 +507,102 @@ macro_rules! matches_pattern_internal {
         )
     };
 
+    // Property and deref-property arms for dyn Trait types.
+    //
+    // When the struct name starts with `dyn`, the generated closure must use
+    // `&(dyn Trait + '_)` rather than `&dyn Trait`. The `+ '_` ties the
+    // reference lifetime and the trait-object lifetime together via Rust's
+    // lifetime elision rules. Without it, Rust 1.96+ infers them as two
+    // independent lifetime variables and rejects the vtable dispatch with
+    // "lifetime may not live long enough".
+    //
+    // These arms must appear before the generic `[$($struct_name:tt)*]` arms
+    // so that they take precedence when the first token is `dyn`.
+
+    // Property, {} matcher -- dyn Trait
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!(dyn $($struct_rest)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),).with_custom_definition(stringify!($property_name($($argument),*))),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::__matcher_expr!({$($matcher)*}),).with_custom_definition(stringify!($property_name($($argument),*))),],
+            [dyn $($struct_rest)*], { $first $($rest)* }
+        )
+    };
+
+    // Property, [] matcher -- dyn Trait
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!(dyn $($struct_rest)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),).with_custom_definition(stringify!($property_name($($argument),*))),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::__matcher_expr!([$($matcher)*]),).with_custom_definition(stringify!($property_name($($argument),*))),],
+            [dyn $($struct_rest)*], { $first $($rest)* }
+        )
+    };
+
+    // Property, $expr matcher -- dyn Trait
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!(dyn $($struct_rest)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $matcher,).with_custom_definition(stringify!($property_name($($argument),*))),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $matcher,).with_custom_definition(stringify!($property_name($($argument),*))),],
+            [dyn $($struct_rest)*], { $first $($rest)* }
+        )
+    };
+
+    // Deref property, {} matcher -- dyn Trait
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!(dyn $($struct_rest)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),).with_custom_definition(stringify!($property_name($($argument),*))),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*})),).with_custom_definition(stringify!($property_name($($argument),*))),],
+            [dyn $($struct_rest)*], { $first $($rest)* }
+        )
+    };
+
+    // Deref property, [] matcher -- dyn Trait
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*] $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!(dyn $($struct_rest)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),).with_custom_definition(stringify!($property_name($($argument),*))),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*])),).with_custom_definition(stringify!($property_name($($argument),*))),],
+            [dyn $($struct_rest)*], { $first $($rest)* }
+        )
+    };
+
+    // Deref property, $expr matcher -- dyn Trait
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr $(,)? }) => {
+        $crate::matchers::__internal::is(
+            stringify!(dyn $($struct_rest)*),
+            $crate::matchers::all!($($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),).with_custom_definition(stringify!($property_name($($argument),*))),)
+        )
+    };
+    (@fwd [$($acc:tt)*], [dyn $($struct_rest:tt)*], { * $property_name:ident($($argument:expr),* $(,)?) : $matcher:expr, $first:tt $($rest:tt)* }) => {
+        $crate::matches_pattern_internal!(
+            @fwd [$($acc)* $crate::matchers::result_of!(|s: &(dyn $($struct_rest)* + '_)| s.$property_name($($argument),*), $crate::matchers::points_to($matcher),).with_custom_definition(stringify!($property_name($($argument),*))),],
+            [dyn $($struct_rest)*], { $first $($rest)* }
+        )
+    };
+
     // Property, {} matcher
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $property_name:ident($($argument:expr),* $(,)?) : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(

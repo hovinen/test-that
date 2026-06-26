@@ -3258,3 +3258,325 @@ fn includes_correct_definition_in_explanation_for_set_shorthand_method_not_in_la
         )))
     )
 }
+
+#[test]
+#[cfg(feature = "anyhow")]
+fn matches_pattern_matches_source_of_source_of_error() -> TestResult<()> {
+    use anyhow::anyhow;
+
+    let inner = anyhow!("Inner error");
+    let outer = inner.context("Outer error");
+    let outermost = outer.context("Outermost error");
+    verify_that!(
+        outermost,
+        matches_pattern!(anyhow::Error {
+            source(): some(points_to(matches_pattern!(dyn std::error::Error {
+                source(): some(displays_as(eq("Inner error")))
+            })))
+        })
+    )
+}
+
+// Tests for dyn Trait arms added to matches_pattern_internal!.
+//
+// The property $expr / last arm is already covered by
+// matches_pattern_matches_source_of_source_of_error above. The remaining 11
+// tests below cover the other 11 new arms.
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_multiple_expr_method_matchers() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> i32;
+        fn b(&self) -> i32;
+    }
+    #[derive(Debug)]
+    struct MyImpl;
+    impl MyTrait for MyImpl {
+        fn a(&self) -> i32 {
+            1
+        }
+        fn b(&self) -> i32 {
+            2
+        }
+    }
+    let impl_val = MyImpl;
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            a(): eq(1),
+            b(): eq(2),
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_single_brace_method_matcher() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> Vec<i32>;
+    }
+    #[derive(Debug)]
+    struct MyImpl;
+    impl MyTrait for MyImpl {
+        fn a(&self) -> Vec<i32> {
+            vec![1, 2, 3]
+        }
+    }
+    let impl_val = MyImpl;
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            a(): {eq(3), eq(1), eq(2)}
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_multiple_brace_method_matchers() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> Vec<i32>;
+        fn b(&self) -> Vec<i32>;
+    }
+    #[derive(Debug)]
+    struct MyImpl;
+    impl MyTrait for MyImpl {
+        fn a(&self) -> Vec<i32> {
+            vec![1, 2]
+        }
+        fn b(&self) -> Vec<i32> {
+            vec![3, 4]
+        }
+    }
+    let impl_val = MyImpl;
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            a(): {eq(2), eq(1)},
+            b(): {eq(4), eq(3)},
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_single_list_method_matcher() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> Vec<i32>;
+    }
+    #[derive(Debug)]
+    struct MyImpl;
+    impl MyTrait for MyImpl {
+        fn a(&self) -> Vec<i32> {
+            vec![1, 2, 3]
+        }
+    }
+    let impl_val = MyImpl;
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            a(): [eq(1), eq(2), eq(3)]
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_multiple_list_method_matchers() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> Vec<i32>;
+        fn b(&self) -> Vec<i32>;
+    }
+    #[derive(Debug)]
+    struct MyImpl;
+    impl MyTrait for MyImpl {
+        fn a(&self) -> Vec<i32> {
+            vec![1, 2]
+        }
+        fn b(&self) -> Vec<i32> {
+            vec![3, 4]
+        }
+    }
+    let impl_val = MyImpl;
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            a(): [eq(1), eq(2)],
+            b(): [eq(3), eq(4)],
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_single_deref_expr_method_matcher() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> &i32;
+    }
+    #[derive(Debug)]
+    struct MyImpl {
+        val: i32,
+    }
+    impl MyTrait for MyImpl {
+        fn a(&self) -> &i32 {
+            &self.val
+        }
+    }
+    let impl_val = MyImpl { val: 42 };
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            *a(): eq(42)
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_multiple_deref_expr_method_matchers() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> &i32;
+        fn b(&self) -> &i32;
+    }
+    #[derive(Debug)]
+    struct MyImpl {
+        a: i32,
+        b: i32,
+    }
+    impl MyTrait for MyImpl {
+        fn a(&self) -> &i32 {
+            &self.a
+        }
+        fn b(&self) -> &i32 {
+            &self.b
+        }
+    }
+    let impl_val = MyImpl { a: 1, b: 2 };
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            *a(): eq(1),
+            *b(): eq(2),
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_single_deref_brace_method_matcher() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> &[i32];
+    }
+    #[derive(Debug)]
+    struct MyImpl {
+        vals: Vec<i32>,
+    }
+    impl MyTrait for MyImpl {
+        fn a(&self) -> &[i32] {
+            &self.vals
+        }
+    }
+    let impl_val = MyImpl { vals: vec![1, 2, 3] };
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            *a(): {eq(3), eq(1), eq(2)}
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_multiple_deref_brace_method_matchers() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> &[i32];
+        fn b(&self) -> &[i32];
+    }
+    #[derive(Debug)]
+    struct MyImpl {
+        a: Vec<i32>,
+        b: Vec<i32>,
+    }
+    impl MyTrait for MyImpl {
+        fn a(&self) -> &[i32] {
+            &self.a
+        }
+        fn b(&self) -> &[i32] {
+            &self.b
+        }
+    }
+    let impl_val = MyImpl { a: vec![1, 2], b: vec![3, 4] };
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            *a(): {eq(2), eq(1)},
+            *b(): {eq(4), eq(3)},
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_single_deref_list_method_matcher() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> &[i32];
+    }
+    #[derive(Debug)]
+    struct MyImpl {
+        vals: Vec<i32>,
+    }
+    impl MyTrait for MyImpl {
+        fn a(&self) -> &[i32] {
+            &self.vals
+        }
+    }
+    let impl_val = MyImpl { vals: vec![1, 2, 3] };
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            *a(): [eq(1), eq(2), eq(3)]
+        }))
+    )
+}
+
+#[test]
+fn matches_pattern_on_dyn_trait_with_multiple_deref_list_method_matchers() -> TestResult<()> {
+    use std::fmt::Debug;
+    trait MyTrait: Debug {
+        fn a(&self) -> &[i32];
+        fn b(&self) -> &[i32];
+    }
+    #[derive(Debug)]
+    struct MyImpl {
+        a: Vec<i32>,
+        b: Vec<i32>,
+    }
+    impl MyTrait for MyImpl {
+        fn a(&self) -> &[i32] {
+            &self.a
+        }
+        fn b(&self) -> &[i32] {
+            &self.b
+        }
+    }
+    let impl_val = MyImpl { a: vec![1, 2], b: vec![3, 4] };
+    let value: &dyn MyTrait = &impl_val;
+    verify_that!(
+        value,
+        points_to(matches_pattern!(dyn MyTrait {
+            *a(): [eq(1), eq(2)],
+            *b(): [eq(3), eq(4)],
+        }))
+    )
+}
