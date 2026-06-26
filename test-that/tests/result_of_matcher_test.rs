@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use anyhow::anyhow;
 use test_that::prelude::*;
 
 #[derive(Debug)]
@@ -395,4 +396,17 @@ fn result_of_with_unordered_container_shorthand() -> TestResult<()> {
 fn result_of_with_empty_container_shorthand() -> TestResult<()> {
     let value = SomeStructWithVecMethod { items: vec![] };
     verify_that!(value, result_of!(|s: &SomeStructWithVecMethod| s.get_items(), []))
+}
+
+#[test]
+fn result_of_allows_format_in_method_body() -> TestResult<()> {
+    let value = "A value";
+    verify_that!(value, result_of!(|s: &&str| format!("{s}"), eq("A value")))
+}
+
+#[test]
+#[cfg(feature = "anyhow")]
+fn result_of_allows_format_of_anyhow_error() -> TestResult<()> {
+    let value = anyhow!("An error");
+    verify_that!(value, result_of!(|s: &anyhow::Error| format!("{s:#}"), eq("An error")))
 }
