@@ -54,7 +54,7 @@ pub(super) mod subset_of_matcher;
 pub(super) mod superset_of_matcher;
 
 pub use container_contains::unordered_matcher::__internal::ContainerContainsUnorderedMatcher;
-pub use container_eq_matcher::container_eq;
+pub use container_eq_matcher::{ContainerEqMatcher, container_eq};
 pub use contains_matcher::{ContainsMatcher, contains};
 pub use each_matcher::each;
 pub use empty_matcher::empty;
