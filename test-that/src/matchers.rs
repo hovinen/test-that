@@ -33,6 +33,7 @@ mod ge_matcher;
 mod gt_matcher;
 #[cfg(feature = "std")]
 mod has_entry_matcher;
+mod in_range_matcher;
 mod is_encoded_string_matcher;
 #[cfg(feature = "num-traits")]
 mod is_finite_matcher;
@@ -70,6 +71,7 @@ pub use ge_matcher::ge;
 pub use gt_matcher::gt;
 #[cfg(feature = "std")]
 pub use has_entry_matcher::has_entry;
+pub use in_range_matcher::in_range;
 pub use is_encoded_string_matcher::is_utf8_string;
 #[cfg(feature = "num-traits")]
 pub use is_finite_matcher::is_finite;
