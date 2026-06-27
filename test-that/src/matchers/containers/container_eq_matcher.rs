@@ -168,7 +168,12 @@ where
     }
 
     fn explain_match(&self, actual: &ActualContainerT) -> Description {
-        build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual)).into()
+        build_explanation(
+            self.get_missing_items(actual),
+            self.get_unexpected_items(actual),
+            self.matches(actual),
+        )
+        .into()
     }
 }
 
@@ -228,7 +233,12 @@ where
     }
 
     fn explain_match(&self, actual: &ActualContainerT) -> Description {
-        build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual)).into()
+        build_explanation(
+            self.get_missing_items(actual),
+            self.get_unexpected_items(actual),
+            self.matches(actual),
+        )
+        .into()
     }
 }
 
@@ -272,33 +282,40 @@ impl<ExpectedContainerT: Debug, Mode> Describable for ContainerEqMatcher<Expecte
     }
 }
 
-fn build_explanation<T: Debug, U: Debug>(missing: Vec<T>, unexpected: Vec<U>) -> String {
-    match (missing.len(), unexpected.len()) {
+fn build_explanation<T: Debug, U: Debug>(
+    missing: Vec<T>,
+    unexpected: Vec<U>,
+    matcher_result: MatcherResult,
+) -> String {
+    match (missing.len(), unexpected.len(), matcher_result) {
         // TODO(b/261175849) add more data here (out of order elements, duplicated elements, etc...)
-        (0, 0) => "which contains all the elements".to_string(),
-        (0, 1) => format!("which contains the unexpected element {:?}", unexpected[0]),
-        (0, _) => format!("which contains the unexpected elements {unexpected:?}",),
-        (1, 0) => format!("which is missing the element {:?}", missing[0]),
-        (1, 1) => {
+        (0, 0, MatcherResult::NoMatch) => {
+            "which contains all the elements but in the wrong order".to_string()
+        }
+        (0, 0, MatcherResult::Match) => "which contains all the elements".to_string(),
+        (0, 1, _) => format!("which contains the unexpected element {:?}", unexpected[0]),
+        (0, _, _) => format!("which contains the unexpected elements {unexpected:?}",),
+        (1, 0, _) => format!("which is missing the element {:?}", missing[0]),
+        (1, 1, _) => {
             format!(
                 "which is missing the element {:?} and contains the unexpected element {:?}",
                 missing[0], unexpected[0]
             )
         }
-        (1, _) => {
+        (1, _, _) => {
             format!(
                 "which is missing the element {:?} and contains the unexpected elements {unexpected:?}",
                 missing[0]
             )
         }
-        (_, 0) => format!("which is missing the elements {missing:?}"),
-        (_, 1) => {
+        (_, 0, _) => format!("which is missing the elements {missing:?}"),
+        (_, 1, _) => {
             format!(
                 "which is missing the elements {missing:?} and contains the unexpected element {:?}",
                 unexpected[0]
             )
         }
-        (_, _) => {
+        (_, _, _) => {
             format!(
                 "which is missing the elements {missing:?} and contains the unexpected elements {unexpected:?}",
             )
@@ -414,7 +431,7 @@ mod tests {
                     Value of: vec![1, 3, 2]
                     Expected: is equal to [1, 2, 3]
                     Actual: [1, 3, 2],
-                      which contains all the elements
+                      which contains all the elements but in the wrong order
                 "
             ))))
         )
@@ -425,8 +442,16 @@ mod tests {
         let result = verify_that!(vec![1, 3, 2], container_eq(vec![1, 2, 3]));
         verify_that!(
             result,
-            err(displays_as(contains_substring("which contains all the elements")))
+            err(displays_as(contains_substring(
+                "which contains all the elements but in the wrong order"
+            )))
         )
+    }
+
+    #[test]
+    fn container_eq_does_not_show_part_about_wrong_order_when_ignoring_order() -> TestResult<()> {
+        let result = verify_that!(vec![1, 3, 2], not(container_eq(vec![1, 2, 3]).ignoring_order()));
+        verify_that!(result, err(displays_as(not(contains_substring("but in the wrong order")))))
     }
 
     #[test]
