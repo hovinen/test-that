@@ -389,8 +389,39 @@
 /// #    .unwrap();
 /// ```
 ///
+/// ## Matching trait objects
+///
+/// One can match trait objects in many cases. The type is then `dyn` plus the
+/// name of the trait. The trait must extend [`std::fmt::Debug`], as with all
+/// types against which one matches with this crate. Since trait objects are
+/// always behind references or smart pointers, you must wrap that matcher in
+/// [`points_to`].
+///
+/// ```
+/// # use test_that::prelude::*;
+/// trait MyTrait: std::fmt::Debug {
+///     fn get_value(&self) -> i32;
+/// }
+///
+/// #[derive(Debug)]
+/// struct MyStruct;
+/// impl MyTrait for MyStruct {
+///     fn get_value(&self) -> i32 {
+///         42
+///     }
+/// }
+///
+/// let value = MyStruct;
+/// let reference: &dyn MyTrait = &value;
+/// verify_that!(reference, points_to(matches_pattern!(dyn MyTrait {
+///     get_value(): eq(42),
+/// })))
+/// # .unwrap();
+/// ```
+///
 /// [`contains_exactly!`]: crate::matchers::containers::contains_exactly
 /// [`in_order()`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
+/// [`points_to`]: crate::matchers::points_to
 /// [`verify_that!`]: crate::verify_that
 #[macro_export]
 #[doc(hidden)]
