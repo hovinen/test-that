@@ -99,6 +99,20 @@ use super::container_contains::Requirements;
 /// uses a naive algorithm requiring time proportional to the product of the
 /// sizes of the expected and actual values. This should therefore only be used
 /// when the containers are small enough that this is not a problem.
+///
+/// ## Comparing conatiners while ignoring order
+///
+/// Use [ignoring_order()][ContainerEqMatcher::ignoring_order] to ignore the
+/// order of the elements.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// # fn should_pass() -> TestResult<()> {
+/// verify_that!(vec![1, 2, 3], container_eq([3, 2, 1]).ignoring_order())?;
+/// #     Ok(())
+/// # }
+/// # should_pass().unwrap();
+/// ```
 // This returns ContainerEqMatcher and not impl Matcher because
 // ContainerEqMatcher has some specialisations for slice types (see
 // documentation above). Returning impl Matcher would hide those from the
