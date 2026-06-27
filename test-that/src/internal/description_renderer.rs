@@ -44,14 +44,14 @@ pub(crate) const INDENTATION_SIZE: usize = 2;
 pub(crate) struct List(Vec<Block>, Decoration);
 
 impl List {
-    /// Render this instance using the formatter `f`.
+    /// Renders this instance using the formatter `f`.
     ///
     /// Indent each line of output by `indentation` spaces.
     pub(crate) fn render(&self, f: &mut dyn Write, indentation: usize) -> Result {
         self.render_with_prefix(f, indentation, "".into())
     }
 
-    /// Append a new [`Block`] containing `literal`.
+    /// Appends a new [`Block`] containing `literal`.
     ///
     /// The input `literal` is split into lines so that each line will be
     /// indented correctly.
@@ -59,27 +59,34 @@ impl List {
         self.0.push(literal.into());
     }
 
-    /// Append a new [`Block`] containing `inner` as a nested [`List`].
+    /// Appends the elements of `inner` directly.
+    pub(crate) fn push(&mut self, list: List) {
+        for element in list.0 {
+            self.0.push(element);
+        }
+    }
+
+    /// Appends a new [`Block`] containing `inner` as a nested [`List`].
     pub(crate) fn push_nested(&mut self, inner: List) {
         self.0.push(Block::Nested(inner));
     }
 
-    /// Render each [`Block`] of this instance preceded with a bullet "* ".
+    /// Renders each [`Block`] of this instance preceded with a bullet "* ".
     pub(crate) fn bullet_list(self) -> Self {
         Self(self.0, Decoration::Bullet)
     }
 
-    /// Render each [`Block`] of this instance preceded with its 0-based index.
+    /// Renders each [`Block`] of this instance preceded with its 0-based index.
     pub(crate) fn enumerate(self) -> Self {
         Self(self.0, Decoration::Enumerate)
     }
 
-    /// Return the number of [`Block`] in this instance.
+    /// Returns the number of [`Block`] in this instance.
     pub(crate) fn len(&self) -> usize {
         self.0.len()
     }
 
-    /// Return `true` if there are no [`Block`] in this instance, `false`
+    /// Returns `true` if there are no [`Block`] in this instance, `false`
     /// otherwise.
     pub(crate) fn is_empty(&self) -> bool {
         self.0.is_empty()

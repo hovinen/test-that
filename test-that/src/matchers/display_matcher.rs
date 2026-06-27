@@ -55,8 +55,12 @@ impl<T: Debug + Display + ?Sized, InnerMatcher: Matcher<String>> Matcher<T>
     }
 
     fn explain_match(&self, actual: &T) -> Description {
-        format!("which displays as a string {}", self.inner.explain_match(&format!("{actual}")))
-            .into()
+        let rendered = if self.alternate { format!("{actual:#}") } else { format!("{actual}") };
+        let inner_explanation = self.inner.explain_match(&rendered);
+        Description::new()
+            .text("which displays as:")
+            .nested(Description::from(rendered).indent())
+            .append(inner_explanation)
     }
 }
 
@@ -137,14 +141,44 @@ mod tests {
         verify_that!(
             result,
             err(displays_as(contains_substring(indoc!(
-                "
-                  Actual: \"123\\n234\",
-                    which displays as a string which isn't equal to \"123\\n345\"
+                r#"
+                  Actual: "123\n234",
+                    which displays as:
+                      123
+                      234
+                    which isn't equal to "123\n345"
                     Difference(-actual / +expected):
                      123
                     -234
                     +345
-                "
+                "#
+            ))))
+        )
+    }
+
+    #[cfg(feature = "std")]
+    #[test]
+    #[serial]
+    fn display_puts_alternate_rendering_in_explanation_when_requested() -> TestResult<()> {
+        #[derive(Debug)]
+        struct Struct;
+        impl Display for Struct {
+            fn fmt(&self, f: &mut Formatter<'_>) -> core::result::Result<(), Error> {
+                if f.alternate() { write!(f, "Correct") } else { write!(f, "Not correct") }
+            }
+        }
+
+        let result = verify_that!(Struct, displays_as(eq("Not correct")).alternate());
+
+        verify_that!(
+            result,
+            err(displays_as(contains_substring(indoc!(
+                r#"
+                  Actual: Struct,
+                    which displays as:
+                      Correct
+                    which isn't equal to "Not correct"
+                "#
             ))))
         )
     }

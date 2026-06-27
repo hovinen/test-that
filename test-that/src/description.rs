@@ -105,6 +105,15 @@ impl Description {
         self
     }
 
+    /// Appends the elements of [`Description`] to this instance.
+    ///
+    /// The elements will appear at the same level of indentation as those of
+    /// this instance.
+    pub fn append(mut self, other: Description) -> Self {
+        self.elements.push(other.elements);
+        self
+    }
+
     /// Appends a nested [`Description`] to this instance.
     ///
     /// The nested [`Description`] `inner` is indented uniformly at the next
