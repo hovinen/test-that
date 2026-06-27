@@ -66,12 +66,12 @@ pub mod __internal {
 
     impl<ActualT, ExpectedRefT, ExpectedT> Matcher<ActualT> for EqDerefOfMatcher<ExpectedRefT>
     where
-        ActualT: Debug + ?Sized,
+        ActualT: PartialEq<ExpectedT> + Debug + ?Sized,
         ExpectedRefT: Deref<Target = ExpectedT> + Debug,
-        ExpectedT: PartialEq<ActualT> + Debug,
+        ExpectedT: Debug,
     {
         fn matches(&self, actual: &ActualT) -> MatcherResult {
-            (self.expected.deref() == actual).into()
+            (actual == self.expected.deref()).into()
         }
 
         fn explain_match(&self, actual: &ActualT) -> Description {

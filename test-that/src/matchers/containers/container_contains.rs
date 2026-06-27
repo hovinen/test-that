@@ -168,7 +168,7 @@ use core::fmt::Display;
 macro_rules! __contains_exactly {
     ($(,)?) => {{
         $crate::matchers::containers::ContainerContainsUnorderedMatcher::new(
-            [],
+            vec![],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
@@ -191,7 +191,7 @@ macro_rules! __contains_exactly {
     // Accumulator finalization.
     (@acc [$($acc:tt)*]) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$($acc)*],
+            vec![$($acc)*],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
@@ -320,7 +320,7 @@ macro_rules! __contains_exactly {
 macro_rules! __contains_each {
     ($(,)?) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [],
+            vec![],
             $crate::matchers::__internal::Requirements::Superset
         )
     }};
@@ -341,7 +341,7 @@ macro_rules! __contains_each {
 
     (@acc [$($acc:tt)*]) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$($acc)*],
+            vec![$($acc)*],
             $crate::matchers::__internal::Requirements::Superset
         )
     }};
@@ -472,7 +472,7 @@ macro_rules! __contains_each {
 macro_rules! __is_contained_in {
     ($(,)?) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [],
+            vec![],
             $crate::matchers::__internal::Requirements::Subset,
         )
     }};
@@ -493,7 +493,7 @@ macro_rules! __is_contained_in {
 
     (@acc [$($acc:tt)*]) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$($acc)*],
+            vec![$($acc)*],
             $crate::matchers::__internal::Requirements::Subset,
         )
     }};

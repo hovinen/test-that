@@ -13,11 +13,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::{
+    description::Description,
+    matcher::{Describable, Matcher, MatcherResult},
+    matchers::{
+        containers::{
+            OwnedItems, RefItems, container_contains::unordered_matcher::__internal::MatchMatrix,
+        },
+        eq, eq_deref_of,
+    },
+};
 use alloc::{
     string::{String, ToString},
     vec::Vec,
 };
-use core::fmt::Debug;
+use core::{fmt::Debug, marker::PhantomData};
+
+use super::container_contains::Requirements;
 
 /// Matches a container equal (in the sense of `==`) to `expected`.
 ///
@@ -93,132 +105,155 @@ use core::fmt::Debug;
 // compiler.
 pub fn container_eq<ExpectedContainerT, Mode>(
     expected: ExpectedContainerT,
-) -> __internal::ContainerEqMatcher<ExpectedContainerT, Mode>
-where
-    ExpectedContainerT: Debug,
-{
-    __internal::ContainerEqMatcher { expected, phantom: Default::default() }
+) -> ContainerEqMatcher<ExpectedContainerT, Mode> {
+    ContainerEqMatcher { expected, ignore_order: false, phantom: Default::default() }
 }
 
-pub mod __internal {
-    use super::build_explanation;
-    use crate::description::Description;
-    use crate::matcher::{Describable, Matcher, MatcherResult};
-    use crate::matchers::containers::{OwnedItems, RefItems};
-    use alloc::vec::Vec;
-    use core::fmt::Debug;
-    use core::marker::PhantomData;
+/// A matcher which matches a container equal (in the sense of [`PartialEq`])
+/// to the given value.
+pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {
+    expected: ExpectedContainerT,
+    ignore_order: bool,
+    phantom: PhantomData<Mode>,
+}
 
-    #[doc(hidden)]
-    pub struct ContainerEqMatcher<ExpectedContainerT, Mode> {
-        pub(super) expected: ExpectedContainerT,
-        pub(super) phantom: PhantomData<Mode>,
+impl<ExpectedContainerT, Mode> ContainerEqMatcher<ExpectedContainerT, Mode> {
+    /// Ignores the order of the elements when comparing containers.
+    ///
+    /// The containers will be deemed equal if there is a 1:1 correspondence of
+    /// elements in the actual and expected containers in which each actual
+    /// element equals (in the sense of [`PartialEq`]) its corresponding
+    /// expected element.
+    pub fn ignoring_order(self) -> Self {
+        Self { ignore_order: true, ..self }
+    }
+}
+
+impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
+    Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, RefItems>
+where
+    ActualElementT: PartialEq<ExpectedElementT> + Debug + ?Sized,
+    ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
+    ExpectedElementT: Debug,
+    ExpectedContainerT: Debug,
+    for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
+    for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
+{
+    fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
+        if self.ignore_order {
+            let expected: Vec<_> = self.expected.into_iter().map(eq_deref_of).collect();
+            let match_matrix = MatchMatrix::generate_for_fixed_matcher::<_, ActualElementT, _>(
+                actual.into_iter(),
+                expected.len(),
+                &expected,
+            );
+            match_matrix.is_match_for(Requirements::PerfectMatch).into()
+        } else {
+            (*actual == self.expected).into()
+        }
     }
 
-    impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
-        Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, RefItems>
+    fn explain_match(&self, actual: &ActualContainerT) -> Description {
+        build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual)).into()
+    }
+}
+
+impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, RefItems>
+where
+    for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
+{
+    fn get_missing_items<ActualElementT, ActualContainerT>(
+        &self,
+        actual: &ActualContainerT,
+    ) -> Vec<&ExpectedElementT>
     where
-        ActualElementT: PartialEq<ExpectedElementT> + Debug + ?Sized,
-        ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
+        ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
         ExpectedElementT: Debug,
-        ExpectedContainerT: Debug,
         for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
-        for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
     {
-        fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
-            (*actual == self.expected).into()
-        }
-
-        fn explain_match(&self, actual: &ActualContainerT) -> Description {
-            build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual))
-                .into()
-        }
+        self.expected.into_iter().filter(|&i| !actual.into_iter().any(|j| j == i)).collect()
     }
 
-    impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, RefItems>
+    fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
+        &self,
+        actual: &'a ActualContainerT,
+    ) -> Vec<&'a ActualElementT>
     where
-        for<'a> &'a ExpectedContainerT: IntoIterator<Item = &'a ExpectedElementT>,
-    {
-        fn get_missing_items<ActualElementT, ActualContainerT>(
-            &self,
-            actual: &ActualContainerT,
-        ) -> Vec<&ExpectedElementT>
-        where
-            ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
-            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
-            for<'a> &'a ActualContainerT: IntoIterator<Item = &'a ActualElementT>,
-        {
-            self.expected.into_iter().filter(|&i| !actual.into_iter().any(|j| j == i)).collect()
-        }
-
-        fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
-            &self,
-            actual: &'a ActualContainerT,
-        ) -> Vec<&'a ActualElementT>
-        where
-            ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
-            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
-            for<'b> &'b ActualContainerT: IntoIterator<Item = &'b ActualElementT>,
-        {
-            actual.into_iter().filter(|&i| !self.expected.into_iter().any(|j| i == j)).collect()
-        }
-    }
-
-    impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
-        Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, OwnedItems>
-    where
-        ActualElementT: PartialEq<ExpectedElementT> + Debug,
-        ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
+        ActualElementT: PartialEq<ExpectedElementT> + ?Sized,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
         ExpectedElementT: Debug,
-        ExpectedContainerT: Debug,
-        for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
-        for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
+        for<'b> &'b ActualContainerT: IntoIterator<Item = &'b ActualElementT>,
     {
-        fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
+        actual.into_iter().filter(|&i| !self.expected.into_iter().any(|j| i == j)).collect()
+    }
+}
+
+impl<ActualElementT, ActualContainerT, ExpectedElementT, ExpectedContainerT>
+    Matcher<ActualContainerT> for ContainerEqMatcher<ExpectedContainerT, OwnedItems>
+where
+    ActualElementT: PartialEq<ExpectedElementT> + Debug,
+    ActualContainerT: PartialEq<ExpectedContainerT> + Debug + ?Sized,
+    ExpectedElementT: Debug,
+    ExpectedContainerT: Debug,
+    for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
+    for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
+{
+    fn matches(&self, actual: &ActualContainerT) -> MatcherResult {
+        if self.ignore_order {
+            let expected: Vec<_> = self.expected.into_iter().map(eq).collect();
+            let match_matrix = MatchMatrix::generate_for_fixed_matcher(
+                actual.into_iter(),
+                expected.len(),
+                &expected,
+            );
+            match_matrix.is_match_for(Requirements::PerfectMatch).into()
+        } else {
             (*actual == self.expected).into()
         }
-
-        fn explain_match(&self, actual: &ActualContainerT) -> Description {
-            build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual))
-                .into()
-        }
     }
 
-    impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, OwnedItems>
+    fn explain_match(&self, actual: &ActualContainerT) -> Description {
+        build_explanation(self.get_missing_items(actual), self.get_unexpected_items(actual)).into()
+    }
+}
+
+impl<ExpectedElementT, ExpectedContainerT> ContainerEqMatcher<ExpectedContainerT, OwnedItems>
+where
+    for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
+{
+    fn get_missing_items<ActualElementT, ActualContainerT>(
+        &self,
+        actual: &ActualContainerT,
+    ) -> Vec<ExpectedElementT>
     where
-        for<'a> &'a ExpectedContainerT: IntoIterator<Item = ExpectedElementT>,
+        ActualElementT: PartialEq<ExpectedElementT>,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        ExpectedElementT: Debug,
+        for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
     {
-        fn get_missing_items<ActualElementT, ActualContainerT>(
-            &self,
-            actual: &ActualContainerT,
-        ) -> Vec<ExpectedElementT>
-        where
-            ActualElementT: PartialEq<ExpectedElementT>,
-            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
-            for<'a> &'a ActualContainerT: IntoIterator<Item = ActualElementT>,
-        {
-            self.expected.into_iter().filter(|i| !actual.into_iter().any(|j| j == *i)).collect()
-        }
-
-        fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
-            &self,
-            actual: &'a ActualContainerT,
-        ) -> Vec<ActualElementT>
-        where
-            ActualElementT: PartialEq<ExpectedElementT>,
-            ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
-            for<'b> &'b ActualContainerT: IntoIterator<Item = ActualElementT>,
-        {
-            actual.into_iter().filter(|i| !self.expected.into_iter().any(|j| *i == j)).collect()
-        }
+        self.expected.into_iter().filter(|i| !actual.into_iter().any(|j| j == *i)).collect()
     }
 
-    impl<ExpectedContainerT: Debug, Mode> Describable for ContainerEqMatcher<ExpectedContainerT, Mode> {
-        fn describe(&self, matcher_result: MatcherResult) -> Description {
-            match matcher_result {
-                MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
-                MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
-            }
+    fn get_unexpected_items<'a, ActualElementT, ActualContainerT>(
+        &self,
+        actual: &'a ActualContainerT,
+    ) -> Vec<ActualElementT>
+    where
+        ActualElementT: PartialEq<ExpectedElementT>,
+        ActualContainerT: PartialEq<ExpectedContainerT> + ?Sized,
+        ExpectedElementT: Debug,
+        for<'b> &'b ActualContainerT: IntoIterator<Item = ActualElementT>,
+    {
+        actual.into_iter().filter(|i| !self.expected.into_iter().any(|j| *i == j)).collect()
+    }
+}
+
+impl<ExpectedContainerT: Debug, Mode> Describable for ContainerEqMatcher<ExpectedContainerT, Mode> {
+    fn describe(&self, matcher_result: MatcherResult) -> Description {
+        match matcher_result {
+            MatcherResult::Match => format!("is equal to {:?}", self.expected).into(),
+            MatcherResult::NoMatch => format!("isn't equal to {:?}", self.expected).into(),
         }
     }
 }
@@ -500,6 +535,46 @@ mod tests {
         verify_that!(
             value.as_slice(),
             points_to(container_eq(["String 1", "String 2", "String 3"]))
+        )
+    }
+
+    #[test]
+    fn container_eq_matches_ignoring_order_when_requested() -> TestResult<()> {
+        verify_that!(vec![1, 2, 3], container_eq(vec![3, 2, 1]).ignoring_order())
+    }
+
+    #[test]
+    fn container_eq_does_not_match_non_matching_container_when_ignoring_order() -> TestResult<()> {
+        verify_that!(vec![1, 2, 3], not(container_eq(vec![4, 2, 1]).ignoring_order()))
+    }
+
+    #[test]
+    fn container_eq_matches_slice_of_strings_while_ignoring_order() -> TestResult<()> {
+        let string_1 = String::from("String 1");
+        let string_2 = String::from("String 2");
+        let string_3 = String::from("String 3");
+        let value = vec![string_1, string_2, string_3];
+        verify_that!(
+            value.as_slice(),
+            points_to(container_eq(["String 3", "String 2", "String 1"]).ignoring_order())
+        )
+    }
+
+    #[test]
+    fn container_eq_matches_with_owned_item_conatiner_ignoring_order_when_requested()
+    -> TestResult<()> {
+        verify_that!(
+            OwnedItemContainer(vec![1, 2, 3]),
+            container_eq(OwnedItemContainer(vec![3, 2, 1])).ignoring_order()
+        )
+    }
+
+    #[test]
+    fn container_eq_does_not_match_non_matching_with_owned_item_conatiner_when_ignoring_order()
+    -> TestResult<()> {
+        verify_that!(
+            OwnedItemContainer(vec![1, 2, 3]),
+            not(container_eq(OwnedItemContainer(vec![4, 2, 1])).ignoring_order())
         )
     }
 }

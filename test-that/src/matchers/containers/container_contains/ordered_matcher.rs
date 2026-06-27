@@ -35,27 +35,21 @@ pub mod __internal {
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub struct ContainerContainsOrderedMatcher<
-        'matchers,
-        ContainerT: ?Sized,
-        T: Debug,
-        ModeT,
-        const N: usize,
-    > {
-        elements: [Box<dyn Matcher<T> + 'matchers>; N],
+    pub struct ContainerContainsOrderedMatcher<'matchers, ContainerT: ?Sized, T: Debug, ModeT> {
+        elements: Vec<Box<dyn Matcher<T> + 'matchers>>,
         requirements: Requirements,
         _phantom: PhantomData<(*const ContainerT, ModeT)>,
     }
 
-    impl<'matchers, ContainerT: ?Sized, T: Debug, ModeT, const N: usize>
-        ContainerContainsOrderedMatcher<'matchers, ContainerT, T, ModeT, N>
+    impl<'matchers, ContainerT: ?Sized, T: Debug, ModeT>
+        ContainerContainsOrderedMatcher<'matchers, ContainerT, T, ModeT>
     {
         /// Factory only intended for use in the macro `elements_are!`.
         ///
         /// **For internal use only. API stablility is not guaranteed!**
         #[doc(hidden)]
         pub fn new(
-            elements: [Box<dyn Matcher<T> + 'matchers>; N],
+            elements: Vec<Box<dyn Matcher<T> + 'matchers>>,
             requirements: Requirements,
         ) -> Self {
             Self { elements, requirements, _phantom: PhantomData }
@@ -188,8 +182,8 @@ pub mod __internal {
         }
     }
 
-    impl<'matchers, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
-        for ContainerContainsOrderedMatcher<'matchers, ContainerT, T, RefItems, N>
+    impl<'matchers, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
+        for ContainerContainsOrderedMatcher<'matchers, ContainerT, T, RefItems>
     where
         for<'elements> &'elements ContainerT: IntoIterator<Item = &'elements T>,
     {
@@ -202,8 +196,8 @@ pub mod __internal {
         }
     }
 
-    impl<'matchers, T: Debug, ContainerT: Debug + ?Sized, const N: usize> Matcher<ContainerT>
-        for ContainerContainsOrderedMatcher<'matchers, ContainerT, T, OwnedItems, N>
+    impl<'matchers, T: Debug, ContainerT: Debug + ?Sized> Matcher<ContainerT>
+        for ContainerContainsOrderedMatcher<'matchers, ContainerT, T, OwnedItems>
     where
         for<'container> &'container ContainerT: IntoIterator<Item = T>,
     {
@@ -216,8 +210,8 @@ pub mod __internal {
         }
     }
 
-    impl<'matchers, T: Debug, ContainerT: ?Sized, ModeT, const N: usize> Describable
-        for ContainerContainsOrderedMatcher<'matchers, ContainerT, T, ModeT, N>
+    impl<'matchers, T: Debug, ContainerT: ?Sized, ModeT> Describable
+        for ContainerContainsOrderedMatcher<'matchers, ContainerT, T, ModeT>
     {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
             format!(

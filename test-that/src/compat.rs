@@ -62,7 +62,7 @@ macro_rules! __unordered_elements_are {
 
     ($($matcher:expr),* $(,)?) => {{
         $crate::matchers::__internal::ContainerContainsUnorderedMatcher::new(
-            [$($crate::__alloc::boxed::Box::new($matcher)),*],
+            vec![$($crate::__alloc::boxed::Box::new($matcher)),*],
             $crate::matchers::__internal::Requirements::PerfectMatch
         )
     }};
