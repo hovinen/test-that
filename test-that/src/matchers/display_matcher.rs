@@ -26,7 +26,7 @@ use core::fmt::{Debug, Display};
 /// assert_that!(result, displays_as(eq("Hello, world!")));
 /// ```
 ///
-/// Use [alternate()][DisplayMatcher::alternate] to match against the value
+/// Use [`alternate()`][DisplayMatcher::alternate] to match against the value
 /// rendered with the alternate formatter `{:#}`.
 ///
 /// ```
