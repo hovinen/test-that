@@ -96,7 +96,9 @@ having to think much about how they show up when they fail.
 I started Test That! as a fork of the crate
 [GoogleTest Rust](https://crates.io/crates/googletest), which I had spearheaded
 while working at Google. The goal of the fork is to provide a more ergonomic
-developer experience than GoogleTest Rust does.
+developer experience than GoogleTest Rust does. See
+[my blog post](https://hovinen.me/announcements/2026/06/24/introducing-test-that.html)
+for more information my motivations for this fork.
 
 The GoogleTest Rust was in turn inspired by Google's C++ testing library
 [GoogleTest](https://github.com/google/googletest). Its goal was to bring the
