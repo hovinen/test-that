@@ -17,10 +17,10 @@ use core::{marker::PhantomData, ops::RangeBounds};
 /// Matches a value contained in the given range.
 ///
 /// The range can be any of the standard range types, including
-/// [Range][std::ops::Range], [RangeInclusive][std::ops::RangeInclusive],
-/// [RangeFrom][std::ops::RangeFrom], and [RangeTo][std::ops::RangeTo]. The
+/// [`Range`][std::ops::Range], [`RangeInclusive`][std::ops::RangeInclusive],
+/// [`RangeFrom`][std::ops::RangeFrom], and [`RangeTo`][std::ops::RangeTo]. The
 /// underlying type must satisfy the requirements for these types,
-/// namely, [PartialOrd][std::cmp::PartialOrd].
+/// namely, [`PartialOrd`][std::cmp::PartialOrd].
 ///
 /// The actual value is normally the same type as the range endpoints It can,
 /// however, be of any type which can be ordered with respect to the range
