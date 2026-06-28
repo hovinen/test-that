@@ -15,7 +15,7 @@
 
 [package]
 name = "integration-tests"
-version = "0.4.1"
+version = "0.5.0"
 description = "Integration tests for Test That!"
 repository = "https://github.com/hovinen/test-that"
 license = "Apache-2.0"
@@ -29,7 +29,7 @@ authors = [
 ]
 
 [dependencies]
-test-that = { path = "../test-that", version = "0.4.1", features = ["anyhow"] }
+test-that = { path = "../test-that", version = "0.5.0", features = ["anyhow"] }
 anyhow = "1.0.102"
 indoc = "2.0.7"
 rstest = "0.26.1"
