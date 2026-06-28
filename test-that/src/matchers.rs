@@ -63,7 +63,7 @@ pub use anything_matcher::anything;
 pub use char_count_matcher::char_count;
 #[cfg(feature = "regex")]
 pub use contains_regex_matcher::contains_regex;
-pub use display_matcher::displays_as;
+pub use display_matcher::{DisplayMatcher, displays_as};
 pub use eq_deref_of_matcher::eq_deref_of;
 pub use eq_matcher::eq;
 pub use err_matcher::err;

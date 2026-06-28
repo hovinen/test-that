@@ -25,6 +25,15 @@ use core::fmt::{Debug, Display};
 /// let result = "Hello, world!";
 /// assert_that!(result, displays_as(eq("Hello, world!")));
 /// ```
+///
+/// Use [alternate()][DisplayMatcher::alternate] to match against the value
+/// rendered with the alternate formatter `{:#}`.
+///
+/// ```
+/// # use test_that::prelude::*;
+/// let result = "Hello, world!";
+/// assert_that!(result, displays_as(eq("Hello, world!")).alternate());
+/// ```
 pub fn displays_as<InnerMatcher>(inner: InnerMatcher) -> DisplayMatcher<InnerMatcher> {
     DisplayMatcher { inner, alternate: false }
 }
