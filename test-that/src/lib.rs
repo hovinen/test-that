@@ -82,5 +82,9 @@ pub mod prelude {
 
 pub use result::{OrFailExt, TestResult, TestResultExt, verify_current_test_outcome};
 
+#[cfg(feature = "googletest-compat")]
+#[allow(deprecated)]
+pub use result::Result;
+
 #[cfg(feature = "non-fatal-assertions")]
 pub use test_that_macro::test;
