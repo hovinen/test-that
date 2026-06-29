@@ -73,6 +73,11 @@ of `vec` were or which element caused the failure. To get that information, you
 already have to rerun the test and investigate. Possibly adding more debugging
 information. This costs time and nerves.
 
+To be fair, it is possible to add a custom message to `assert_eq!` and `assert!`
+invocations. However, one must remember to add that message when writing tests.
+When one is churning out many unit tests at a time, that step is easily
+forgotten.
+
 Test That! lets you write test assertions which precisely capture your _intent_
 while then producing test failure messages which tell you _exactly_ what was
 wrong.
