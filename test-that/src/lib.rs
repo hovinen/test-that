@@ -80,7 +80,10 @@ pub mod prelude {
     pub use crate::result::Result;
 }
 
-pub use result::{OrFailExt, TestResult, TestResultExt, verify_current_test_outcome};
+pub use result::{OrFailExt, TestResult, TestResultExt};
+
+#[cfg(feature = "std")]
+pub use result::verify_current_test_outcome;
 
 #[cfg(feature = "googletest-compat")]
 #[allow(deprecated)]
