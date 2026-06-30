@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[cfg(feature = "anyhow")]
 use anyhow::anyhow;
 use test_that::prelude::*;
 
