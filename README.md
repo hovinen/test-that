@@ -12,7 +12,7 @@
 [docs-url]: https://docs.rs/test-that/*/test_that/
 [license-badge]: https://img.shields.io/badge/license-Apache-blue.svg
 [license-url]: https://github.com/hovinen/test-that/blob/main/LICENSE
-[actions-badge]: https://github.com/hovinen/test-that/workflows/CI/badge.svg
+[actions-badge]: https://github.com/hovinen/test-that/actions/workflows/ci.yml/badge.svg
 [actions-url]: https://github.com/hovinen/test-that/actions?query=workflow%3ACI+branch%3Amain
 
 Test That! is a powerful test assertion library for Rust.

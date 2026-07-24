@@ -106,7 +106,7 @@ pub fn test(
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
     let mut parsed_fn = parse_macro_input!(input as ItemFn);
-    let attrs = parsed_fn.attrs.drain(..).collect::<Vec<_>>();
+    let attrs = std::mem::take(&mut parsed_fn.attrs);
     let (mut sig, block) = (parsed_fn.sig, parsed_fn.block);
     let (outer_return_type, trailer) =
         if attrs.iter().any(|attr| attr.path().is_ident("should_panic")) {
