@@ -16,3 +16,8 @@ updates:
       - dependency-name: "semver"
       - dependency-name: "crates-io"
   rebase-strategy: "disabled"
+  allow:
+    - dependency-name: "serial_test"
+      update-types:
+        - "version-update:semver-minor"
+        - "version-update:semver-patch"
