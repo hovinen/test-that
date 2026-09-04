@@ -479,9 +479,10 @@ fn not_contains_eq_on_vec_of_non_static_str_refs() -> TestResult<()> {
 
 #[test]
 fn result_of_method_returning_option_with_field_lifetime_not_self() -> TestResult<()> {
-    // The method returns Option<&'a str> where 'a is the struct's field lifetime,
-    // which outlives &self. This tests that result_of! handles the case where
-    // the returned reference lifetime is independent of &self.
+    // The method returns Option<&'a str> where 'a is the struct's field
+    // lifetime, which outlives &self. This tests that result_of! handles
+    // the case where the returned reference lifetime is independent of
+    // &self.
     #[derive(Debug)]
     struct MaybeNamed<'a> {
         name: Option<&'a str>,

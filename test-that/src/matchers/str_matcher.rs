@@ -503,9 +503,9 @@ impl Configuration {
     // matcher self.times. Does not take other configuration into account.
     fn does_containment_match(&self, actual: &str, expected: &str) -> bool {
         if let Some(times) = self.times.as_ref() {
-            // Split returns an iterator over the "boundaries" left and right of the
-            // substring to be matched, of which there is one more than the number of
-            // substrings.
+            // Split returns an iterator over the "boundaries" left and right of
+            // the substring to be matched, of which there is one more than the
+            // number of substrings.
             matches!(times.matches(&(actual.split(expected).count() - 1)), MatcherResult::Match)
         } else {
             actual.contains(expected)
@@ -563,12 +563,14 @@ impl Configuration {
         }
 
         if self.ignore_leading_whitespace {
-            // TODO - b/283448414 : Support StrMatcher with ignore_leading_whitespace.
+            // TODO - b/283448414 : Support StrMatcher with
+            // ignore_leading_whitespace.
             return default_explanation;
         }
 
         if self.ignore_trailing_whitespace {
-            // TODO - b/283448414 : Support StrMatcher with ignore_trailing_whitespace.
+            // TODO - b/283448414 : Support StrMatcher with
+            // ignore_trailing_whitespace.
             return default_explanation;
         }
 
@@ -577,7 +579,8 @@ impl Configuration {
             return default_explanation;
         }
         if matches!(self.case_policy, CasePolicy::IgnoreAscii) {
-            // TODO - b/283448414 : Support StrMatcher with ignore ascii case policy.
+            // TODO - b/283448414 : Support StrMatcher with ignore ascii case
+            // policy.
             return default_explanation;
         }
         if self.do_strings_match(expected, actual) {
@@ -589,8 +592,9 @@ impl Configuration {
 
         let diff = match self.mode {
             MatchMode::Equals | MatchMode::StartsWith | MatchMode::Contains => {
-                // TODO(b/287632452): Also consider improving the output in MatchMode::Contains
-                // when the substring begins or ends in the middle of a line of the actual
+                // TODO(b/287632452): Also consider improving the output in
+                // MatchMode::Contains when the substring begins
+                // or ends in the middle of a line of the actual
                 // value.
                 create_diff(actual, expected, self.mode.to_diff_mode())
             }

@@ -26,13 +26,12 @@ fn field_matches_integer_field() -> TestResult<()> {
     verify_that!(IntField { int: 32 }, field!(IntField.int, eq(32)))
 }
 
-#[derive(Debug)]
-struct StringField {
-    strink: String,
-}
-
 #[test]
 fn field_matches_string_field() -> TestResult<()> {
+    #[derive(Debug)]
+    struct StringField {
+        strink: String,
+    }
     verify_that!(StringField { strink: "yes".to_string() }, field!(StringField.strink, eq("yes")))
 }
 
