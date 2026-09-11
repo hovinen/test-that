@@ -55,8 +55,34 @@
 #[doc(hidden)]
 macro_rules! __all {
     ($($matcher:expr),* $(,)?) => {{
-        $crate::matchers::__internal::AllMatcher::new([$($crate::__alloc::boxed::Box::new($matcher)),*])
+        $crate::matchers::__internal::AllMatcher::new($crate::__matcher_list!($($matcher),*))
     }}
+}
+
+/// Arranges the given matchers into the nested tuple consumed by
+/// [`AllMatcher`][crate::matchers::__internal::AllMatcher] and
+/// [`AnyMatcher`][crate::matchers::__internal::AnyMatcher].
+///
+/// The matchers are held by value in a nested tuple rather than as an array of
+/// boxed trait objects. Boxing them would coerce each to `dyn Matcher<T>` at
+/// the point the list is built, where `T` is not yet known; that coercion has
+/// to solve `Matcher<T>` for an unresolved `T`, which can make inference
+/// diverge. Keeping them concrete defers the coercion to
+/// [`Components::for_each`][crate::matchers::__internal::Components::for_each],
+/// where `T` is a bound parameter.
+///
+/// The nesting is what makes the number of matchers unbounded: a tuple of each
+/// arity would need an implementation of each arity.
+///
+/// For internal use only. API stability is not guaranteed!
+#[macro_export]
+#[doc(hidden)]
+macro_rules! __matcher_list {
+    () => { () };
+    ($matcher:expr $(,)?) => { ($matcher,) };
+    ($matcher:expr, $($rest:expr),+ $(,)?) => {
+        ($matcher, $crate::__matcher_list!($($rest),+))
+    };
 }
 
 /// Functionality needed by the [`all`] macro.
@@ -67,73 +93,139 @@ pub mod __internal {
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matchers::anything;
-    use alloc::boxed::Box;
     use alloc::vec::Vec;
     use core::fmt::Debug;
+    use core::marker::PhantomData;
 
-    /// A matcher which matches an input value matched by all matchers in the
-    /// array `components`.
+    /// The component matchers of an [`AllMatcher`] or [`AnyMatcher`], held as a
+    /// nested tuple: `()`, `(a,)`, `(a, (b,))`, `(a, (b, (c,)))` and so on.
     ///
     /// For internal use only. API stability is not guaranteed!
     #[doc(hidden)]
-    pub struct AllMatcher<'a, T: Debug + ?Sized, const N: usize> {
-        components: [Box<dyn Matcher<T> + 'a>; N],
+    pub trait Components<T: Debug + ?Sized> {
+        /// The number of component matchers.
+        fn count(&self) -> usize;
+
+        /// Invokes `visit` on each component matcher in turn.
+        fn for_each(&self, visit: &mut dyn FnMut(&dyn Matcher<T>));
     }
 
-    impl<'a, T: Debug + ?Sized, const N: usize> AllMatcher<'a, T, N> {
+    impl<T: Debug + ?Sized> Components<T> for () {
+        fn count(&self) -> usize {
+            0
+        }
+
+        fn for_each(&self, _visit: &mut dyn FnMut(&dyn Matcher<T>)) {}
+    }
+
+    impl<T: Debug + ?Sized, MatcherT: Matcher<T>> Components<T> for (MatcherT,) {
+        fn count(&self) -> usize {
+            1
+        }
+
+        fn for_each(&self, visit: &mut dyn FnMut(&dyn Matcher<T>)) {
+            visit(&self.0);
+        }
+    }
+
+    impl<T: Debug + ?Sized, MatcherT: Matcher<T>, RestT: Components<T>> Components<T>
+        for (MatcherT, RestT)
+    {
+        fn count(&self) -> usize {
+            1 + self.1.count()
+        }
+
+        fn for_each(&self, visit: &mut dyn FnMut(&dyn Matcher<T>)) {
+            visit(&self.0);
+            self.1.for_each(visit);
+        }
+    }
+
+    /// The descriptions of every component matcher.
+    pub(crate) fn descriptions<T: Debug + ?Sized>(
+        components: &impl Components<T>,
+        matcher_result: MatcherResult,
+    ) -> Vec<Description> {
+        let mut output = Vec::with_capacity(components.count());
+        components.for_each(&mut |component| output.push(component.describe(matcher_result)));
+        output
+    }
+
+    /// The explanations of every component matcher which does not match.
+    pub(crate) fn failure_explanations<T: Debug + ?Sized>(
+        components: &impl Components<T>,
+        actual: &T,
+    ) -> Vec<Description> {
+        let mut output = Vec::new();
+        components.for_each(&mut |component| {
+            if component.matches(actual).is_no_match() {
+                output.push(component.explain_match(actual));
+            }
+        });
+        output
+    }
+
+    /// The explanations of every component matcher.
+    pub(crate) fn explanations<T: Debug + ?Sized>(
+        components: &impl Components<T>,
+        actual: &T,
+    ) -> Vec<Description> {
+        let mut output = Vec::with_capacity(components.count());
+        components.for_each(&mut |component| output.push(component.explain_match(actual)));
+        output
+    }
+
+    /// A matcher which matches an input value matched by all of its component
+    /// matchers.
+    ///
+    /// For internal use only. API stability is not guaranteed!
+    #[doc(hidden)]
+    pub struct AllMatcher<T: Debug + ?Sized, ComponentsT> {
+        components: ComponentsT,
+        phantom: PhantomData<fn(&T)>,
+    }
+
+    impl<T: Debug + ?Sized, ComponentsT> AllMatcher<T, ComponentsT> {
         /// Constructs an [`AllMatcher`] with the given component matchers.
         ///
         /// Intended for use only by the [`all`] macro.
-        pub fn new(components: [Box<dyn Matcher<T> + 'a>; N]) -> Self {
-            Self { components }
+        pub fn new(components: ComponentsT) -> Self {
+            Self { components, phantom: PhantomData }
         }
     }
 
-    impl<'a, T: Debug + ?Sized, const N: usize> Matcher<T> for AllMatcher<'a, T, N> {
+    impl<T: Debug + ?Sized, ComponentsT: Components<T>> Matcher<T> for AllMatcher<T, ComponentsT> {
         fn matches(&self, actual: &T) -> MatcherResult {
-            for component in &self.components {
-                match component.matches(actual) {
-                    MatcherResult::NoMatch => {
-                        return MatcherResult::NoMatch;
-                    }
-                    MatcherResult::Match => {}
+            let mut result = MatcherResult::Match;
+            self.components.for_each(&mut |component| {
+                if component.matches(actual).is_no_match() {
+                    result = MatcherResult::NoMatch;
                 }
-            }
-            MatcherResult::Match
+            });
+            result
         }
 
         fn explain_match(&self, actual: &T) -> Description {
-            match N {
+            match self.components.count() {
                 0 => anything().explain_match(actual),
-                1 => self.components[0].explain_match(actual),
+                1 => explanations(&self.components, actual).remove(0),
                 _ => {
-                    let failures = self
-                        .components
-                        .iter()
-                        .filter(|component| component.matches(actual).is_no_match())
-                        .collect::<Vec<_>>();
-
+                    let mut failures = failure_explanations(&self.components, actual);
                     if failures.len() == 1 {
-                        failures[0].explain_match(actual)
+                        failures.remove(0)
                     } else {
-                        Description::new()
-                            .collect(
-                                failures
-                                    .into_iter()
-                                    .map(|component| component.explain_match(actual)),
-                            )
-                            .bullet_list()
+                        Description::new().collect(failures).bullet_list()
                     }
                 }
             }
         }
     }
 
-    impl<'a, T: Debug + ?Sized, const N: usize> Describable for AllMatcher<'a, T, N> {
+    impl<T: Debug + ?Sized, ComponentsT: Components<T>> Describable for AllMatcher<T, ComponentsT> {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
-            match N {
+            match self.components.count() {
                 0 => anything().describe(matcher_result),
-                1 => self.components[0].describe(matcher_result),
+                1 => descriptions(&self.components, matcher_result).remove(0),
                 _ => {
                     let header = if matcher_result.into() {
                         "has all the following properties:"
@@ -143,7 +235,7 @@ pub mod __internal {
                     Description::new().text(header).nested(
                         Description::new()
                             .bullet_list()
-                            .collect(self.components.iter().map(|m| m.describe(matcher_result))),
+                            .collect(descriptions(&self.components, matcher_result)),
                     )
                 }
             }
@@ -163,7 +255,7 @@ mod tests {
     fn description_shows_more_than_one_matcher() -> TestResult<()> {
         let first_matcher = starts_with("A");
         let second_matcher = ends_with("string");
-        let matcher: __internal::AllMatcher<String, 2> = all!(first_matcher, second_matcher);
+        let matcher: __internal::AllMatcher<String, _> = all!(first_matcher, second_matcher);
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -179,7 +271,7 @@ mod tests {
     #[test]
     fn description_shows_one_matcher_directly() -> TestResult<()> {
         let first_matcher = starts_with("A");
-        let matcher: __internal::AllMatcher<String, 1> = all!(first_matcher);
+        let matcher: __internal::AllMatcher<String, _> = all!(first_matcher);
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -192,7 +284,7 @@ mod tests {
     -> TestResult<()> {
         let first_matcher = starts_with("Another");
         let second_matcher = ends_with("string");
-        let matcher: __internal::AllMatcher<str, 2> = all!(first_matcher, second_matcher);
+        let matcher: __internal::AllMatcher<str, _> = all!(first_matcher, second_matcher);
 
         verify_that!(
             matcher.explain_match("A string"),
@@ -203,7 +295,7 @@ mod tests {
     #[test]
     fn mismatch_description_is_simple_when_only_one_consistuent() -> TestResult<()> {
         let first_matcher = starts_with("Another");
-        let matcher: __internal::AllMatcher<str, 1> = all!(first_matcher);
+        let matcher: __internal::AllMatcher<str, _> = all!(first_matcher);
 
         verify_that!(
             matcher.explain_match("A string"),

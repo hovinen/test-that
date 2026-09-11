@@ -57,7 +57,7 @@
 #[doc(hidden)]
 macro_rules! __any {
     ($($matcher:expr),* $(,)?) => {{
-        $crate::matchers::__internal::AnyMatcher::new([$($crate::__alloc::boxed::Box::new($matcher)),*])
+        $crate::matchers::__internal::AnyMatcher::new($crate::__matcher_list!($($matcher),*))
     }}
 }
 
@@ -66,73 +66,69 @@ macro_rules! __any {
 /// For internal use only. API stablility is not guaranteed!
 #[doc(hidden)]
 pub mod __internal {
+    use super::super::all_matcher::__internal::{
+        Components, descriptions, explanations, failure_explanations,
+    };
     use crate::description::Description;
     use crate::matcher::{Describable, Matcher, MatcherResult};
     use crate::matchers::anything;
-    use alloc::boxed::Box;
-    use alloc::vec::Vec;
     use core::fmt::Debug;
+    use core::marker::PhantomData;
 
-    /// A matcher which matches an input value matched by all matchers in the
-    /// array `components`.
+    /// A matcher which matches an input value matched by at least one of its
+    /// component matchers.
     ///
     /// For internal use only. API stablility is not guaranteed!
     #[doc(hidden)]
-    pub struct AnyMatcher<'a, T: Debug + ?Sized, const N: usize> {
-        components: [Box<dyn Matcher<T> + 'a>; N],
+    pub struct AnyMatcher<T: Debug + ?Sized, ComponentsT> {
+        components: ComponentsT,
+        phantom: PhantomData<fn(&T)>,
     }
 
-    impl<'a, T: Debug + ?Sized, const N: usize> AnyMatcher<'a, T, N> {
+    impl<T: Debug + ?Sized, ComponentsT> AnyMatcher<T, ComponentsT> {
         /// Constructs an [`AnyMatcher`] with the given component matchers.
         ///
-        /// Intended for use only by the [`all`] macro.
-        pub fn new(components: [Box<dyn Matcher<T> + 'a>; N]) -> Self {
-            Self { components }
+        /// Intended for use only by the [`any`] macro.
+        pub fn new(components: ComponentsT) -> Self {
+            Self { components, phantom: PhantomData }
         }
     }
 
-    impl<'a, T: Debug + ?Sized, const N: usize> Matcher<T> for AnyMatcher<'a, T, N> {
+    impl<T: Debug + ?Sized, ComponentsT: Components<T>> Matcher<T> for AnyMatcher<T, ComponentsT> {
         fn matches(&self, actual: &T) -> MatcherResult {
-            MatcherResult::from(self.components.iter().any(|c| c.matches(actual).is_match()))
+            let mut result = MatcherResult::NoMatch;
+            self.components.for_each(&mut |component| {
+                if component.matches(actual).is_match() {
+                    result = MatcherResult::Match;
+                }
+            });
+            result
         }
 
         fn explain_match(&self, actual: &T) -> Description {
-            match N {
+            match self.components.count() {
                 0 => format!("which {}", anything().describe(MatcherResult::NoMatch)).into(),
-                1 => self.components[0].explain_match(actual),
+                1 => explanations(&self.components, actual).remove(0),
                 _ => {
-                    let failures = self
-                        .components
-                        .iter()
-                        .filter(|component| component.matches(actual).is_no_match())
-                        .collect::<Vec<_>>();
-
+                    let mut failures = failure_explanations(&self.components, actual);
                     if failures.len() == 1 {
-                        failures[0].explain_match(actual)
+                        failures.remove(0)
                     } else {
-                        Description::new()
-                            .collect(
-                                failures
-                                    .into_iter()
-                                    .map(|component| component.explain_match(actual)),
-                            )
-                            .bullet_list()
+                        Description::new().collect(failures).bullet_list()
                     }
                 }
             }
         }
     }
 
-    impl<'a, T: Debug + ?Sized, const N: usize> Describable for AnyMatcher<'a, T, N> {
+    impl<T: Debug + ?Sized, ComponentsT: Components<T>> Describable for AnyMatcher<T, ComponentsT> {
         fn describe(&self, matcher_result: MatcherResult) -> Description {
-            match N {
+            match self.components.count() {
                 0 => anything().describe(matcher_result),
-                1 => self.components[0].describe(matcher_result),
+                1 => descriptions(&self.components, matcher_result).remove(0),
                 _ => {
-                    let properties = self
-                        .components
-                        .iter()
-                        .map(|m| m.describe(matcher_result))
+                    let properties = descriptions(&self.components, matcher_result)
+                        .into_iter()
                         .collect::<Description>()
                         .bullet_list()
                         .indent();
@@ -163,7 +159,7 @@ mod tests {
     fn description_shows_more_than_one_matcher() -> TestResult<()> {
         let first_matcher = starts_with("A");
         let second_matcher = ends_with("string");
-        let matcher: __internal::AnyMatcher<String, 2> = any!(first_matcher, second_matcher);
+        let matcher: __internal::AnyMatcher<String, _> = any!(first_matcher, second_matcher);
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -179,7 +175,7 @@ mod tests {
     #[test]
     fn description_shows_one_matcher_directly() -> TestResult<()> {
         let first_matcher = starts_with("A");
-        let matcher: __internal::AnyMatcher<String, 1> = any!(first_matcher);
+        let matcher: __internal::AnyMatcher<String, _> = any!(first_matcher);
 
         verify_that!(
             matcher.describe(MatcherResult::Match),
@@ -192,7 +188,7 @@ mod tests {
     -> TestResult<()> {
         let first_matcher = starts_with("Another");
         let second_matcher = ends_with("string");
-        let matcher: __internal::AnyMatcher<str, 2> = any!(first_matcher, second_matcher);
+        let matcher: __internal::AnyMatcher<str, _> = any!(first_matcher, second_matcher);
 
         verify_that!(
             matcher.explain_match("A string"),
@@ -203,7 +199,7 @@ mod tests {
     #[test]
     fn mismatch_description_is_simple_when_only_one_constituent() -> TestResult<()> {
         let first_matcher = starts_with("Another");
-        let matcher: __internal::AnyMatcher<str, 1> = any!(first_matcher);
+        let matcher: __internal::AnyMatcher<str, _> = any!(first_matcher);
 
         verify_that!(
             matcher.explain_match("A string"),

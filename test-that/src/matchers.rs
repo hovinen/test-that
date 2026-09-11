@@ -120,5 +120,7 @@ pub mod __internal {
     pub use super::disjunction_matcher::__internal::DisjunctionMatcher;
     pub use super::field_matcher::__internal::field_matcher;
     pub use super::is_matcher::is;
-    pub use super::result_of_matcher::__internal::ResultOfMatcher;
+    pub use super::result_of_matcher::__internal::{
+        ResultOfMatcher, apply_matcher, explain_matcher,
+    };
 }

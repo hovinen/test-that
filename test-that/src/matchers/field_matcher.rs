@@ -211,8 +211,8 @@ macro_rules! field_internal {
                     _ => None,
                 }
             },
-            &stringify!($field),
-            $m)
+            &stringify!($field))
+        .with($m)
     }};
 }
 
@@ -227,17 +227,35 @@ pub mod __internal {
     };
     use core::fmt::Debug;
 
-    /// Creates a matcher to verify a specific field of the actual struct using
-    /// the provided inner matcher.
+    /// Creates a matcher to verify a specific field of the actual struct.
+    ///
+    /// The inner matcher to apply is supplied via [`FieldMatcherStage::with`].
     ///
     /// **For internal use only. API stablility is not guaranteed!**
     #[doc(hidden)]
-    pub fn field_matcher<OuterT: Debug, InnerT: Debug, InnerMatcher: Matcher<InnerT>>(
+    pub fn field_matcher<OuterT: Debug, InnerT: Debug>(
         field_accessor: fn(&OuterT) -> Option<&InnerT>,
         field_path: &'static str,
-        inner: InnerMatcher,
-    ) -> impl Matcher<OuterT> {
-        FieldMatcher { field_accessor, field_path, inner }
+    ) -> FieldMatcherStage<OuterT, InnerT> {
+        FieldMatcherStage { field_accessor, field_path }
+    }
+
+    /// **For internal use only. API stablility is not guaranteed!**
+    #[doc(hidden)]
+    pub struct FieldMatcherStage<OuterT, InnerT> {
+        field_accessor: fn(&OuterT) -> Option<&InnerT>,
+        field_path: &'static str,
+    }
+
+    impl<OuterT: Debug, InnerT: Debug> FieldMatcherStage<OuterT, InnerT> {
+        /// **For internal use only. API stablility is not guaranteed!**
+        #[doc(hidden)]
+        pub fn with<InnerMatcher: Matcher<InnerT>>(
+            self,
+            inner: InnerMatcher,
+        ) -> impl Matcher<OuterT> {
+            FieldMatcher { field_accessor: self.field_accessor, field_path: self.field_path, inner }
+        }
     }
 
     struct FieldMatcher<OuterT, InnerT, InnerMatcher> {
