@@ -246,10 +246,9 @@ impl<T> TestResultExt for core::result::Result<T, TestAssertionFailure> {
 pub trait OrFailExt<T> {
     /// Converts this instance into a [`Result`].
     ///
-    /// Typically, the `Self` type is itself a [`Result`][core::result::Result]
-    /// or an [`Option`][core::option::Option]. This method should then map
-    /// `None` or the `Err` variant to a [`TestAssertionFailure`] and leave the
-    /// `Some` or `Ok` variant unchanged.
+    /// Typically, the `Self` type is itself a [`Result`] or an [`Option`]. This
+    /// method should then map `None` or the `Err` variant to a
+    /// [`TestAssertionFailure`] and leave the `Some` or `Ok` variant unchanged.
     fn or_fail(self) -> TestResult<T>;
 }
 
