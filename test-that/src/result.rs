@@ -14,7 +14,7 @@
 // limitations under the License.
 
 use crate::internal::test_outcome::{TestAssertionFailure, TestOutcome};
-use alloc::string::String;
+use alloc::string::{String, ToString as _};
 
 /// A `Result` whose `Err` variant indicates a test failure.
 ///
@@ -206,21 +206,50 @@ impl<T> TestResultExt for core::result::Result<T, TestAssertionFailure> {
 /// Importing this trait allows one to easily map [`anyhow::Error`] to a test
 /// failure:
 ///
-/// ```ignore
+/// ```
+/// use test_that::prelude::*;
+///
+/// # /* So that this compiles in the doctest context
 /// #[test]
-/// fn should_work() -> Result<()> {
-///     let value = something_which_can_fail().or_fail()?;
-///     ...
+/// # */
+/// # #[cfg(feature = "anyhow")]
+/// fn fails_due_to_anyhow_error() -> TestResult<()> {
+///     something_which_can_fail().or_fail()?;
+///     Ok(())
 /// }
 ///
-/// fn something_which_can_fail() -> anyhow::Result<...> { ... }
+/// # #[cfg(feature = "anyhow")]
+/// fn something_which_can_fail() -> anyhow::Result<()> {
+///     anyhow::bail!("An error")
+/// }
+///
+/// # #[cfg(feature = "anyhow")]
+/// fails_due_to_anyhow_error().unwrap_err();
+/// ```
+///
+/// This is also implemented for `Option<T>`:
+///
+/// ```
+/// use test_that::prelude::*;
+///
+/// # /* So that this compiles in the doctest context
+/// #[test]
+/// # */
+/// fn fails_due_to_missing_element() -> TestResult<()> {
+///     let empty_hash_map = std::collections::HashMap::<u32, u32>::new();
+///     let value = empty_hash_map.get(&0).or_fail()?;
+///     Ok(())
+/// }
+///
+/// fails_due_to_missing_element().unwrap_err();
 /// ```
 pub trait OrFailExt<T> {
     /// Converts this instance into a [`Result`].
     ///
-    /// Typically, the `Self` type is itself a [`core::result::Result`]. This
-    /// method should then map the `Err` variant to a [`TestAssertionFailure`]
-    /// and leave the `Ok` variant unchanged.
+    /// Typically, the `Self` type is itself a [`Result`][core::result::Result]
+    /// or an [`Option`][core::option::Option]. This method should then map
+    /// `None` or the `Err` variant to a [`TestAssertionFailure`] and leave the
+    /// `Some` or `Ok` variant unchanged.
     fn or_fail(self) -> TestResult<T>;
 }
 
@@ -237,5 +266,13 @@ impl<OkT, CaseT: core::fmt::Debug> OrFailExt<OkT>
 {
     fn or_fail(self) -> core::result::Result<OkT, TestAssertionFailure> {
         self.map_err(|e| TestAssertionFailure::create(alloc::format!("{e}")))
+    }
+}
+
+impl<T> OrFailExt<T> for core::option::Option<T> {
+    fn or_fail(self) -> core::result::Result<T, TestAssertionFailure> {
+        self.ok_or_else(|| {
+            TestAssertionFailure::create("Expected Option to be Some but was None".to_string())
+        })
     }
 }
