@@ -389,7 +389,11 @@ fn result_of_method_narrowing_lifetime_from_field_to_self() -> TestResult<()> {
         title: &'a str,
     }
     impl<'a> Titled<'a> {
-        // Returns &'b str (lifetime of &'b self), narrower than 'a.
+        // Returns &'b str (lifetime of &'b self), narrower than 'a. The
+        // explicit lifetime is kept (rather than elided, as clippy suggests)
+        // to make that relationship visible; eliding it would not change the
+        // test's meaning.
+        #[allow(clippy::needless_lifetimes)]
         fn title<'b>(&'b self) -> &'b str {
             self.title
         }
@@ -640,7 +644,11 @@ fn result_of_method_returning_sub_slice_narrowed_to_self_lifetime() -> TestResul
         data: &'a [i32],
     }
     impl<'a> View<'a> {
-        // Returns a sub-slice with the narrower lifetime of &'b self.
+        // Returns a sub-slice with the narrower lifetime of &'b self. The
+        // explicit lifetime is kept (rather than elided, as clippy suggests)
+        // to make that relationship visible; eliding it would not change the
+        // test's meaning.
+        #[allow(clippy::needless_lifetimes)]
         fn first_two<'b>(&'b self) -> &'b [i32] {
             &self.data[..2]
         }

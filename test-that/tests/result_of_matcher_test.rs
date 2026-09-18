@@ -400,6 +400,10 @@ fn result_of_with_empty_container_shorthand() -> TestResult<()> {
 }
 
 #[test]
+// The `format!` is the point of this test (verifying that macros are allowed
+// in the closure body); clippy's suggestion to replace it with `.to_string()`
+// would defeat that.
+#[allow(clippy::useless_format)]
 fn result_of_allows_format_in_method_body() -> TestResult<()> {
     let value = "A value";
     verify_that!(value, result_of!(|s: &&str| format!("{s}"), eq("A value")))
