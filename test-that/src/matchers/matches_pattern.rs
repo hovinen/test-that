@@ -139,7 +139,7 @@
 /// #     .unwrap();
 /// ```
 ///
-/// **Important**: The method should be pure function with a deterministic
+/// **Important**: The method should be a pure function with a deterministic
 /// output and no side effects. In particular, in the event of an assertion
 /// failure, it will be invoked a second time, with the assertion failure output
 /// reflecting the *second* invocation.
@@ -164,7 +164,7 @@
 /// #     .unwrap();
 /// ```
 ///
-/// If the method returns a reference, you must "dereference" it. Either preceed
+/// If the method returns a reference, you must "dereference" it. Either precede
 /// it with `*`:
 ///
 /// ```

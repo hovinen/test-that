@@ -63,7 +63,7 @@ macro_rules! __any {
 
 /// Functionality needed by the [`any`] macro.
 ///
-/// For internal use only. API stablility is not guaranteed!
+/// For internal use only. API stability is not guaranteed!
 #[doc(hidden)]
 pub mod __internal {
     use super::super::all_matcher::__internal::{
@@ -78,7 +78,7 @@ pub mod __internal {
     /// A matcher which matches an input value matched by at least one of its
     /// component matchers.
     ///
-    /// For internal use only. API stablility is not guaranteed!
+    /// For internal use only. API stability is not guaranteed!
     #[doc(hidden)]
     pub struct AnyMatcher<T: Debug + ?Sized, ComponentsT> {
         components: ComponentsT,

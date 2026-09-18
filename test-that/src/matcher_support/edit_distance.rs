@@ -71,7 +71,7 @@ pub(crate) enum Mode {
     /// returned.
     Exact,
 
-    /// Indicates that `expected` is inteded to be a prefix of `actual`.
+    /// Indicates that `expected` is intended to be a prefix of `actual`.
     ///
     /// Any additional parts of `actual` after the prefix `expected` are omitted
     /// from the output.
@@ -83,7 +83,7 @@ pub(crate) enum Mode {
     /// Any initial [`Edit::ExtraActual`] entries are replaced with
     /// [`Edit::AdditionalActual`] in the edit list. If the first entry which is
     /// not an [`Edit::ExtraActual`] is [`Edit::ExtraExpected`], then the last
-    /// [`Edit::ExtraActual`] is actual in the output.
+    /// [`Edit::ExtraActual`] is retained in the output.
     Contains,
 }
 

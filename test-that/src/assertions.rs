@@ -191,7 +191,7 @@ macro_rules! verify_pred {
 /// ```ignore
 /// match some_value {
 ///     ExpectedVariant => {...}
-///     UnwantedVaraint => {
+///     UnwantedVariant => {
 ///         fail!("This thing which should not happen happened anyway")?;
 ///     }
 /// }
@@ -202,7 +202,7 @@ macro_rules! verify_pred {
 /// ```ignore
 /// match some_value {
 ///     ExpectedVariant => {...}
-///     UnwantedVaraint => {
+///     UnwantedVariant => {
 ///         fail!("This thing which should not happen happened anyway: {}", some_value)?;
 ///     }
 /// }
@@ -214,7 +214,7 @@ macro_rules! verify_pred {
 /// ```ignore
 /// match some_value {
 ///     ExpectedVariant => {...}
-///     UnwantedVaraint => {
+///     UnwantedVariant => {
 ///         fail!()?;
 ///     }
 /// }
@@ -460,7 +460,7 @@ pub mod internal {
     /// Constructs a `Result::Err(TestAssertionFailure)` for a predicate failure
     /// as produced by the macro [`crate::verify_pred`].
     ///
-    /// This intended only for use by the macro [`crate::verify_pred`].
+    /// This is intended only for use by the macro [`crate::verify_pred`].
     ///
     /// **For internal use only. API stability is not guaranteed!**
     #[must_use = "The assertion result must be evaluated to affect the test result."]

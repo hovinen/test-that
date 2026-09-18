@@ -24,8 +24,8 @@
 //! unsized arrays `[T]`, `Vec<T>`, `HashSet<T>`, `HashMap<K, V>`, and so on.
 //! The latter is a special case which may appear in some custom containers.
 //!
-//! One can match against slices `&[T]` by first "dereferencing" with them
-//! with the [`points_to`] matcher. For example:
+//! One can match against slices `&[T]` by first "dereferencing" them with
+//! the [`points_to`] matcher. For example:
 //!
 //! ```
 //! # use test_that::prelude::*;

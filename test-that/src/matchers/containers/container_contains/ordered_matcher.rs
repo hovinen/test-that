@@ -19,7 +19,7 @@
 
 /// Module for use only by the procedural macros in this module.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
     use crate::{
@@ -33,7 +33,7 @@ pub mod __internal {
 
     /// This struct is meant to be used only by the macro `elements_are!`.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub struct ContainerContainsOrderedMatcher<'matchers, ContainerT: ?Sized, T: Debug, ModeT> {
         elements: Vec<Box<dyn Matcher<T> + 'matchers>>,
@@ -46,7 +46,7 @@ pub mod __internal {
     {
         /// Factory only intended for use in the macro `elements_are!`.
         ///
-        /// **For internal use only. API stablility is not guaranteed!**
+        /// **For internal use only. API stability is not guaranteed!**
         #[doc(hidden)]
         pub fn new(
             elements: Vec<Box<dyn Matcher<T> + 'matchers>>,

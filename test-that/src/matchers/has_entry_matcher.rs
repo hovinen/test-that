@@ -56,7 +56,7 @@
 /// ```
 ///
 /// However, `has_entry` will offer somewhat better diagnostic messages in the
-/// case of assertion failure. And it avoid the extra allocation hidden in the
+/// case of assertion failure. And it avoids the extra allocation hidden in the
 /// code above.
 pub fn has_entry<KeyT, MatcherT>(
     key: KeyT,

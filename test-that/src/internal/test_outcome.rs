@@ -20,7 +20,7 @@ use core::fmt::{Debug, Display, Error, Formatter};
 /// This is kept as a running record as the test progresses. One can access it
 /// with `TestOutcome::with_current_test_outcome`.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub enum TestOutcome {
     /// The test ran or is currently running and no assertions have failed.
@@ -41,7 +41,7 @@ impl TestOutcome {
     /// This is intended only for use by the attribute macro
     /// `#[test_that::test]`.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     #[cfg(feature = "std")]
     pub fn init_current_test_outcome() {
@@ -61,7 +61,7 @@ impl TestOutcome {
     /// been recorded with
     /// [`and_log_failure`](crate::TestResultExt::and_log_failure).
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     #[cfg(feature = "std")]
     pub fn close_current_test_outcome<E: Display>(
@@ -164,7 +164,7 @@ impl core::fmt::Display for TestFailure {
 
 /// A report that a single test assertion failed.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 #[derive(Clone)]
 pub struct TestAssertionFailure {
@@ -176,7 +176,7 @@ pub struct TestAssertionFailure {
 impl TestAssertionFailure {
     /// Creates a new instance with the given `description`.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     pub fn create(description: String) -> Self {
         Self { description, custom_message: None }
     }

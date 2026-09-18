@@ -136,7 +136,7 @@ macro_rules! __pointwise {
 
 /// Module for use only by the procedural macros in this module.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
     use crate::description::Description;
@@ -148,7 +148,7 @@ pub mod __internal {
 
     /// This struct is meant to be used only through the `pointwise` macro.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub struct PointwiseMatcher<MatcherT, Mode> {
         matchers: Vec<MatcherT>,

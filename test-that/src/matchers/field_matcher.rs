@@ -73,7 +73,7 @@ macro_rules! field_internal {
 
 /// Functions for use only by the declarative macros in this module.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
     use crate::{
@@ -86,7 +86,7 @@ pub mod __internal {
     ///
     /// The inner matcher to apply is supplied via [`FieldMatcherStage::with`].
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub fn field_matcher<OuterT: Debug, InnerT: Debug>(
         field_accessor: fn(&OuterT) -> Option<&InnerT>,
@@ -95,7 +95,7 @@ pub mod __internal {
         FieldMatcherStage { field_accessor, field_path }
     }
 
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub struct FieldMatcherStage<OuterT, InnerT> {
         field_accessor: fn(&OuterT) -> Option<&InnerT>,
@@ -103,7 +103,7 @@ pub mod __internal {
     }
 
     impl<OuterT: Debug, InnerT: Debug> FieldMatcherStage<OuterT, InnerT> {
-        /// **For internal use only. API stablility is not guaranteed!**
+        /// **For internal use only. API stability is not guaranteed!**
         #[doc(hidden)]
         pub fn with<InnerMatcher: Matcher<InnerT>>(
             self,

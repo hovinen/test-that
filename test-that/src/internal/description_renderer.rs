@@ -19,7 +19,7 @@ use alloc::{
 };
 use core::fmt::{Result, Write};
 
-/// Number of space used to indent lines when no alignement is required.
+/// Number of spaces used to indent lines when no alignment is required.
 pub(crate) const INDENTATION_SIZE: usize = 2;
 
 /// A list of [`Block`] possibly rendered with a [`Decoration`].

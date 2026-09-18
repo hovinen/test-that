@@ -149,7 +149,7 @@ pub struct NearMatcher<T: Debug> {
 impl<T: Debug> NearMatcher<T> {
     /// Configures this instance to treat two NaNs as equal.
     ///
-    /// This behaviour differs from the IEEE standad for floating point which
+    /// This behaviour differs from the IEEE standard for floating point which
     /// treats two NaNs as infinitely far apart.
     pub fn nans_are_equal(mut self) -> Self {
         self.nans_are_equal = true;
@@ -158,9 +158,9 @@ impl<T: Debug> NearMatcher<T> {
 
     /// Configures this instance to treat two NaNs as not equal.
     ///
-    /// This behaviour complies with the IEEE standad for floating point. It is
+    /// This behaviour complies with the IEEE standard for floating point. It is
     /// the default behaviour for this matcher, so invoking this method is
-    /// usually redunant.
+    /// usually redundant.
     pub fn nans_are_not_equal(mut self) -> Self {
         self.nans_are_equal = false;
         self

@@ -22,7 +22,7 @@ use core::{marker::PhantomData, ops::RangeBounds};
 /// underlying type must satisfy the requirements for these types,
 /// namely, [`PartialOrd`][std::cmp::PartialOrd].
 ///
-/// The actual value is normally the same type as the range endpoints It can,
+/// The actual value is normally the same type as the range endpoints. It can,
 /// however, be of any type which can be ordered with respect to the range
 /// endpoints.
 ///

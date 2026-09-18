@@ -19,7 +19,7 @@
 
 /// Functions for use only by the declarative macros in this module.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
     use crate::{
@@ -48,7 +48,7 @@ pub mod __internal {
 
     /// Generates a tuple matcher for tuples of a specific length.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     macro_rules! tuple_matcher_n {
         ($([$field_number:tt, $matcher_type:ident, $field_type:ident]),*) => {

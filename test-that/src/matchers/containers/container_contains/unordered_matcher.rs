@@ -19,7 +19,7 @@
 
 /// Module for use only by the macros in this module.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 pub mod __internal {
     use crate::{
@@ -168,7 +168,7 @@ pub mod __internal {
     /// This is the analogue to [ContainerContainsUnorderedMatcher] for maps and
     /// map-like collections.
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub struct MapContainsMatcher<'matchers, ContainerT, KeyT, ValueT, ModeT, const N: usize>
     where
@@ -576,7 +576,7 @@ pub mod __internal {
 
     /// The list of elements that do not match any element in the corresponding
     /// set.
-    /// These lists are represented as fixed sized bit set to avoid
+    /// These lists are represented as fixed-size bit sets to avoid
     /// allocation.
     /// TODO(bjacotg) Use BitArr!(for N) once generic_const_exprs is stable.
     struct UnmatchableElements {
@@ -650,8 +650,8 @@ pub mod __internal {
     }
 
     /// The representation of a match between actual and expected.
-    /// The value at idx represents to which expected the actual at idx is
-    /// matched with. For example, `BestMatch([Some(0), None, Some(1)])`
+    /// The value at idx represents which expected the actual at idx is
+    /// matched to. For example, `BestMatch([Some(0), None, Some(1)])`
     /// means:
     ///  * The 0th element in actual matches the 0th element in expected.
     ///  * The 1st element in actual does not match.

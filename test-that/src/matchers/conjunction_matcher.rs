@@ -25,7 +25,7 @@ pub mod __internal {
 
     /// Matcher created by [`MatcherExt::and`][crate::matcher::MatcherExt::and].
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub struct ConjunctionMatcher<M1, M2> {
         pub(super) m1: M1,

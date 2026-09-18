@@ -607,9 +607,9 @@ Test That! includes integrations with the
 [Proptest](https://crates.io/crates/proptest) crates to simplify turning
 errors from those crates into test failures.
 
-To use this, activate the `anyhow`, respectively `proptest` feature in
-Test That! and invoke the extension method [`or_fail()`] on a `Result` value in
-your test. For example:
+To use this, activate the `anyhow` feature (or, respectively, the `proptest`
+feature) in Test That! and invoke the extension method [`or_fail()`] on a
+`Result` value in your test. For example:
 
 ```
 # use test_that::prelude::*;

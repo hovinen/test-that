@@ -184,9 +184,10 @@ pub trait Describable {
     /// Returns a description of `self` or a negative description if
     /// `matcher_result` is `DoesNotMatch`.
     ///
-    /// The function should print a verb phrase that describes the property a
-    /// value matching, respectively not matching, this matcher should have.
-    /// The subject of the verb phrase is the value being matched.
+    /// The function should print a verb phrase that describes the property
+    /// that a value which matches (or, respectively, does not match) this
+    /// matcher should have. The subject of the verb phrase is the value being
+    /// matched.
     ///
     /// The output appears next to `Expected` in an assertion failure message.
     /// For example:

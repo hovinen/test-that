@@ -25,7 +25,7 @@ pub mod __internal {
 
     /// Matcher created by [`MatcherExt::or`][crate::matcher::MatcherExt::or].
     ///
-    /// **For internal use only. API stablility is not guaranteed!**
+    /// **For internal use only. API stability is not guaranteed!**
     #[doc(hidden)]
     pub struct DisjunctionMatcher<M1, M2> {
         pub(super) m1: M1,

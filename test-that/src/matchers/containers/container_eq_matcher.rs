@@ -99,7 +99,7 @@ use core::{fmt::Debug, marker::PhantomData};
 /// sizes of the expected and actual values. This should therefore only be used
 /// when the containers are small enough that this is not a problem.
 ///
-/// ## Comparing conatiners while ignoring order
+/// ## Comparing containers while ignoring order
 ///
 /// Use [ignoring_order()][ContainerEqMatcher::ignoring_order] to ignore the
 /// order of the elements.

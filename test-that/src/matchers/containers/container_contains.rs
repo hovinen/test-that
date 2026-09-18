@@ -108,7 +108,7 @@ use core::fmt::Display;
 /// 2. It then checks whether each matcher matches at least one corresponding
 ///    element in the actual container and each element in the actual container
 ///    is matched by at least one matcher. If not, it fails with a message
-///    indicating which matcher respectively container elements had no
+///    indicating which matchers or container elements, respectively, had no
 ///    counterparts.
 ///
 /// 3. Finally, it checks whether the mapping of matchers to corresponding
@@ -555,9 +555,10 @@ impl<K, V> PairBorrow<K, V> for (K, V) {
 }
 
 /// The requirements of the mapping between matchers and actual values by
-/// which [`UnorderedElemetnsAre`] is deemed to match its input.
+/// which [`ContainerContainsUnorderedMatcher`][crate::matchers::containers::ContainerContainsUnorderedMatcher]
+/// is deemed to match its input.
 ///
-/// **For internal use only. API stablility is not guaranteed!**
+/// **For internal use only. API stability is not guaranteed!**
 #[doc(hidden)]
 #[derive(Clone, Copy)]
 pub enum Requirements {
