@@ -14,7 +14,7 @@
 // limitations under the License.
 
 use indoc::indoc;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use test_that::matcher::Matcher;
 use test_that::prelude::*;
 
@@ -292,6 +292,14 @@ fn contains_exactly_matches_hash_map() -> TestResult<()> {
 }
 
 #[test]
+fn contains_exactly_matches_btree_map() -> TestResult<()> {
+    verify_that!(
+        BTreeMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
+        contains_exactly![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")]
+    )
+}
+
+#[test]
 fn contains_exactly_matches_hash_map_with_trailing_comma() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
@@ -372,6 +380,14 @@ fn contains_each_supports_trailing_comma() -> TestResult<()> {
 fn contains_each_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
+        contains_each![eq(2) => eq("Two"), eq(1) => eq("One")]
+    )
+}
+
+#[test]
+fn contains_each_matches_btree_map() -> TestResult<()> {
+    verify_that!(
+        BTreeMap::from([(1, "One"), (2, "Two"), (3, "Three")]),
         contains_each![eq(2) => eq("Two"), eq(1) => eq("One")]
     )
 }
@@ -480,6 +496,14 @@ fn is_contained_supports_trailing_comma() -> TestResult<()> {
 fn is_contained_in_matches_hash_map() -> TestResult<()> {
     verify_that!(
         HashMap::from([(1, "One"), (2, "Two")]),
+        is_contained_in![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")]
+    )
+}
+
+#[test]
+fn is_contained_in_matches_btree_map() -> TestResult<()> {
+    verify_that!(
+        BTreeMap::from([(1, "One"), (2, "Two")]),
         is_contained_in![eq(2) => eq("Two"), eq(1) => eq("One"), eq(3) => eq("Three")]
     )
 }
