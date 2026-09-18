@@ -58,6 +58,7 @@ pub use container_eq_matcher::{ContainerEqMatcher, container_eq};
 pub use contains_matcher::{ContainsMatcher, contains};
 pub use each_matcher::each;
 #[cfg(feature = "googletest-compat")]
+#[allow(deprecated)]
 pub use is_empty_matcher::empty;
 pub use is_empty_matcher::is_empty;
 pub use len_matcher::len;

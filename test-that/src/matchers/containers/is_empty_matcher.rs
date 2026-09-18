@@ -39,6 +39,7 @@ pub fn is_empty() -> __internal::EmptyMatcher {
 ///
 /// Provided to ease porting from older versions of GoogleTest.
 #[cfg(feature = "googletest-compat")]
+#[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use is_empty instead"))]
 pub fn empty() -> __internal::EmptyMatcher {
     __internal::EmptyMatcher
 }

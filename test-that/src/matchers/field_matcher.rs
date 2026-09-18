@@ -20,6 +20,7 @@
 /// **Deprecated**. Please use
 /// [matches_pattern!][crate::matchers::matches_pattern] instead.
 #[cfg(feature = "googletest-compat")]
+#[cfg_attr(feature = "googletest-migrate", deprecated(note = "Use matches_pattern! instead"))]
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __field {

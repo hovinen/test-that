@@ -102,6 +102,7 @@ pub use crate::{
 
 #[cfg(feature = "googletest-compat")]
 #[doc(inline)]
+#[allow(deprecated)]
 pub use crate::__field as field;
 
 // Types and functions used by macros matchers.

@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #![cfg(feature = "googletest-compat")]
+#![allow(deprecated)]
 
 use test_that::matcher::{Describable as _, MatcherResult};
 use test_that::prelude::*;
