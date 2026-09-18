@@ -29,6 +29,14 @@ authors = [
 ]
 
 [dependencies]
+# These dependencies are used only inside `#[cfg(test)]` blocks in the various
+# `[[bin]]` targets below, which is why `cargo clippy` without `--all-targets`
+# reports them as unused (see CONTRIBUTING.md, which documents running clippy
+# with `--all-targets`). They cannot be moved to [dev-dependencies] because
+# `run_integration_tests.sh` builds those binaries with `cargo rustc --bin
+# <name> -- --test`, which compiles them in test-harness mode via a raw rustc
+# flag without cargo switching to its own test-unit dependency resolution, so
+# [dev-dependencies] would not be available to them.
 test-that = { path = "../test-that", version = "0.5.2", features = ["anyhow"] }
 anyhow = "1.0.102"
 indoc = "2.0.7"
@@ -41,121 +49,121 @@ path = "src/integration_tests.rs"
 test = false
 
 [[bin]]
-name = "assert_predicate_with_failure"
+name = "assert-predicate-with-failure"
 path = "src/assert_predicate_with_failure.rs"
 test = false
 
 [[bin]]
-name = "assertion_failure_in_subroutine"
+name = "assertion-failure-in-subroutine"
 path = "src/assertion_failure_in_subroutine.rs"
 test = false
 
 [[bin]]
-name = "assertion_failures_with_short_structured_actual_values"
+name = "assertion-failures-with-short-structured-actual-values"
 path = "src/assertion_failures_with_short_structured_actual_values.rs"
 test = false
 
 [[bin]]
-name = "async_test_with_expect_that"
+name = "async-test-with-expect-that"
 path = "src/async_test_with_expect_that.rs"
 test = false
 
 [[bin]]
-name = "custom_error_message"
+name = "custom-error-message"
 path = "src/custom_error_message.rs"
 test = false
 
 [[bin]]
-name = "expect_that_failure"
+name = "expect-that-failure"
 path = "src/expect_that_failure.rs"
 test = false
 
 [[bin]]
-name = "expect_pred_failure"
+name = "expect-pred-failure"
 path = "src/expect_pred_failure.rs"
 test = false
 
 [[bin]]
-name = "failure_due_to_fail_macro"
+name = "failure-due-to-fail-macro"
 path = "src/failure_due_to_fail_macro.rs"
 test = false
 
 [[bin]]
-name = "failure_due_to_fail_macro_with_empty_message"
+name = "failure-due-to-fail-macro-with-empty-message"
 path = "src/failure_due_to_fail_macro_with_empty_message.rs"
 test = false
 
 [[bin]]
-name = "failure_due_to_fail_macro_with_format_arguments"
+name = "failure-due-to-fail-macro-with-format-arguments"
 path = "src/failure_due_to_fail_macro_with_format_arguments.rs"
 test = false
 
 [[bin]]
-name = "failure_due_to_returned_error"
+name = "failure-due-to-returned-error"
 path = "src/failure_due_to_returned_error.rs"
 test = false
 
 [[bin]]
-name = "fatal_and_non_fatal_failure"
+name = "fatal-and-non-fatal-failure"
 path = "src/fatal_and_non_fatal_failure.rs"
 test = false
 
 [[bin]]
-name = "first_failure_aborts"
+name = "first-failure-aborts"
 path = "src/first_failure_aborts.rs"
 test = false
 
 [[bin]]
-name = "test_that_test_with_rstest"
+name = "test-that-test-with-rstest"
 path = "src/test_that_test_with_rstest.rs"
 test = false
 
 [[bin]]
-name = "non_fatal_failure_in_subroutine"
+name = "non-fatal-failure-in-subroutine"
 path = "src/non_fatal_failure_in_subroutine.rs"
 test = false
 
 [[bin]]
-name = "passing_test_with_should_panic"
+name = "passing-test-with-should-panic"
 path = "src/passing_test_with_should_panic.rs"
 test = false
 
 [[bin]]
-name = "simple_assertion_failure"
+name = "simple-assertion-failure"
 path = "src/simple_assertion_failure.rs"
 test = false
 
 [[bin]]
-name = "simple_assertion_failure_with_assert_that"
+name = "simple-assertion-failure-with-assert-that"
 path = "src/simple_assertion_failure_with_assert_that.rs"
 test = false
 
 [[bin]]
-name = "test_returning_anyhow_error"
+name = "test-returning-anyhow-error"
 path = "src/test_returning_anyhow_error.rs"
 test = false
 
 [[bin]]
-name = "two_expect_pred_failures"
+name = "two-expect-pred-failures"
 path = "src/two_expect_pred_failures.rs"
 test = false
 
 [[bin]]
-name = "two_expect_that_failures"
+name = "two-expect-that-failures"
 path = "src/two_expect_that_failures.rs"
 test = false
 
 [[bin]]
-name = "two_non_fatal_failures"
+name = "two-non-fatal-failures"
 path = "src/two_non_fatal_failures.rs"
 test = false
 
 [[bin]]
-name = "verify_predicate_with_failure"
+name = "verify-predicate-with-failure"
 path = "src/verify_predicate_with_failure.rs"
 test = false
 
 [[bin]]
-name = "verify_predicate_with_failure_as_method_in_submodule"
+name = "verify-predicate-with-failure-as-method-in-submodule"
 path = "src/verify_predicate_with_failure_as_method_in_submodule.rs"
 test = false

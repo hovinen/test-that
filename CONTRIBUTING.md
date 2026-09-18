@@ -21,7 +21,12 @@ git config core.hooksPath .githooks
 
 The hook runs:
 - `cargo +nightly fmt -- --check` — fails if any file needs reformatting
-- `cargo +nightly clippy -- -D warnings` — fails on any Clippy warning
+- `cargo +nightly clippy --workspace --all-targets --all-features -- -D
+  warnings` — fails on any Clippy warning
+
+Note: always pass `--all-targets` when running Clippy on this workspace.
+Without it, `integration-tests`' binaries are checked outside of test mode,
+where their `#[cfg(test)]`-only dependencies appear (incorrectly) unused.
 
 ## Running the autoformatter rustfmt
 
