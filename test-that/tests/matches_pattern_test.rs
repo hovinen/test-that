@@ -212,6 +212,46 @@ fn has_meaningful_assertion_failure_message_when_wrong_enum_variant_is_used() ->
 }
 
 #[test]
+fn has_meaningful_assertion_failure_message_when_actual_wrong_variant_is_unit() -> TestResult<()> {
+    #[derive(Debug)]
+    enum AnEnum {
+        #[allow(dead_code)]
+        A {
+            a: u32,
+        },
+        B,
+    }
+    let actual = AnEnum::B;
+    let result = verify_that!(actual, matches_pattern!(AnEnum::A { a: eq(123) }));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which has the wrong enum variant `B`")))
+    )
+}
+
+#[test]
+fn has_meaningful_assertion_failure_message_when_actual_wrong_variant_has_named_field()
+-> TestResult<()> {
+    #[derive(Debug)]
+    enum AnEnum {
+        #[allow(dead_code)]
+        A(u32),
+        B {
+            #[allow(unused)]
+            b: u32,
+        },
+    }
+    let actual = AnEnum::B { b: 123 };
+    let result = verify_that!(actual, matches_pattern!(AnEnum::A(eq(123))));
+
+    verify_that!(
+        result,
+        err(displays_as(contains_substring("which has the wrong enum variant `B`")))
+    )
+}
+
+#[test]
 fn supports_qualified_struct_names() -> TestResult<()> {
     mod a_module {
         #[derive(Debug)]
