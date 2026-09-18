@@ -182,7 +182,7 @@ fn matches_deref_property_with_container_matcher() -> TestResult<()> {
 fn matches_deref_property_with_empty() -> TestResult<()> {
     let value = AStruct { a_vec: vec![], ..a_struct() };
 
-    verify_that!(value, matches_pattern!(AStruct { *get_a_slice(): empty() }))
+    verify_that!(value, matches_pattern!(AStruct { *get_a_slice(): is_empty() }))
 }
 
 #[test]
@@ -251,7 +251,7 @@ fn matches_property_returning_str_with_non_container_matcher() -> TestResult<()>
 fn matches_property_returning_owned_container_with_empty() -> TestResult<()> {
     let value = AStruct { a_vec: vec![], ..a_struct() };
 
-    verify_that!(value, matches_pattern!(AStruct { get_a_vec(): empty() }))
+    verify_that!(value, matches_pattern!(AStruct { get_a_vec(): is_empty() }))
 }
 
 #[test]
@@ -271,7 +271,7 @@ fn matches_member_with_all_of_container_matchers() -> TestResult<()> {
 fn matches_member_with_any_of_container_matchers() -> TestResult<()> {
     verify_that!(
         a_struct(),
-        matches_pattern!(AStruct { a_vec: any!(container_eq([1, 2, 3]), empty()) })
+        matches_pattern!(AStruct { a_vec: any!(container_eq([1, 2, 3]), is_empty()) })
     )
 }
 
@@ -299,7 +299,7 @@ fn does_not_match_deref_property_with_wrong_content() -> TestResult<()> {
 
 #[test]
 fn does_not_match_field_with_wrong_content() -> TestResult<()> {
-    let result = verify_that!(a_struct(), matches_pattern!(AStruct { a_vec: empty() }));
+    let result = verify_that!(a_struct(), matches_pattern!(AStruct { a_vec: is_empty() }));
 
     verify_that!(result, err(anything()))
 }

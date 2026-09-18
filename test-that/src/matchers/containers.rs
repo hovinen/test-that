@@ -47,7 +47,7 @@ pub(super) mod container_contains;
 pub(super) mod container_eq_matcher;
 pub(super) mod contains_matcher;
 pub(super) mod each_matcher;
-pub(super) mod empty_matcher;
+pub(super) mod is_empty_matcher;
 pub(super) mod len_matcher;
 pub(super) mod pointwise_matcher;
 pub(super) mod subset_of_matcher;
@@ -57,7 +57,9 @@ pub use container_contains::unordered_matcher::__internal::ContainerContainsUnor
 pub use container_eq_matcher::{ContainerEqMatcher, container_eq};
 pub use contains_matcher::{ContainsMatcher, contains};
 pub use each_matcher::each;
-pub use empty_matcher::empty;
+#[cfg(feature = "googletest-compat")]
+pub use is_empty_matcher::empty;
+pub use is_empty_matcher::is_empty;
 pub use len_matcher::len;
 pub use subset_of_matcher::subset_of;
 pub use superset_of_matcher::superset_of;

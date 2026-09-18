@@ -20,10 +20,10 @@
 /// # use std::collections::HashSet;
 /// # fn should_pass() -> TestResult<()> {
 /// let value: Vec<i32> = vec![];
-/// verify_that!(value, empty())?;
-/// verify_that!(*value.as_slice(), empty())?;
+/// verify_that!(value, is_empty())?;
+/// verify_that!(*value.as_slice(), is_empty())?;
 /// let value: HashSet<i32> = HashSet::new();
-/// verify_that!(value, empty())?;
+/// verify_that!(value, is_empty())?;
 /// #     Ok(())
 /// # }
 /// # should_pass().unwrap();
@@ -31,6 +31,14 @@
 ///
 /// See [module documentation][crate::matchers::containers] for information
 /// about what types this matcher can match.
+pub fn is_empty() -> __internal::EmptyMatcher {
+    __internal::EmptyMatcher
+}
+
+/// Equivalent to [`is_empty`].
+///
+/// Provided to ease porting from older versions of GoogleTest.
+#[cfg(feature = "googletest-compat")]
 pub fn empty() -> __internal::EmptyMatcher {
     __internal::EmptyMatcher
 }
@@ -63,62 +71,62 @@ pub mod __internal {
 
 #[cfg(test)]
 mod tests {
-    use super::empty;
+    use super::is_empty;
     use crate::prelude::*;
     use alloc::vec::Vec;
 
     #[test]
     fn empty_matcher_matches_empty_vec() -> TestResult<()> {
         let value: Vec<i32> = vec![];
-        verify_that!(value, empty())
+        verify_that!(value, is_empty())
     }
 
     #[test]
     fn empty_matcher_matches_empty_array() -> TestResult<()> {
-        verify_that!([] as [u32; 0], empty())
+        verify_that!([] as [u32; 0], is_empty())
     }
 
     #[test]
     fn empty_matcher_matches_empty_ref_to_array_with_points_to() -> TestResult<()> {
-        verify_that!(&([] as [u32; 0]), points_to(empty()))
+        verify_that!(&([] as [u32; 0]), points_to(is_empty()))
     }
 
     #[test]
     fn empty_matcher_matches_empty_ref_to_array_with_deref_notation() -> TestResult<()> {
         let value: [u32; 0] = [];
         let reference = &value;
-        verify_that!(*reference, empty())
+        verify_that!(*reference, is_empty())
     }
 
     #[test]
     fn empty_matcher_matches_empty_slice_with_points_to() -> TestResult<()> {
         let value: Vec<u32> = vec![];
         let slice = value.as_slice();
-        verify_that!(slice, points_to(empty()))
+        verify_that!(slice, points_to(is_empty()))
     }
 
     #[test]
     fn empty_matcher_matches_empty_slice_with_deref_notation() -> TestResult<()> {
         let value: Vec<u32> = vec![];
         let slice = value.as_slice();
-        verify_that!(*slice, empty())
+        verify_that!(*slice, is_empty())
     }
 
     #[test]
     fn empty_matcher_does_not_match_non_empty_vec() -> TestResult<()> {
-        verify_that!(vec![1, 2, 3], not(empty()))
+        verify_that!(vec![1, 2, 3], not(is_empty()))
     }
 
     #[test]
     fn empty_matcher_does_not_match_non_empty_array() -> TestResult<()> {
-        verify_that!([1, 2, 3], not(empty()))
+        verify_that!([1, 2, 3], not(is_empty()))
     }
 
     #[test]
     fn empty_matcher_does_not_match_non_empty_slice() -> TestResult<()> {
         let value: Vec<u32> = vec![1, 2, 3];
         let slice = value.as_slice();
-        verify_that!(*slice, not(empty()))
+        verify_that!(*slice, not(is_empty()))
     }
 
     #[cfg(feature = "std")]
@@ -126,7 +134,7 @@ mod tests {
     fn empty_matcher_matches_empty_hash_set() -> TestResult<()> {
         use std::collections::HashSet;
         let value: HashSet<i32> = HashSet::new();
-        verify_that!(value, empty())
+        verify_that!(value, is_empty())
     }
 
     #[derive(Debug)]
@@ -143,6 +151,6 @@ mod tests {
     #[test]
     fn empty_matches_on_container_when_ref_to_container_has_into_iterator_producing_owned_values()
     -> TestResult<()> {
-        verify_that!(OwnedItemContainer(vec![]), empty())
+        verify_that!(OwnedItemContainer(vec![]), is_empty())
     }
 }

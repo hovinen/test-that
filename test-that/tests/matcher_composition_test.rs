@@ -265,7 +265,7 @@ fn points_to_vec_each_any_of_allowed_values() -> TestResult<()> {
 #[test]
 fn all_len_gt_zero_and_not_empty() -> TestResult<()> {
     let value = vec![42];
-    verify_that!(value, all!(len(gt(0)), not(empty())))
+    verify_that!(value, all!(len(gt(0)), not(is_empty())))
 }
 
 #[test]
@@ -288,7 +288,7 @@ fn ok_all_starts_with_and_ends_with() -> TestResult<()> {
 #[test]
 fn points_to_not_empty_vec() -> TestResult<()> {
     let v = vec![1, 2, 3];
-    verify_that!(&v, points_to(not(empty())))
+    verify_that!(&v, points_to(not(is_empty())))
 }
 
 #[test]
@@ -328,7 +328,7 @@ fn result_of_option_vec_points_to_some_not_empty() -> TestResult<()> {
         }
     }
     let value = Wrapper { data: Some(vec![1, 2]) };
-    verify_that!(value, result_of!(|w: &Wrapper| w.data_ref(), points_to(some(not(empty())))))
+    verify_that!(value, result_of!(|w: &Wrapper| w.data_ref(), points_to(some(not(is_empty())))))
 }
 
 #[test]
@@ -829,6 +829,6 @@ fn result_of_method_on_lifetime_struct_returning_slice_matched_with_contains_eac
 fn any_contains_each_in_order_or_empty() -> TestResult<()> {
     let full: Vec<i32> = vec![1, 2, 3];
     let no_items: Vec<i32> = vec![];
-    verify_that!(full, any!(contains_each![eq(1), eq(3)].in_order(), empty()))?;
-    verify_that!(no_items, any!(contains_each![eq(1), eq(3)].in_order(), empty()))
+    verify_that!(full, any!(contains_each![eq(1), eq(3)].in_order(), is_empty()))?;
+    verify_that!(no_items, any!(contains_each![eq(1), eq(3)].in_order(), is_empty()))
 }

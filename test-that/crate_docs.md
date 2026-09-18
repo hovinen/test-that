@@ -139,7 +139,7 @@ The following matchers are provided in Test That!:
 | [`contains_substring`] | A string containing the given substring.                               |
 | [`displays_as`]      | A [`Display`] value whose formatted string is matched by the argument.   |
 | [`each`]             | A container all of whose elements the given argument matches.            |
-| [`empty`]            | An empty collection.                                                     |
+| [`is_empty`]         | An empty collection.                                                     |
 | [`ends_with`]        | A string ending with the given suffix.                                   |
 | [`eq`]               | A value equal to the argument, in the sense of the [`PartialEq`] trait.  |
 | [`eq_deref_of`]      | A value equal to the dereferenced value of the argument.                 |
@@ -184,7 +184,7 @@ The following matchers are provided in Test That!:
 [`contains_substring`]: matchers::contains_substring
 [`displays_as`]: matchers::displays_as
 [`each`]: matchers::containers::each
-[`empty`]: matchers::containers::empty
+[`is_empty`]: matchers::containers::is_empty
 [`ends_with`]: matchers::ends_with
 [`eq`]: matchers::eq
 [`eq_deref_of`]: matchers::eq_deref_of
