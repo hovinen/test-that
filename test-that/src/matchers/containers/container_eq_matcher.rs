@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use super::container_contains::Requirements;
 use crate::{
     description::Description,
     matcher::{Describable, Matcher, MatcherResult},
@@ -28,8 +29,6 @@ use alloc::{
     vec::Vec,
 };
 use core::{fmt::Debug, marker::PhantomData};
-
-use super::container_contains::Requirements;
 
 /// Matches a container equal (in the sense of `==`) to `expected`.
 ///
@@ -113,10 +112,6 @@ use super::container_contains::Requirements;
 /// # }
 /// # should_pass().unwrap();
 /// ```
-// This returns ContainerEqMatcher and not impl Matcher because
-// ContainerEqMatcher has some specialisations for slice types (see
-// documentation above). Returning impl Matcher would hide those from the
-// compiler.
 pub fn container_eq<ExpectedContainerT, Mode>(
     expected: ExpectedContainerT,
 ) -> ContainerEqMatcher<ExpectedContainerT, Mode> {

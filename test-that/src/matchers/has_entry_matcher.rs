@@ -15,8 +15,8 @@
 
 #![cfg(feature = "std")]
 
-/// Matches a HashMap containing the given `key` whose value is matched by the
-/// matcher `inner`.
+/// Matches a [`HashMap`][std::collections::HashMap] containing the given `key`
+/// whose value is matched by the matcher `inner`.
 ///
 /// ```
 /// # use test_that::prelude::*;

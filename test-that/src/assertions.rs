@@ -344,12 +344,12 @@ macro_rules! assert_pred {
 /// Matches the given value against the given matcher, marking the test as
 /// failed but continuing execution if it does not match.
 ///
-/// This is a *non-fatal* assertion: the test continues
-/// execution in the event of assertion failure.
+/// This is a *non-fatal* assertion: the test continues execution in the event
+/// of assertion failure.
 ///
 /// This can only be invoked inside tests with the
-/// [`test_that::test`][crate::test] attribute. The assertion must
-/// occur in the same thread as that running the test itself.
+/// [`test_that::test`][crate::test] attribute. The assertion must occur in the
+/// same thread as that running the test itself.
 ///
 /// Invoking this macro is equivalent to using
 /// [`and_log_failure`](crate::TestResultExt::and_log_failure) as follows:
@@ -402,12 +402,12 @@ macro_rules! expect_that {
 /// Asserts that the given predicate applied to the given arguments returns
 /// true, failing the test but continuing execution if not.
 ///
-/// This is a *non-fatal* predicate assertion: the test
-/// continues execution in the event of assertion failure.
+/// This is a *non-fatal* predicate assertion: the test continues execution
+/// in the event of assertion failure.
 ///
 /// This can only be invoked inside tests with the
-/// [`test_that::test`][crate::test] attribute. The assertion must
-/// occur in the same thread as that running the test itself.
+/// [`test_that::test`][crate::test] attribute. The assertion must occur in
+/// the same thread as that running the test itself.
 ///
 /// Invoking this macro is equivalent to using
 /// [`and_log_failure`](crate::TestResultExt::and_log_failure) as follows:

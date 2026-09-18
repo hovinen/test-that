@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Matches an `Option` containing a value matched by `inner`.
+/// Matches an [`Option`] containing a value matched by `inner`.
 ///
 /// ```
 /// # use test_that::prelude::*;

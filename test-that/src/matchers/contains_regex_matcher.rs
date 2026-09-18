@@ -44,11 +44,6 @@ use regex::Regex;
 ///
 /// Panics if the given `pattern` is not a syntactically valid regular
 /// expression.
-// N.B. This returns the concrete type rather than an impl Matcher so that it
-// can act simultaneously as a Matcher<str> and a Matcher<String>. Otherwise the
-// compiler treats it as a Matcher<str> only and the code
-//   verify_that!("Some value".to_string(), contains_regex(".*value"))?;
-// doesn't compile.
 pub fn contains_regex<PatternT: Deref<Target = str>>(
     pattern: PatternT,
 ) -> __internal::ContainsRegexMatcher {

@@ -59,7 +59,7 @@ pub trait Matcher<ActualT: Debug + ?Sized>: Describable {
     /// the `==` operator) to the value `actual`.
     fn matches(&self, actual: &ActualT) -> MatcherResult;
 
-    /// Prepares a [`String`] describing how the expected value
+    /// Builds a [`String`] describing how the expected value
     /// encoded in this instance matches or does not match the given value
     /// `actual`.
     ///
@@ -150,9 +150,6 @@ pub trait MatcherExt: Sized {
     /// # should_fail_1().unwrap_err();
     /// # should_fail_2().unwrap_err();
     /// ```
-    // TODO(b/264518763): Replace the return type with impl Matcher and reduce
-    // visibility of ConjunctionMatcher once impl in return position in trait
-    // methods is stable.
     fn and<Right>(self, right: Right) -> ConjunctionMatcher<Self, Right> {
         ConjunctionMatcher::new(self, right)
     }
@@ -174,9 +171,6 @@ pub trait MatcherExt: Sized {
     /// # should_pass().unwrap();
     /// # should_fail().unwrap_err();
     /// ```
-    // TODO(b/264518763): Replace the return type with impl Matcher and reduce
-    // visibility of DisjunctionMatcher once impl in return position in trait
-    // methods is stable.
     fn or<Right>(self, right: Right) -> DisjunctionMatcher<Self, Right> {
         DisjunctionMatcher::new(self, right)
     }

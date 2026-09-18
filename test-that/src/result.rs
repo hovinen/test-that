@@ -26,11 +26,13 @@ use alloc::string::{String, ToString as _};
 /// This can be used with subroutines which may cause the test to fatally fail
 /// and which return some value needed by the caller. For example:
 ///
-/// ```ignore
+/// ```
+/// # use test_that::prelude::*;
 /// fn load_file_content_as_string() -> TestResult<String> {
-///     let file_stream = load_file().err_to_test_failure()?;
+///     let file_stream = load_file().or_fail()?;
 ///     Ok(file_stream.to_string())
 /// }
+/// # fn load_file() -> Option<String> { None }
 /// ```
 ///
 /// The `Err` variant contains a [`TestAssertionFailure`] which carries the data
@@ -194,57 +196,64 @@ impl<T> TestResultExt for core::result::Result<T, TestAssertionFailure> {
 }
 
 /// Provides an extension method for converting an arbitrary type into a
-/// [`Result`].
+/// [`TestResult`].
 ///
 /// A type can implement this trait to provide an easy way to return immediately
 /// from a test in conjunction with the `?` operator. This is useful for
-/// [`Result`] types whose `Result::Err` variant does not implement
-/// [`std::error::Error`].
+/// [`Option`] as well as [`Result`] types whose `Result::Err` variant does not
+/// implement [`std::error::Error`].
 ///
 /// There is an implementation of this trait for [`anyhow::Error`] (which does
 /// not implement `std::error::Error`) when the `anyhow` feature is enabled.
 /// Importing this trait allows one to easily map [`anyhow::Error`] to a test
-/// failure:
+/// failure.
 ///
-/// ```
-/// use test_that::prelude::*;
+/// This is also implemented for [`Option`].
 ///
-/// # /* So that this compiles in the doctest context
-/// #[test]
-/// # */
-/// # #[cfg(feature = "anyhow")]
-/// fn fails_due_to_anyhow_error() -> TestResult<()> {
-///     something_which_can_fail().or_fail()?;
-///     Ok(())
-/// }
-///
-/// # #[cfg(feature = "anyhow")]
-/// fn something_which_can_fail() -> anyhow::Result<()> {
-///     anyhow::bail!("An error")
-/// }
-///
-/// # #[cfg(feature = "anyhow")]
-/// fails_due_to_anyhow_error().unwrap_err();
-/// ```
-///
-/// This is also implemented for `Option<T>`:
-///
-/// ```
-/// use test_that::prelude::*;
-///
-/// # /* So that this compiles in the doctest context
-/// #[test]
-/// # */
-/// fn fails_due_to_missing_element() -> TestResult<()> {
-///     let empty_hash_map = std::collections::HashMap::<u32, u32>::new();
-///     let value = empty_hash_map.get(&0).or_fail()?;
-///     Ok(())
-/// }
-///
-/// fails_due_to_missing_element().unwrap_err();
-/// ```
+/// See [`or_fail`][OrFailExt::or_fail] for usage examples.
 pub trait OrFailExt<T> {
-    /// Converts this instance into a [`Result`].
+    /// Converts this instance into a [`TestResult`].
+    ///
+    /// Invoking this method allows direct use of the `?` operator in tests.
+    /// For example, in the case of [`Option`]:
+    ///
+    /// ```
+    /// use test_that::prelude::*;
+    ///
+    /// # /* So that this compiles in the doctest context
+    /// #[test]
+    /// # */
+    /// fn fails_due_to_missing_element() -> TestResult<()> {
+    ///     let empty_hash_map = std::collections::HashMap::<u32, u32>::new();
+    ///     let value = empty_hash_map.get(&0).or_fail()?;
+    ///     Ok(())
+    /// }
+    ///
+    /// fails_due_to_missing_element().unwrap_err();
+    /// ```
+    ///
+    /// In the case of [`anyhow::Error`]:
+    ///
+    /// ```
+    /// use test_that::prelude::*;
+    ///
+    /// # /* So that this compiles in the doctest context
+    /// #[test]
+    /// # */
+    /// # #[cfg(feature = "anyhow")]
+    /// fn fails_due_to_anyhow_error() -> TestResult<()> {
+    ///     something_which_can_fail().or_fail()?;
+    ///     Ok(())
+    /// }
+    ///
+    /// # #[cfg(feature = "anyhow")]
+    /// fn something_which_can_fail() -> anyhow::Result<()> {
+    ///     anyhow::bail!("An error")
+    /// }
+    ///
+    /// # #[cfg(feature = "anyhow")]
+    /// fails_due_to_anyhow_error().unwrap_err();
+    /// ```
     ///
     /// Typically, the `Self` type is itself a [`Result`] or an [`Option`]. This
     /// method should then map `None` or the `Err` variant to a

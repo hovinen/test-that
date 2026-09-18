@@ -53,9 +53,9 @@ use core::fmt::Display;
 /// See [module documentation][crate::matchers::containers] for information
 /// about what types this matcher can match.
 ///
-/// This can also match against [`HashMap`][std::collections::HashMap] and
-/// similar collections. The arguments are a sequence of mappings of matchers
-/// corresponding to the keys and their respective values.
+/// This can also match against [`HashMap`] and similar collections. The
+/// arguments are a sequence of mappings of matchers corresponding to the keys
+/// and their respective values.
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -120,7 +120,7 @@ use core::fmt::Display;
 /// ## Enforcing the order of elements
 ///
 /// To enforce that the elements appear in the same order as the matchers, use
-/// [`in_order`][crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order]:
+/// [`in_order`]:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -156,11 +156,13 @@ use core::fmt::Display;
 ///
 /// The same caveat applies as with the set notation above.
 ///
+/// [`HashMap`]: std::collections::HashMap
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect
 /// [`Vec`]: std::vec::Vec
 /// [`field!`]: crate::matchers::field
+/// [`in_order`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
 /// [`matches_pattern!`]: crate::matchers::matches_pattern
 /// [`result_of!`]: crate::matchers::result_of
 #[macro_export]
@@ -230,9 +232,7 @@ macro_rules! __contains_exactly {
 /// additional elements that don't correspond to any matcher.
 ///
 /// Put another way, `contains_each!` matches if there is a subset of the actual
-/// container which
-/// [`contains_exactly`][crate::matchers::containers::contains_exactly] would
-/// match.
+/// container which [`contains_exactly`] would match.
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -262,9 +262,9 @@ macro_rules! __contains_exactly {
 /// See [module documentation][crate::matchers::containers] for information
 /// about what types this matcher can match.
 ///
-/// This can also match against [`HashMap`][std::collections::HashMap] and
-/// similar collections. The arguments are a sequence of mappings of matchers
-/// corresponding to the keys and their respective values.
+/// This can also match against [`HashMap`] and similar collections. The
+/// arguments are a sequence of mappings of matchers corresponding to the keys
+/// and their respective values.
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -295,7 +295,7 @@ macro_rules! __contains_exactly {
 /// ## Enforcing the order of elements
 ///
 /// To enforce that the elements appear in the same order as the matchers, use
-/// [`in_order`][crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order]:
+/// [`in_order`]:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -311,10 +311,13 @@ macro_rules! __contains_exactly {
 /// # should_fail().unwrap_err();
 /// ```
 ///
+/// [`HashMap`]: std::collections::HashMap
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect
 /// [`Vec`]: std::vec::Vec
+/// [`contains_exactly`]: crate::matchers::containers::contains_exactly
+/// [`in_order`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __contains_each {
@@ -380,8 +383,7 @@ macro_rules! __contains_each {
 /// container.
 ///
 /// Put another way, `is_contained_in!` matches if there is a subset of the
-/// matchers which would match with
-/// [`contains_exactly`][crate::matchers::containers::contains_exactly].
+/// matchers which would match with [`contains_exactly`].
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -411,9 +413,9 @@ macro_rules! __contains_each {
 /// See [module documentation][crate::matchers::containers] for information
 /// about what types this matcher can match.
 ///
-/// This can also match against [`HashMap`][std::collections::HashMap] and
-/// similar collections. The arguments are a sequence of mappings of matchers
-/// corresponding to the keys and their respective values.
+/// This can also match against [`HashMap`] and similar collections. The
+/// arguments are a sequence of mappings of matchers corresponding to the keys
+/// and their respective values.
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -447,7 +449,7 @@ macro_rules! __contains_each {
 /// ## Enforcing the order of elements
 ///
 /// To enforce that the elements appear in the same order as the matchers, use
-/// [`in_order`][crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order]:
+/// [`in_order`]:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -463,10 +465,13 @@ macro_rules! __contains_each {
 /// # should_fail().unwrap_err();
 /// ```
 ///
+/// [`HashMap`]: std::collections::HashMap
 /// [`IntoIterator`]: std::iter::IntoIterator
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect
 /// [`Vec`]: std::vec::Vec
+/// [`contains_exactly`]: crate::matchers::containers::contains_exactly
+/// [`in_order`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
 #[macro_export]
 #[doc(hidden)]
 macro_rules! __is_contained_in {
