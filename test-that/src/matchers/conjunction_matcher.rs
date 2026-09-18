@@ -136,20 +136,6 @@ mod tests {
     }
 
     #[test]
-    fn chained_and_matches() -> TestResult<()> {
-        #[derive(Debug)]
-        struct Struct {
-            a: i32,
-            b: i32,
-            c: i32,
-        }
-        verify_that!(
-            Struct { a: 1, b: 2, c: 3 },
-            field!(Struct.a, eq(1)).and(field!(Struct.b, eq(2))).and(field!(Struct.c, eq(3)))
-        )
-    }
-
-    #[test]
     fn works_with_str_slices() -> TestResult<()> {
         verify_that!("A string", starts_with("A").and(ends_with("string")))
     }

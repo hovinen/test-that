@@ -98,9 +98,13 @@ pub use str_matcher::{
 // Reexport and unmangle the macros.
 #[doc(inline)]
 pub use crate::{
-    __all as all, __any as any, __field as field, __matches_pattern as matches_pattern,
-    __pat as pat, __result_of as result_of,
+    __all as all, __any as any, __matches_pattern as matches_pattern, __pat as pat,
+    __result_of as result_of,
 };
+
+#[cfg(feature = "googletest-compat")]
+#[doc(inline)]
+pub use crate::__field as field;
 
 // Types and functions used by macros matchers.
 // Do not use directly.

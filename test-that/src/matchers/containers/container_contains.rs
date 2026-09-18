@@ -78,7 +78,7 @@ use core::fmt::Display;
 /// ```
 ///
 /// This also works inside other macros including [`matches_pattern!`],
-/// [`result_of!`], [`field!`], and the `contains_exactly!` family itself:
+/// [`result_of!`], and the `contains_exactly!` family itself:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -146,7 +146,7 @@ use core::fmt::Display;
 /// ```
 ///
 /// This also works inside other macros including [`matches_pattern!`],
-/// [`result_of!`], [`field!`], and the `contains_exactly!` family itself:
+/// [`result_of!`], and the `contains_exactly!` family itself:
 ///
 /// ```
 /// # use test_that::prelude::*;
@@ -161,7 +161,6 @@ use core::fmt::Display;
 /// [`Iterator`]: std::iter::Iterator
 /// [`Iterator::collect`]: std::iter::Iterator::collect
 /// [`Vec`]: std::vec::Vec
-/// [`field!`]: crate::matchers::field
 /// [`in_order`]: crate::matchers::containers::ContainerContainsUnorderedMatcher::in_order
 /// [`matches_pattern!`]: crate::matchers::matches_pattern
 /// [`result_of!`]: crate::matchers::result_of

@@ -458,12 +458,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!({$($matcher)*})),)
+            $crate::matchers::all!($($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::__matcher_expr!({$($matcher)*})),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!({$($matcher)*})),],
+            @fwd [$($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::__matcher_expr!({$($matcher)*})),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -472,12 +472,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!([$($matcher)*])),)
+            $crate::matchers::all!($($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::__matcher_expr!([$($matcher)*])),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::__matcher_expr!([$($matcher)*])),],
+            @fwd [$($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::__matcher_expr!([$($matcher)*])),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -486,12 +486,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $matcher),)
+            $crate::matchers::all!($($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($matcher),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { $field_name:ident : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $matcher),],
+            @fwd [$($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($matcher),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -500,12 +500,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : {$($matcher:tt)*} $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*}))),)
+            $crate::matchers::all!($($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*}))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : {$($matcher:tt)*}, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*}))),],
+            @fwd [$($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::matchers::points_to($crate::__matcher_expr!({$($matcher)*}))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -514,12 +514,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : [$($matcher:tt)*] $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*]))),)
+            $crate::matchers::all!($($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*]))),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : [$($matcher:tt)*], $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*]))),],
+            @fwd [$($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::matchers::points_to($crate::__matcher_expr!([$($matcher)*]))),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -528,12 +528,12 @@ macro_rules! matches_pattern_internal {
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : $matcher:expr $(,)? }) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher)),)
+            $crate::matchers::all!($($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::matchers::points_to($matcher)),)
         )
     };
     (@fwd [$($acc:tt)*], [$($struct_name:tt)*], { *$field_name:ident : $matcher:expr, $first:tt $($rest:tt)* }) => {
         $crate::matches_pattern_internal!(
-            @fwd [$($acc)* $crate::matchers::field!($($struct_name)*.$field_name, $crate::matchers::points_to($matcher)),],
+            @fwd [$($acc)* $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field_name: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field_name)).with($crate::matchers::points_to($matcher)),],
             [$($struct_name)*], { $first $($rest)* }
         )
     };
@@ -818,7 +818,7 @@ macro_rules! matches_pattern_internal {
     ) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!({$($matcher)*})))
+            $crate::matchers::all!($crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 0: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(0)).with($crate::__matcher_expr!({$($matcher)*})))
         )
     };
 
@@ -828,7 +828,7 @@ macro_rules! matches_pattern_internal {
     ) => {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
-                $crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 0: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(0)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             1,
@@ -842,7 +842,7 @@ macro_rules! matches_pattern_internal {
     ) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!([$($matcher)*])))
+            $crate::matchers::all!($crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 0: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(0)).with($crate::__matcher_expr!([$($matcher)*])))
         )
     };
 
@@ -852,7 +852,7 @@ macro_rules! matches_pattern_internal {
     ) => {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
-                $crate::matchers::field!($($struct_name)*.0, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 0: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(0)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             1,
@@ -866,7 +866,7 @@ macro_rules! matches_pattern_internal {
     ) => {
         $crate::matchers::__internal::is(
             stringify!($($struct_name)*),
-            $crate::matchers::all!($crate::matchers::field!($($struct_name)*.0, $matcher))
+            $crate::matchers::all!($crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 0: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(0)).with($matcher))
         )
     };
 
@@ -876,7 +876,7 @@ macro_rules! matches_pattern_internal {
     ) => {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
-                $crate::matchers::field!($($struct_name)*.0, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 0: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(0)).with($matcher)
             ),
             [$($struct_name)*],
             1,
@@ -894,7 +894,7 @@ macro_rules! matches_pattern_internal {
             stringify!($($struct_name)*),
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.$field, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
         )
     };
@@ -909,7 +909,7 @@ macro_rules! matches_pattern_internal {
             stringify!($($struct_name)*),
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.$field, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
         )
     };
@@ -929,7 +929,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.1, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 1: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(1)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             2,
@@ -946,7 +946,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.1, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 1: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(1)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             2,
@@ -963,7 +963,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.2, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 2: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(2)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             3,
@@ -980,7 +980,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.2, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 2: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(2)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             3,
@@ -997,7 +997,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.3, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 3: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(3)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             4,
@@ -1014,7 +1014,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.3, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 3: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(3)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             4,
@@ -1031,7 +1031,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.4, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 4: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(4)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             5,
@@ -1048,7 +1048,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.4, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 4: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(4)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             5,
@@ -1065,7 +1065,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.5, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 5: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(5)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             6,
@@ -1082,7 +1082,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.5, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 5: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(5)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             6,
@@ -1099,7 +1099,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.6, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 6: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(6)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             7,
@@ -1116,7 +1116,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.6, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 6: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(6)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             7,
@@ -1133,7 +1133,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.7, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 7: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(7)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             8,
@@ -1150,7 +1150,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.7, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 7: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(7)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             8,
@@ -1167,7 +1167,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.8, $crate::__matcher_expr!({$($matcher)*}))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 8: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(8)).with($crate::__matcher_expr!({$($matcher)*}))
             ),
             [$($struct_name)*],
             9,
@@ -1184,7 +1184,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.8, $crate::__matcher_expr!([$($matcher)*]))
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 8: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(8)).with($crate::__matcher_expr!([$($matcher)*]))
             ),
             [$($struct_name)*],
             9,
@@ -1202,7 +1202,7 @@ macro_rules! matches_pattern_internal {
             stringify!($($struct_name)*),
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.$field, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { $field: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!($field)).with($matcher)
             ),
         )
     };
@@ -1216,7 +1216,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.1, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 1: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(1)).with($matcher)
             ),
             [$($struct_name)*],
             2,
@@ -1233,7 +1233,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.2, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 2: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(2)).with($matcher)
             ),
             [$($struct_name)*],
             3,
@@ -1250,7 +1250,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.3, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 3: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(3)).with($matcher)
             ),
             [$($struct_name)*],
             4,
@@ -1267,7 +1267,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.4, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 4: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(4)).with($matcher)
             ),
             [$($struct_name)*],
             5,
@@ -1284,7 +1284,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.5, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 5: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(5)).with($matcher)
             ),
             [$($struct_name)*],
             6,
@@ -1301,7 +1301,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.6, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 6: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(6)).with($matcher)
             ),
             [$($struct_name)*],
             7,
@@ -1318,7 +1318,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.7, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 7: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(7)).with($matcher)
             ),
             [$($struct_name)*],
             8,
@@ -1335,7 +1335,7 @@ macro_rules! matches_pattern_internal {
         $crate::matches_pattern_internal!(
             $crate::matchers::all!(
                 $($processed)*,
-                $crate::matchers::field!($($struct_name)*.8, $matcher)
+                $crate::matchers::__internal::field_matcher(|o| match o { $($struct_name)* { 8: value, .. } => Some(value), #[allow(unreachable_patterns)] _ => None }, &stringify!(8)).with($matcher)
             ),
             [$($struct_name)*],
             9,

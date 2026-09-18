@@ -144,7 +144,6 @@ The following matchers are provided in Test That!:
 | [`eq`]               | A value equal to the argument, in the sense of the [`PartialEq`] trait.  |
 | [`eq_deref_of`]      | A value equal to the dereferenced value of the argument.                 |
 | [`err`]              | A [`Result`][std::result::Result] containing an `Err` variant the argument matches. |
-| [`field!`]           | A struct or enum with a given field whose value the argument matches.    |
 | [`ge`]               | A [`PartialOrd`] value greater than or equal to the given value.         |
 | [`gt`]               | A [`PartialOrd`] value strictly greater than the given value.            |
 | [`has_entry`]        | A [`HashMap`] containing a given key whose value the argument matches.   |
@@ -190,7 +189,6 @@ The following matchers are provided in Test That!:
 [`eq`]: matchers::eq
 [`eq_deref_of`]: matchers::eq_deref_of
 [`err`]: matchers::err
-[`field!`]: matchers::field
 [`ge`]: matchers::ge
 [`gt`]: matchers::gt
 [`has_entry`]: matchers::has_entry
