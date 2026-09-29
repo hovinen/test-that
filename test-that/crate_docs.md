@@ -152,6 +152,7 @@ The following matchers are provided in Test That!:
 | [`is_finite`]        | A floating point number which is finite.                                 |
 | [`is_infinite`]      | A floating point number which is infinite.                               |
 | [`is_nan`]           | A floating point number which is NaN.                                    |
+| [`is_utf8_string`]   | A byte sequence which is a UTF-8 string matched by the given matcher.    |
 | [`le`]               | A [`PartialOrd`] value less than or equal to the given value.            |
 | [`len`]              | A container whose number of elements the argument matches.               |
 | [`lt`]               | A [`PartialOrd`] value strictly less than the given value.               |
@@ -197,6 +198,7 @@ The following matchers are provided in Test That!:
 [`is_finite`]: matchers::is_finite
 [`is_infinite`]: matchers::is_infinite
 [`is_nan`]: matchers::is_nan
+[`is_utf8_string`]: matchers::is_utf8_string
 [`le`]: matchers::le
 [`len`]: matchers::containers::len
 [`lt`]: matchers::lt
