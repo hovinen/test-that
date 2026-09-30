@@ -70,6 +70,8 @@ pub use ge_matcher::ge;
 pub use gt_matcher::gt;
 pub use has_entry_matcher::has_entry;
 pub use in_range_matcher::in_range;
+#[cfg(feature = "encoding_rs")]
+pub use is_encoded_string_matcher::is_encoded_string;
 pub use is_encoded_string_matcher::is_utf8_string;
 #[cfg(feature = "num-traits")]
 pub use is_finite_matcher::is_finite;

@@ -153,6 +153,7 @@ The following matchers are provided in Test That!:
 | [`is_infinite`]      | A floating point number which is infinite.                               |
 | [`is_nan`]           | A floating point number which is NaN.                                    |
 | [`is_utf8_string`]   | A byte sequence which is a UTF-8 string matched by the given matcher.    |
+| [`is_encoded_string`]| A byte sequence which is a string in the given encoding matched by the given matcher. Requires the `encoding_rs` feature. |
 | [`le`]               | A [`PartialOrd`] value less than or equal to the given value.            |
 | [`len`]              | A container whose number of elements the argument matches.               |
 | [`lt`]               | A [`PartialOrd`] value strictly less than the given value.               |
@@ -198,6 +199,7 @@ The following matchers are provided in Test That!:
 [`is_finite`]: matchers::is_finite
 [`is_infinite`]: matchers::is_infinite
 [`is_nan`]: matchers::is_nan
+[`is_encoded_string`]: matchers::is_encoded_string
 [`is_utf8_string`]: matchers::is_utf8_string
 [`le`]: matchers::le
 [`len`]: matchers::containers::len
@@ -664,7 +666,9 @@ All dependencies of Test That! are optional. The default features include:
 
 - Support for non-fatal assertions,
 - Support for matching against regular expressions,
-- Support for matching floating point numbers, and
+- Support for matching floating point numbers,
+- Support for matching byte sequences in encodings other than UTF-8 (the
+  `encoding_rs` feature, enabling [`is_encoded_string`]), and
 - Features requiring std.
 
 Test That! also runs in nostd environments. It requires an allocator.
