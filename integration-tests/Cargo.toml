@@ -37,7 +37,15 @@ authors = [
 # <name> -- --test`, which compiles them in test-harness mode via a raw rustc
 # flag without cargo switching to its own test-unit dependency resolution, so
 # [dev-dependencies] would not be available to them.
-test-that = { path = "../test-that", version = "0.6.0", features = ["anyhow"] }
+# The default features are listed explicitly, minus `encoding_rs`, which
+# requires a newer Rust version than the MSRV of these tests.
+test-that = { path = "../test-that", version = "0.6.0", default-features = false, features = [
+  "anyhow",
+  "regex",
+  "num-traits",
+  "non-fatal-assertions",
+  "std",
+] }
 anyhow = "1.0.102"
 indoc = "2.0.7"
 rstest = "0.26.1"

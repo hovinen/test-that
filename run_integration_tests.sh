@@ -51,7 +51,7 @@ INTEGRATION_TEST_BINARIES=(
   "verify-predicate-with-failure-as-method-in-submodule"
 )
 
-cargo build
+cargo build -p integration-tests
 for binary in ${INTEGRATION_TEST_BINARIES[@]}; do
   cargo rustc -p integration-tests --bin $binary -- --test
 done

@@ -125,7 +125,12 @@ jobs:
     name: test (GoogleTest compat) / ubuntu / ${{ matrix.toolchain }}
     strategy:
       matrix:
-        toolchain: [stable, 1.85]
+        include:
+          - toolchain: stable
+            args: --features googletest-compat
+          # encoding_rs (a default feature) requires a newer rustc than 1.85.
+          - toolchain: 1.85
+            args: -p test-that --no-default-features --features regex,num-traits,non-fatal-assertions,std,googletest-compat
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install ${{ matrix.toolchain }}
@@ -140,7 +145,7 @@ jobs:
         if: hashFiles('Cargo.lock') == ''
         run: cargo generate-lockfile
       - name: cargo test --locked
-        run: cargo test --locked --features googletest-compat
+        run: cargo test --locked ${{ matrix.args }}
 
   integration-test:
     runs-on: ubuntu-latest
