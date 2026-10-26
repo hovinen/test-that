@@ -283,7 +283,8 @@ fn build_explanation<T: Debug, U: Debug>(
     matcher_result: MatcherResult,
 ) -> String {
     match (missing.len(), unexpected.len(), matcher_result) {
-        // TODO(b/261175849) add more data here (out of order elements, duplicated elements, etc...)
+        // TODO(b/261175849) add more data here (out of order elements,
+        // duplicated elements, etc...)
         (0, 0, MatcherResult::NoMatch) => {
             "which contains all the elements but in the wrong order".to_string()
         }

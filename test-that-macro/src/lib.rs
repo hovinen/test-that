@@ -124,9 +124,9 @@ pub fn test(
     sig.output = ReturnType::Default;
     let (maybe_closure, invocation) = if sig.asyncness.is_some() {
         (
-            // In the async case, the ? operator returns from the *block* rather than the
-            // surrounding function. So we just put the test content in an async block. Async
-            // closures are still unstable (see https://github.com/rust-lang/rust/issues/62290),
+            // In the async case, the ? operator returns from the *block* rather
+            // than the surrounding function. So we just put the test content in
+            // an async block. Async closures are still unstable (see https://github.com/rust-lang/rust/issues/62290),
             // so we can't use the same solution as the sync case below.
             quote! {},
             quote! {
@@ -135,9 +135,9 @@ pub fn test(
         )
     } else {
         (
-            // In the sync case, the ? operator returns from the surrounding function. So we must
-            // create a separate closure from which the ? operator can return in order to capture
-            // the output.
+            // In the sync case, the ? operator returns from the surrounding
+            // function. So we must create a separate closure from which the ?
+            // operator can return in order to capture the output.
             quote! {
                 let test = move || #block;
             },

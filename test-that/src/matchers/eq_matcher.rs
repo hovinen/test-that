@@ -98,9 +98,10 @@ pub mod __internal {
                 && is_multiline_string_debug(&expected_debug)
             {
                 create_diff(
-                    // The two calls below return None if and only if the strings expected_debug
-                    // respectively actual_debug are not enclosed in ". The calls to
-                    // is_multiline_string_debug above ensure that they are. So the calls cannot
+                    // The two calls below return None if and only if the
+                    // strings expected_debug respectively actual_debug are not
+                    // enclosed in ". The calls to is_multiline_string_debug
+                    // above ensure that they are. So the calls cannot
                     // actually return None and unwrap() should not panic.
                     &to_display_output(&actual_debug).unwrap(),
                     &to_display_output(&expected_debug).unwrap(),
